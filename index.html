@@ -48,7 +48,20 @@
             
             <div id="input-container"></div>
 
-<div class="card result-card-wrapper">
+
+        <div id="page-board" class="page-content"><div id="posts-list"></div></div>
+        <div id="page-qna" class="page-content"><div id="suggestions-list"></div></div>
+    </div>
+
+    <div id="techModal" class="modal"><div class="modal-card"><span class="close-x" onclick="closeTechModal()">&times;</span><h3 style="margin-top:0">연맹 테크 설정</h3><div class="tech-grid" id="tech-inputs"></div><button onclick="closeTechModal()" class="btn-primary" style="width:100%; margin-top:20px;">적용 완료</button></div></div>
+    <div id="viewModal" class="modal">...기존 내용 유지...</div>
+    <div id="spdModal" class="modal">...기존 내용 유지...</div>
+    <div id="writeModal" class="modal">...기존 내용 유지...</div>
+
+    <div id="float-btn" class="write-btn" style="display:none;" onclick="openModal()">+</div>
+    <script src="calc.js"></script>
+    <script src="board.js"></script>
+
     <div class="result-bar slim-version">
         <div class="result-info">
             <div class="info-group">
@@ -68,19 +81,9 @@
             <div id="diff" class="remaining-text">남은 점수: 7,200,000</div>
         </div>
     </div>
-</div>
 
-        <div id="page-board" class="page-content"><div id="posts-list"></div></div>
-        <div id="page-qna" class="page-content"><div id="suggestions-list"></div></div>
-    </div>
-
-    <div id="techModal" class="modal"><div class="modal-card"><span class="close-x" onclick="closeTechModal()">&times;</span><h3 style="margin-top:0">연맹 테크 설정</h3><div class="tech-grid" id="tech-inputs"></div><button onclick="closeTechModal()" class="btn-primary" style="width:100%; margin-top:20px;">적용 완료</button></div></div>
-    <div id="viewModal" class="modal">...기존 내용 유지...</div>
-    <div id="spdModal" class="modal">...기존 내용 유지...</div>
-    <div id="writeModal" class="modal">...기존 내용 유지...</div>
-
-    <div id="float-btn" class="write-btn" style="display:none;" onclick="openModal()">+</div>
     <script src="calc.js"></script>
     <script src="board.js"></script>
+</body>
 </body>
 </html>
