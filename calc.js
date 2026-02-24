@@ -45,7 +45,6 @@ const i18n = {
     }
 };
 
-// 언어 변경 함수를 window에 붙여서 어디서든 클릭 가능하게 함
 window.changeLang = function(lang) {
     window.currentLang = lang;
     const koBtn = document.getElementById('lang-ko');
@@ -55,7 +54,6 @@ window.changeLang = function(lang) {
     initCalc(); 
 };
 
-// 이하 나머지 함수들 (formatTime, openSpdModal 등 기존 로직 유지)
 const BASE = {
     radar: 10000, truck: 100000, secret: 75000, surv: 1500, spd_min: 50, pow_pt: 10, h_gather: 9523.5, drone_part: 2500, drone_data: 3, honor_medal: 300,
     recruit: 1500, ur_shard: 10000, ssr_shard: 3500, sr_shard: 1000, skill_medal: 10, exp_unit: 1.0/660,
@@ -117,7 +115,6 @@ window.applySpd = function() {
 function initCalc() {
     const t = i18n[window.currentLang];
     
-    // 네비게이션 메뉴 번역 적용
     const navCalc = document.getElementById('nav-calc');
     const navBoard = document.getElementById('nav-board');
     const navQna = document.getElementById('nav-qna');
@@ -125,7 +122,6 @@ function initCalc() {
     if(navBoard) navBoard.innerText = t.nav.board;
     if(navQna) navQna.innerText = t.nav.qna;
 
-    // 목표 설정 버튼 번역 적용
     const btn6 = document.getElementById('target-2300000');
     const btn8 = document.getElementById('target-3600000');
     const btn9 = document.getElementById('target-7200000');
@@ -133,12 +129,10 @@ function initCalc() {
     if(btn8) btn8.innerText = t.targets.t8;
     if(btn9) btn9.innerText = t.targets.t9;
 
-    // 섹션 타이틀 번역
     const titles = document.querySelectorAll('.section-title');
     if(titles[0]) titles[0].innerText = t.goal;
     if(titles[1]) titles[1].innerText = t.tech;
     
-    // 테크 입력창 및 요일 탭 렌더링 (기존 로직)
     const grid = document.getElementById('tech-inputs');
     if(grid) {
         const techs = [
@@ -188,7 +182,11 @@ function renderInputs() {
                     <span class="item-score-tag" id="pts-${i.id}">0</span>
                 </div>
                 <input type="number" id="${window.currentDay}-${i.id}" class="compact-input" value="0" oninput="updateAll()">
-                ${i.isSpd ? `<button class="spd-btn-mini" onclick="openSpdModal('${i.id}','${i.l}')">${t.modal.btn_open}</button><div class="time-display" id="time-${i.id}">0${t.units.day} 0${t.units.hour} 0${t.units.min}</div>` : ''}
+                ${i.isSpd ? `
+                    <button class="spd-btn-mini" onclick="openSpdModal('${i.id}','${i.l}')">${t.modal.btn_open}</button>
+                    <div style="text-align:center;">
+                        <div class="time-display" id="time-${i.id}">0${t.units.day} 0${t.units.hour} 0${t.units.min}</div>
+                    </div>` : ''}
             </div>`;
     });
     
@@ -329,5 +327,4 @@ window.setTarget = function(s) {
     updateAll(); 
 };
 
-// 초기화
-window.onload = () => { initCalc(); };
+window.onload = () => { if(typeof initCalc === 'function') initCalc(); loadLiveView('posts'); loadLiveView('suggestions'); };
