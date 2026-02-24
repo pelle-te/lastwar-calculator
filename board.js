@@ -9,14 +9,25 @@ const myId = localStorage.getItem('vs_auth_id');
 let isAdmin = false;
 
 // 페이지 전환
+// board.js 파일의 showPage 함수 수정
 function showPage(pId) {
     document.querySelectorAll('.page-content').forEach(p => p.classList.remove('active'));
     document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+    
     document.getElementById('page-' + pId).classList.add('active');
     document.getElementById('nav-' + pId).classList.add('active');
+    
+    // 글쓰기 버튼 표시 제어
     document.getElementById('float-btn').style.display = pId === 'calc' ? 'none' : 'flex';
-}
 
+    // [추가] 하단 결과 바(배너) 표시 제어
+    const resultBar = document.querySelector('.result-bar');
+    if (resultBar) {
+        resultBar.style.display = pId === 'calc' ? 'block' : 'none';
+    }
+
+    window.scrollTo(0,0);
+}
 function openModal() { document.getElementById('writeModal').style.display = 'block'; }
 function closeModal() { document.getElementById('writeModal').style.display = 'none'; }
 function enableAdmin() { if(prompt("비밀번호") === "1234") { isAdmin = true; alert("관리자 모드 활성"); loadLiveView('posts'); } }
