@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>라스트 워 VS 마스터 v8.0</title>
+    <title>라스트 워 VS 마스터 v8.3 (LIVE)</title>
     <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-firestore-compat.js"></script>
     <style>
@@ -11,72 +11,80 @@
         :root {
             --primary: #4f46e5; --mon: #3b82f6; --tue: #f59e0b; --wed: #8b5cf6;
             --thu: #ef4444; --fri: #10b981; --sat: #b91c1c; --bg: #f8fafc;
-            --card-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.05);
+            --insta-border: #dbdbdb;
         }
-        body { font-family: 'Pretendard', sans-serif; background-color: var(--bg); margin: 0; padding: 0; color: #1e293b; -webkit-tap-highlight-color: transparent; }
+        body { font-family: 'Pretendard', sans-serif; background-color: var(--bg); margin: 0; padding: 0; color: #262626; overflow-x: hidden; }
         
-        /* 모던 내비게이션 바 */
-        .nav-bar { background: #1e293b; display: flex; position: sticky; top: 0; z-index: 2000; padding: 10px; gap: 8px; }
-        .nav-item { flex: 1; padding: 12px 0; text-align: center; color: #94a3b8; font-weight: 700; cursor: pointer; border-radius: 12px; font-size: 0.9rem; transition: 0.3s; }
-        .nav-item.active { color: white; background: rgba(255, 255, 255, 0.1); box-shadow: inset 0 0 0 1px rgba(255,255,255,0.2); }
+        /* 상단 라이브 카운터 바 */
+        .header-bar { background: white; border-bottom: 1px solid var(--insta-border); display: flex; align-items: center; justify-content: space-between; padding: 10px 20px; position: sticky; top: 0; z-index: 2000; }
+        .logo { font-size: 1.1rem; font-weight: 900; background: linear-gradient(45deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .live-counter { font-size: 0.75rem; font-weight: 700; color: #ed4956; display: flex; align-items: center; gap: 5px; }
+        .live-dot { width: 7px; height: 7px; background: #ed4956; border-radius: 50%; animation: blink 1.2s infinite; }
+        @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
+
+        /* 네비게이션 */
+        .nav-bar { background: white; display: flex; border-bottom: 1px solid var(--insta-border); }
+        .nav-item { flex: 1; padding: 15px 0; text-align: center; color: #8e8e8e; font-weight: 700; cursor: pointer; font-size: 0.9rem; }
+        .nav-item.active { color: #262626; border-bottom: 2px solid #262626; }
 
         .container { max-width: 600px; margin: 0 auto; padding-bottom: 180px; }
-        .page-content { display: none; padding: 20px; animation: slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1); }
+        .page-content { display: none; padding: 15px; animation: fadeIn 0.3s ease; }
         .page-content.active { display: block; }
-        @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* 세련된 카드 디자인 */
-        .card { background: white; border-radius: 24px; padding: 24px; box-shadow: var(--card-shadow); margin-bottom: 20px; border: 1px solid rgba(226, 232, 240, 0.8); }
-        .section-title { font-size: 1.1rem; font-weight: 800; margin-bottom: 20px; color: #0f172a; display: flex; align-items: center; gap: 10px; }
-        .section-title::before { content: ''; width: 4px; height: 18px; background: var(--primary); border-radius: 10px; }
-
-        /* 목표 설정 버튼 개편 */
-        .target-selector { display: flex; gap: 8px; }
-        .target-btn { flex: 1; padding: 16px 8px; border-radius: 16px; border: 2px solid #f1f5f9; background: #f8fafc; color: #64748b; font-weight: 800; cursor: pointer; transition: 0.2s; font-size: 0.85rem; }
-        .target-btn.active { border-color: var(--primary); background: #eef2ff; color: var(--primary); transform: translateY(-2px); box-shadow: 0 4px 12px rgba(79, 70, 229, 0.15); }
-
-        /* 요일별 테마 버튼 */
-        .day-tabs { display: flex; gap: 6px; margin: 25px 0; overflow-x: auto; padding-bottom: 5px; -ms-overflow-style: none; scrollbar-width: none; }
-        .day-tabs::-webkit-scrollbar { display: none; }
-        .day-btn { flex: 0 0 60px; padding: 14px 0; border-radius: 14px; border: none; color: white; font-weight: 800; opacity: 0.25; font-size: 0.9rem; cursor: pointer; transition: 0.3s; }
-        .day-btn.active { opacity: 1; transform: scale(1.1); box-shadow: 0 5px 15px -3px rgba(0,0,0,0.2); }
-
-        /* 고급 입력 필드 스타일 */
-        .input-card { background: #f8fafc; padding: 16px; border-radius: 20px; border: 1px solid #e2e8f0; margin-bottom: 12px; transition: 0.2s; }
-        .input-card:focus-within { border-color: var(--primary); background: white; box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.05); }
-        .input-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
-        .input-label { font-size: 0.95rem; font-weight: 700; color: #334155; }
-        .input-header input { width: 100px; text-align: right; border: none; background: white; border-radius: 10px; padding: 8px 12px; font-weight: 800; font-size: 1.1rem; color: var(--primary); box-shadow: inset 0 2px 4px rgba(0,0,0,0.05); }
+        /* 계산기 공통 카드 */
+        .card { background: white; border-radius: 20px; padding: 20px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); border: 1px solid #e2e8f0; margin-bottom: 15px; }
+        .section-title { font-size: 1rem; font-weight: 800; margin-bottom: 15px; color: var(--primary); display: flex; align-items: center; gap: 8px; }
         
-        input[type="range"] { width: 100%; height: 10px; border-radius: 10px; background: #e2e8f0; -webkit-appearance: none; outline: none; margin-top: 10px; }
-        input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width: 24px; height: 24px; background: white; border-radius: 50%; border: 3px solid var(--primary); box-shadow: 0 2px 8px rgba(0,0,0,0.15); cursor: pointer; transition: 0.2s; }
-        input[type="range"]::-webkit-slider-thumb:active { transform: scale(1.2); }
+        /* 인스타그램 스타일 피드 카드 */
+        .insta-card { background: white; border: 1px solid var(--insta-border); border-radius: 12px; margin-bottom: 15px; overflow: hidden; }
+        .insta-header { padding: 12px; display: flex; align-items: center; gap: 10px; }
+        .avatar { width: 32px; height: 32px; background: linear-gradient(45deg, #f09433, #bc1888); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-size: 0.7rem; font-weight: 800; }
+        .insta-img { width: 100%; display: block; background: #fafafa; }
+        .insta-body { padding: 12px; }
+        .insta-content { font-size: 0.9rem; line-height: 1.5; white-space: pre-wrap; margin: 8px 0; }
+        .insta-time { font-size: 0.7rem; color: #8e8e8e; }
+        .del-link { margin-left: auto; font-size: 0.7rem; color: #ed4956; font-weight: 700; cursor: pointer; }
 
-        /* 테크 그리드 */
+        /* 입력 UI */
         .tech-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-        .tech-box { background: #f1f5f9; padding: 12px; border-radius: 16px; border: 1px solid #e2e8f0; }
-        .tech-box label { font-size: 0.75rem; color: #64748b; font-weight: 700; display: block; margin-bottom: 6px; }
-        .tech-box select { width: 100%; border: none; background: transparent; font-weight: 800; color: var(--primary); outline: none; font-size: 0.9rem; cursor: pointer; }
+        .tech-item { background: #f8fafc; padding: 12px; border-radius: 12px; border: 1px solid #e2e8f0; }
+        .tech-item label { font-size: 0.7rem; color: #64748b; font-weight: 700; display: block; margin-bottom: 4px; }
+        .tech-item select { width: 100%; border: none; background: transparent; font-weight: 800; color: var(--primary); outline: none; font-size: 0.85rem; }
+        .day-tabs { display: grid; grid-template-columns: repeat(6, 1fr); gap: 4px; margin: 15px 0; }
+        .day-btn { padding: 12px 0; border-radius: 10px; border: none; color: white; font-weight: 800; opacity: 0.3; font-size: 0.85rem; cursor: pointer; }
+        .day-btn.active { opacity: 1; transform: scale(1.05); }
 
-        /* 결과 창 (플로팅 스타일) */
-        .result-bar { position: fixed; bottom: 20px; left: 20px; right: 20px; background: #1e293b; color: white; padding: 24px; border-radius: 28px; text-align: center; z-index: 3000; box-shadow: 0 20px 40px -10px rgba(0,0,0,0.4); max-width: 560px; margin: 0 auto; }
-        .total-score { font-size: 2.2rem; font-weight: 900; color: #fbbf24; letter-spacing: -1px; }
-        .progress-container { height: 12px; background: rgba(255,255,255,0.1); border-radius: 10px; margin: 15px 0; overflow: hidden; }
-        .progress-fill { height: 100%; background: linear-gradient(90deg, #6366f1, #10b981); width: 0%; transition: width 0.6s cubic-bezier(0.34, 1.56, 0.64, 1); }
-        .diff-text { font-size: 0.95rem; color: #94a3b8; font-weight: 600; }
+        .input-group { background: #f8fafc; padding: 15px; border-radius: 15px; border: 1px solid #e2e8f0; margin-bottom: 12px; }
+        .input-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+        .input-row label { font-size: 0.9rem; font-weight: 700; color: #334155; }
+        .input-row input { width: 85px; text-align: right; border: 2px solid #cbd5e1; border-radius: 8px; padding: 6px; font-weight: 800; color: var(--primary); outline: none; }
+        input[type="range"] { width: 100%; height: 8px; border-radius: 10px; background: #e2e8f0; -webkit-appearance: none; outline: none; }
+        input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width: 22px; height: 22px; background: var(--primary); border-radius: 50%; border: 3px solid white; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
 
-        /* 게시판 UI */
-        .post-item { background: white; padding: 18px; border-radius: 20px; border: 1px solid #e2e8f0; margin-bottom: 14px; position: relative; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.02); }
-        .post-time { font-size: 0.8rem; color: #94a3b8; margin-bottom: 8px; font-weight: 500; }
-        .del-btn { position: absolute; top: 15px; right: 15px; background: #fee2e2; color: #ef4444; border: none; border-radius: 10px; padding: 6px 12px; font-size: 0.75rem; font-weight: 800; cursor: pointer; }
-        .admin-btn { background: #f1f5f9; color: #94a3b8; border: none; padding: 12px; border-radius: 12px; font-size: 0.8rem; cursor: pointer; margin-top: 40px; width: 100%; font-weight: 700; }
+        /* 결과 바 */
+        .result-bar { position: fixed; bottom: 0; left: 0; right: 0; background: #1e293b; color: white; padding: 20px; border-radius: 25px 25px 0 0; text-align: center; z-index: 3000; box-shadow: 0 -5px 20px rgba(0,0,0,0.3); }
+        .total-score { font-size: 1.8rem; font-weight: 900; color: #fbbf24; }
+        .progress-container { height: 10px; background: #334155; border-radius: 10px; margin: 10px 0; overflow: hidden; }
+        .progress-fill { height: 100%; background: linear-gradient(90deg, var(--primary), #10b981); width: 0%; transition: 0.5s; }
+
+        /* 글쓰기 버튼 */
+        .write-btn { position: fixed; bottom: 140px; right: 20px; width: 56px; height: 56px; background: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; box-shadow: 0 4px 15px rgba(0,0,0,0.2); z-index: 1000; cursor: pointer; border: 1px solid #ddd; }
+        .modal { display: none; position: fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); z-index:4000; }
+        .modal-card { background:white; width:90%; max-width:400px; margin: 50px auto; border-radius:20px; padding:20px; }
+        .admin-link { text-align: center; font-size: 0.7rem; color: #94a3b8; margin: 20px 0; opacity: 0.3; cursor: pointer; }
     </style>
 </head>
 <body>
 
+<div class="header-bar">
+    <div class="logo">ALLIANCE MASTER</div>
+    <div class="live-counter"><div class="live-dot"></div><span id="user-count">연결 중...</span></div>
+</div>
+
 <nav class="nav-bar">
     <div id="nav-calc" class="nav-item active" onclick="showPage('calc')">📊 계산기</div>
-    <div id="nav-board" class="nav-item" onclick="showPage('board')">📖 공략</div>
+    <div id="nav-board" class="nav-item" onclick="showPage('board')">📱 피드</div>
     <div id="nav-qna" class="nav-item" onclick="showPage('qna')">💬 건의</div>
 </nav>
 
@@ -84,18 +92,16 @@
     <div id="page-calc" class="page-content active">
         <div class="card">
             <div class="section-title">🎯 DAILY GOAL</div>
-            <div class="target-selector">
-                <button class="target-btn" id="target-2300000" onclick="setTarget(2300000)">🥉 6상자</button>
-                <button class="target-btn" id="target-3600000" onclick="setTarget(3600000)">🥈 8상자</button>
-                <button class="target-btn active" id="target-7200000" onclick="setTarget(7200000)">🥇 9상자</button>
+            <div style="display:flex; gap:6px;">
+                <button class="day-btn" id="target-2300000" onclick="setTarget(2300000)" style="flex:1; opacity:1; background:#f1f5f9; color:#64748b; border:2px solid #ddd;">6상</button>
+                <button class="day-btn" id="target-3600000" onclick="setTarget(3600000)" style="flex:1; opacity:1; background:#f1f5f9; color:#64748b; border:2px solid #ddd;">8상</button>
+                <button class="day-btn active" id="target-7200000" onclick="setTarget(7200000)" style="flex:1; opacity:1; background:#eef2ff; color:var(--primary); border:2px solid var(--primary);">9상</button>
             </div>
         </div>
-
         <div class="card">
             <div class="section-title">🔬 ALLIANCE TECH</div>
             <div class="tech-grid" id="tech-inputs"></div>
         </div>
-
         <div class="day-tabs">
             <button id="btn-mon" class="day-btn active" style="background:var(--mon)" onclick="switchTab('mon')">월</button>
             <button id="btn-tue" class="day-btn" style="background:var(--tue)" onclick="switchTab('tue')">화</button>
@@ -104,53 +110,97 @@
             <button id="btn-fri" class="day-btn" style="background:var(--fri)" onclick="switchTab('fri')">금</button>
             <button id="btn-sat" class="day-btn" style="background:var(--sat)" onclick="switchTab('sat')">토</button>
         </div>
-
         <div id="input-container"></div>
     </div>
 
     <div id="page-board" class="page-content">
-        <div class="card">
-            <div class="section-title">✍️ 공략 게시글 작성</div>
-            <textarea id="board-text" style="width:100%; height:120px; border:2px solid #f1f5f9; background:#f8fafc; border-radius:16px; padding:16px; margin-bottom:12px; resize:none; font-family:inherit; font-size:1rem; outline:none; box-sizing:border-box;" placeholder="연맹원들과 나눌 꿀팁을 적어주세요..."></textarea>
-            <button onclick="sendLivePost('posts')" style="width:100%; background:var(--primary); color:white; border:none; padding:18px; border-radius:16px; font-weight:800; cursor:pointer; font-size:1rem; box-shadow: 0 10px 15px -3px rgba(79, 70, 229, 0.3);">게시하기</button>
-        </div>
         <div id="posts-list"></div>
-        <button class="admin-btn" onclick="enableAdmin()">⚙️ 관리자 모드 접속</button>
+        <div class="admin-link" onclick="enableAdmin()">관리자 삭제 모드</div>
     </div>
 
     <div id="page-qna" class="page-content">
-        <div class="card">
-            <div class="section-title">📧 불편사항 및 기능 제안</div>
-            <textarea id="qna-text" style="width:100%; height:120px; border:2px solid #f1f5f9; background:#f8fafc; border-radius:16px; padding:16px; margin-bottom:12px; resize:none; font-family:inherit; font-size:1rem; outline:none; box-sizing:border-box;" placeholder="이런 기능이 있으면 좋겠어요!"></textarea>
-            <button onclick="sendLivePost('suggestions')" style="width:100%; background:#334155; color:white; border:none; padding:18px; border-radius:16px; font-weight:800; cursor:pointer; font-size:1rem; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1);">건의 제출하기</button>
-        </div>
         <div id="suggestions-list"></div>
-        <button class="admin-btn" onclick="enableAdmin()">⚙️ 관리자 모드 접속</button>
     </div>
 </div>
 
 <div class="result-bar">
     <div class="total-score" id="score">0.0</div>
     <div class="progress-container"><div class="progress-fill" id="bar"></div></div>
-    <div id="diff" class="diff-text">남은 점수: 7,200,000</div>
+    <div id="diff" style="font-size:0.85rem; color:#cbd5e1; font-weight:600;">남은 점수: 7,200,000</div>
+</div>
+
+<div id="float-btn" class="write-btn" style="display:none;" onclick="openModal()">+</div>
+<div id="writeModal" class="modal">
+    <div class="modal-card">
+        <h3 style="margin-top:0">새 게시물 작성</h3>
+        <textarea id="post-text" style="width:100%; height:120px; border:1px solid #dbdbdb; border-radius:12px; padding:12px; box-sizing:border-box; resize:none;" placeholder="내용을 입력하세요..."></textarea>
+        <div style="margin:15px 0"><input type="file" id="post-file" accept="image/*"></div>
+        <div style="display:flex; gap:10px">
+            <button onclick="closeModal()" style="flex:1; padding:12px; border:none; border-radius:10px;">취소</button>
+            <button onclick="sendLivePost()" style="flex:2; background:var(--primary); color:white; border:none; border-radius:10px; font-weight:800;">공유하기</button>
+        </div>
+    </div>
 </div>
 
 <script>
-    // --- 1. Firebase 연동 ---
+    // --- 1. Firebase & Presence ---
     const firebaseConfig = { apiKey: "AIzaSyAbGdlE4KnelSrrKGLVaLcM5433ZZILVYE", authDomain: "lastwar-530f9.firebaseapp.com", projectId: "lastwar-530f9", storageBucket: "lastwar-530f9.firebasestorage.app", messagingSenderId: "135982056229", appId: "1:135982056229:web:92264d4601e5315cdd50cc" };
     firebase.initializeApp(firebaseConfig);
     const db = firebase.firestore();
 
-    if(!localStorage.getItem('vs_uid')) localStorage.setItem('vs_uid', 'u' + Math.random().toString(36).substr(2, 9));
-    const myId = localStorage.getItem('vs_uid');
+    if(!localStorage.getItem('vs_auth_id')) localStorage.setItem('vs_auth_id', 'u' + Math.random().toString(36).substr(2, 7));
+    const myId = localStorage.getItem('vs_auth_id');
     let isAdmin = false, currentDay = 'mon', targetScore = 7200000;
 
+    function updatePresence() { db.collection('presence').doc(myId).set({ lastSeen: firebase.firestore.FieldValue.serverTimestamp() }); }
+    setInterval(updatePresence, 30000); updatePresence();
+    db.collection('presence').onSnapshot(snap => {
+        const now = Date.now(); let count = 0;
+        snap.forEach(doc => { if(doc.data().lastSeen && (now - doc.data().lastSeen.toMillis() < 300000)) count++; });
+        document.getElementById('user-count').innerText = count + "명 접속 중";
+    });
+
+    // --- 2. 페이지 및 게시판 로직 ---
+    function showPage(pId) {
+        document.querySelectorAll('.page-content').forEach(p => p.classList.remove('active'));
+        document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+        document.getElementById('page-' + pId).classList.add('active');
+        document.getElementById('nav-' + pId).classList.add('active');
+        document.getElementById('float-btn').style.display = pId === 'calc' ? 'none' : 'flex';
+        window.scrollTo(0,0);
+    }
+    function openModal() { document.getElementById('writeModal').style.display = 'block'; }
+    function closeModal() { document.getElementById('writeModal').style.display = 'none'; }
+    function enableAdmin() { if(prompt("비밀번호") === "1234") { isAdmin = true; alert("관리자 모드 활성"); loadLiveView('posts'); } }
+
+    async function sendLivePost() {
+        const col = document.getElementById('page-board').classList.contains('active') ? 'posts' : 'suggestions';
+        const txt = document.getElementById('post-text').value;
+        const file = document.getElementById('post-file').files[0];
+        if(!txt.trim()) return;
+        let imgUrl = "";
+        if(file) imgUrl = await new Promise(res => { const r = new FileReader(); r.onload = e => res(e.target.result); r.readAsDataURL(file); });
+        db.collection(col).add({ authorId: myId, content: txt, image: imgUrl, timestamp: firebase.firestore.FieldValue.serverTimestamp() }).then(() => { closeModal(); });
+    }
+
+    function loadLiveView(col) {
+        db.collection(col).orderBy("timestamp", "desc").onSnapshot(snap => {
+            const list = document.getElementById(col + '-list'); list.innerHTML = "";
+            snap.forEach(doc => {
+                const d = doc.data(); const canDel = isAdmin || (d.authorId === myId);
+                const time = d.timestamp ? new Date(d.timestamp.seconds*1000).toLocaleString('ko-KR', {month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'}) : "방금 전";
+                list.innerHTML += `<div class="insta-card"><div class="insta-header"><div class="avatar">${d.authorId?d.authorId.substr(1,2).toUpperCase():'W'}</div><div style="font-size:0.85rem; font-weight:700">연맹원_${d.authorId?d.authorId.substr(1,4):'익명'}</div>${canDel?`<div class="del-link" onclick="deletePost('${col}','${doc.id}')">삭제</div>`:""}</div>${d.image?`<img src="${d.image}" class="insta-img">`:""}<div class="insta-body"><div style="display:flex; gap:12px; margin-bottom:8px; font-size:1.2rem"><span>🤍</span><span>💬</span><span>✈️</span></div><div class="insta-content"><b>연맹원_${d.authorId?d.authorId.substr(1,4):'익명'}</b> ${d.content}</div><div class="insta-time">${time}</div></div></div>`;
+            });
+        });
+    }
+    function deletePost(col, id) { if(confirm("삭제?")) db.collection(col).doc(id).delete(); }
+
+    // --- 3. 계산기 로직 (토요일 처치 및 전사 로직 완벽 보정) ---
     const BASE = {
-        radar: 10000, truck: 100000, secret: 75000, surv: 1500, spd_min: 50, pow_pt: 10,
-        h_gather: 9523.5, drone_part: 2500, drone_data: 3, honor_medal: 300,
+        radar: 10000, truck: 100000, secret: 75000, surv: 1500, spd_min: 50, pow_pt: 10, h_gather: 9523.5, drone_part: 2500, drone_data: 3, honor_medal: 300,
         recruit: 1500, ur_shard: 10000, ssr_shard: 3500, sr_shard: 1000, skill_medal: 10, exp_unit: 1.0/660,
         boxes: [0, 1100, 3300, 10000, 30000, 90000, 270000, 810000],
-        trp: [0, 20, 30, 40, 50, 60, 70, 80, 90, 100, 110],
+        trp: [0, 20, 30, 40, 50, 60, 70, 80, 90, 100, 110], 
         kil_spec: [0, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55],
         kil_gen: [0, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11],
         dth: [0, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]
@@ -158,50 +208,13 @@
 
     function init() {
         const grid = document.getElementById('tech-inputs');
-        const techs = [{id:'t-expert',l:'🏆 대결 전문가 (Lv.20)',v:20},{id:'t-radar',l:'📡 추당-레이더 (Lv.6)',v:6},{id:'t-spd',l:'⏱️ 추당-가속 (Lv.6)',v:6},{id:'t-rec',l:'🎫 추당-모집 (Lv.6)',v:6},{id:'t-con',l:'🏰 추당-건설 (Lv.1)',v:1},{id:'t-tec',l:'🔬 추당-테크 (Lv.1)',v:1},{id:'t-trn',l:'⚔️ 추당-훈련 (Lv.6)',v:6},{id:'t-kil',l:'🔥 추당-적처치 (Lv.6)',v:6}];
-        grid.innerHTML = techs.map(t => `<div class="tech-box"><label>${t.l}</label><select id="${t.id}" onchange="updateAll()">${Array.from({length:21},(_,i)=>`<option value="${i}" ${i===t.v?'selected':''}>Lv ${i} (+${i*5}%)</option>`).join('')}</select></div>`).join('');
+        const techs = [{id:'t-expert',l:'🏆 대결 전문가',v:20},{id:'t-radar',l:'📡 추당-레이더',v:6},{id:'t-spd',l:'⏱️ 추당-가속',v:6},{id:'t-rec',l:'🎫 추당-모집',v:6},{id:'t-con',l:'🏰 추당-건설',v:1},{id:'t-tec',l:'🔬 추당-테크',v:1},{id:'t-trn',l:'⚔️ 추당-훈련',v:6},{id:'t-kil',l:'🔥 추당-적처치',v:6}];
+        grid.innerHTML = techs.map(t => `<div class="tech-item"><label>${t.l}</label><select id="${t.id}" onchange="updateAll()">${Array.from({length:21},(_,i)=>`<option value="${i}" ${i===t.v?'selected':''}>Lv ${i} (+${i*5}%)</option>`).join('')}</select></div>`).join('');
         switchTab('mon'); loadLiveView('posts'); loadLiveView('suggestions');
     }
 
-    function showPage(pId) {
-        document.querySelectorAll('.page-content').forEach(p => p.classList.remove('active'));
-        document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-        document.getElementById('page-' + pId).classList.add('active');
-        document.getElementById('nav-' + pId).classList.add('active');
-        window.scrollTo(0,0);
-    }
-
-    function setTarget(s) {
-        targetScore = s;
-        document.querySelectorAll('.target-btn').forEach(b => b.classList.remove('active'));
-        document.getElementById('target-' + s).classList.add('active');
-        updateAll();
-    }
-
-    function enableAdmin() { if(prompt("관리자 비밀번호를 입력하세요.") === "1234") { isAdmin = true; alert("관리자 권한이 승인되었습니다."); loadLiveView('posts'); loadLiveView('suggestions'); } }
-
-    function loadLiveView(col) {
-        db.collection(col).orderBy("timestamp", "desc").onSnapshot(snap => {
-            const list = document.getElementById(col + '-list'); list.innerHTML = "";
-            snap.forEach(doc => {
-                const d = doc.data(); const canDel = isAdmin || (d.authorId === myId);
-                const time = d.timestamp ? new Date(d.timestamp.seconds*1000).toLocaleString('ko-KR', {month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'}) : "전송 중...";
-                list.innerHTML += `<div class="post-item"><div class="post-time">${time}</div><div style="white-space:pre-wrap; line-height:1.6; color:#334155;">${d.content}</div>${canDel ? `<button class="del-btn" onclick="deletePost('${col}','${doc.id}')">삭제</button>` : ""}</div>`;
-            });
-        });
-    }
-
-    function deletePost(col, id) { if(confirm("정말 삭제하시겠습니까?")) db.collection(col).doc(id).delete(); }
-    async function sendLivePost(col) {
-        const txt = document.getElementById(col === 'posts' ? 'board-text' : 'qna-text');
-        if(!txt.value.trim()) return;
-        db.collection(col).add({ authorId: myId, content: txt.value, timestamp: firebase.firestore.FieldValue.serverTimestamp() }).then(() => txt.value = "");
-    }
-
-    function switchTab(day) {
-        currentDay = day; document.querySelectorAll('.day-btn').forEach(b => b.classList.remove('active'));
-        document.getElementById('btn-'+day).classList.add('active'); renderInputs(); updateAll();
-    }
+    function setTarget(s) { targetScore = s; document.querySelectorAll('.day-btn').forEach(b => { b.classList.remove('active'); b.style.borderColor="#ddd"; b.style.color="#64748b"; b.style.background="#f1f5f9"; }); event.target.classList.add('active'); event.target.style.borderColor="var(--primary)"; event.target.style.color="var(--primary)"; event.target.style.background="#eef2ff"; updateAll(); }
+    function switchTab(day) { currentDay = day; document.querySelectorAll('.day-btn').forEach(b => b.classList.remove('active')); document.getElementById('btn-'+day).classList.add('active'); renderInputs(); updateAll(); }
 
     function renderInputs() {
         const container = document.getElementById('input-container');
@@ -213,32 +226,28 @@
             fri:[{id:'dia',l:'💎 다이아 구매',m:100000},{id:'radar',l:'📡 레이더 임무',m:500},{id:'spd-con',l:'⏱️ 건설 가속 (h)',m:2000},{id:'spd-tec',l:'⏱️ 테크 가속 (h)',m:2000},{id:'spd-trn',l:'⏱️ 훈련 가속 (h)',m:2000},{id:'pow-con',l:'🏰 건물 전투력 (1k)',m:10000},{id:'pow-tec',l:'🔬 테크 전투력 (1k)',m:10000}], 
             sat:[{id:'dia',l:'💎 다이아 구매',m:100000},{id:'truck',l:'🚚 UR 화물차',m:100},{id:'sec',l:'🕵️ UR 은밀 임무',m:200},{id:'spd-all',l:'⏱️ 모든 가속 (h)',m:5000}] 
         };
-        
-        let html = `<div class="section-title">📊 ${currentDay.toUpperCase()} 점수 계산기</div>`;
-        html += (config[currentDay] || []).map(i => `<div class="input-card"><div class="input-header"><div class="input-label">${i.l}</div><input type="number" id="${currentDay}-${i.id}" value="0" min="0" oninput="syncRange('${i.id}', this.value)"></div><input type="range" id="range-${i.id}" min="0" max="${i.m}" value="0" step="1" oninput="syncInput('${i.id}', this.value)"></div>`).join('');
-        
+        let html = `<div class="section-title">📊 ${currentDay.toUpperCase()} INPUT</div>`;
+        html += (config[currentDay] || []).map(i => `<div class="input-group"><div class="input-row"><label>${i.l}</label><input type="number" id="${currentDay}-${i.id}" value="0" min="0" oninput="syncRange('${i.id}', this.value)"></div><input type="range" id="range-${i.id}" min="0" max="${i.m}" value="0" step="1" oninput="syncInput('${i.id}', this.value)"></div>`).join('');
         if(currentDay === 'wed') {
-            html += `<div class="section-title">📦 테크 상자</div><div style="display:grid; grid-template-columns:repeat(2, 1fr); gap:10px; margin-bottom:15px;">`;
-            for(let i=1; i<=7; i++) html += `<div class="tech-box"><label>Lv.${i} 상자</label><input type="number" id="wed-b${i}" value="0" min="0" oninput="updateAll()" style="width:100%; border:none; background:white; padding:8px; border-radius:8px; font-weight:800; color:var(--primary); text-align:right; box-sizing:border-box;"></div>`;
+            html += `<div class="section-title">📦 테크 상자</div><div style="display:grid; grid-template-columns:1fr 1fr; gap:8px;">`;
+            for(let i=1; i<=7; i++) html += `<div class="tech-item"><label>Lv.${i}</label><input type="number" id="wed-b${i}" value="0" oninput="updateAll()" style="width:100%; border:none; background:white; font-weight:800; color:var(--primary); text-align:right"></div>`;
             html += `</div>`;
         }
         if(currentDay === 'fri') {
-            html += `<div class="section-title">⚔️ 유닛 훈련</div>`;
-            html += `<div class="input-card"><div class="input-header"><div class="input-label">🎯 훈련 레벨</div><select id="fri-lvl" onchange="updateAll()" style="border:none; background:white; font-weight:800; font-size:1.1rem; color:var(--primary); padding:8px; border-radius:10px; outline:none;">${Array.from({length:10},(_,i)=>`<option value="${i+1}" ${i===7?'selected':''}>Lv ${i+1}</option>`).join('')}</select></div></div>`;
-            html += renderQuickInput('fri', 'count', '⚔️ 훈련 수 (명)', 50000);
+            html += `<div class="input-group"><div class="input-row"><label>🎯 훈련 레벨</label><select id="fri-lvl" onchange="updateAll()" style="border:none; background:white; font-weight:800; color:var(--primary)">${Array.from({length:10},(_,i)=>`<option value="${i+1}" ${i===7?'selected':''}>Lv ${i+1}</option>`).join('')}</select></div></div>`;
+            html += renderQuickInput('fri', 'count', '⚔️ 훈련 수', 50000);
         }
         if(currentDay === 'sat') {
-            html += `<div class="section-title">🔥 처치 및 전사</div>`;
-            html += `<div class="input-card"><div class="input-header"><div class="input-label">⚔️ 처치 대상</div><select id="sat-target" onchange="updateAll()" style="border:none; background:white; font-weight:800; font-size:0.9rem; color:var(--primary); padding:8px; border-radius:10px; outline:none;"><option value="special">특정 매칭 연맹</option><option value="general">일반 적군</option></select></div></div>`;
-            html += `<div class="input-card"><div class="input-header"><div class="input-label">🎯 처치 레벨</div><select id="sat-elvl" onchange="updateAll()" style="border:none; background:white; font-weight:800; font-size:1.1rem; color:var(--primary); padding:8px; border-radius:10px; outline:none;">${Array.from({length:10},(_,i)=>`<option value="${i+1}" ${i===7?'selected':''}>Lv ${i+1}</option>`).join('')}</select></div></div>`;
-            html += renderQuickInput('sat', 'kill', '🔥 처치 수 (명)', 200000);
-            html += `<div class="input-card"><div class="input-header"><div class="input-label">💀 전사 레벨</div><select id="sat-alvl" onchange="updateAll()" style="border:none; background:white; font-weight:800; font-size:1.1rem; color:var(--primary); padding:8px; border-radius:10px; outline:none;">${Array.from({length:10},(_,i)=>`<option value="${i+1}" ${i===7?'selected':''}>Lv ${i+1}</option>`).join('')}</select></div></div>`;
-            html += renderQuickInput('sat', 'dth', '🩸 전사 수 (명)', 200000);
+            html += `<div class="input-group"><div class="input-row"><label>⚔️ 처치 대상</label><select id="sat-target" onchange="updateAll()" style="border:none; background:white; font-weight:800; color:var(--primary)"><option value="special">특정 매칭 연맹</option><option value="general">일반 적군</option></select></div></div>`;
+            html += `<div class="input-group"><div class="input-row"><label>🎯 처치 레벨</label><select id="sat-elvl" onchange="updateAll()" style="border:none; background:white; font-weight:800; color:var(--primary)">${Array.from({length:10},(_,i)=>`<option value="${i+1}" ${i===7?'selected':''}>Lv ${i+1}</option>`).join('')}</select></div></div>`;
+            html += renderQuickInput('sat', 'kill', '🔥 처치 수', 200000);
+            html += `<div class="input-group"><div class="input-row"><label>💀 전사 레벨</label><select id="sat-alvl" onchange="updateAll()" style="border:none; background:white; font-weight:800; color:var(--primary)">${Array.from({length:10},(_,i)=>`<option value="${i+1}" ${i===7?'selected':''}>Lv ${i+1}</option>`).join('')}</select></div></div>`;
+            html += renderQuickInput('sat', 'dth', '🩸 전사 수', 200000);
         }
         container.innerHTML = html;
     }
 
-    function renderQuickInput(d, id, l, m) { return `<div class="input-card"><div class="input-header"><div class="input-label">${l}</div><input type="number" id="${d}-${id}" value="0" min="0" oninput="syncRange('${id}', this.value)"></div><input type="range" id="range-${id}" min="0" max="${m}" value="0" oninput="syncInput('${id}', this.value)"></div>`; }
+    function renderQuickInput(d, id, l, m) { return `<div class="input-group"><div class="input-row"><label>${l}</label><input type="number" id="${d}-${id}" value="0" min="0" oninput="syncRange('${id}', this.value)"></div><input type="range" id="range-${id}" min="0" max="${m}" value="0" oninput="syncInput('${id}', this.value)"></div>`; }
     function syncInput(id, v) { document.getElementById(`${currentDay}-${id}`).value = v; updateAll(); }
     function syncRange(id, v) { if(v<0) v=0; let r=document.getElementById('range-'+id); if(r) r.value=v; updateAll(); }
     function val(id) { let el = document.getElementById(id); return el ? parseFloat(el.value) || 0 : 0; }
@@ -247,27 +256,21 @@
     function updateAll() {
         const d = currentDay; let s = val(d+'-dia') * 30;
         let m = { rad: getM('t-radar'), spd: getM('t-spd'), rec: getM('t-rec'), con: getM('t-con'), tec: getM('t-tec'), trn: getM('t-trn'), kil: getM('t-kil'), exp: getM('t-expert') };
-        
         if(d==='mon') s += (val('mon-radar')*BASE.radar*m.rad.sub)+(val('mon-stam')*150*m.exp.all)+(val('mon-exp')*1000000*BASE.exp_unit*m.exp.all)+(val('mon-h-food')*BASE.h_gather*m.exp.all)+(val('mon-h-iron')*BASE.h_gather*m.exp.all)+(val('mon-h-gold')*BASE.h_gather*m.exp.all)+(val('mon-part')*BASE.drone_part*m.exp.all)+(val('mon-data')*1000*BASE.drone_data*m.exp.all);
         else if(d==='tue') s += (val('tue-truck')*BASE.truck*m.exp.all)+(val('tue-sec')*BASE.secret*m.exp.all)+(val('tue-surv')*BASE.surv*m.exp.all)+(val('tue-spd')*60*BASE.spd_min*m.spd.sub)+(val('tue-pow')*1000*BASE.pow_pt*m.con.sub);
-        else if(d==='wed') {
-            s += (val('wed-radar')*BASE.radar*m.rad.sub)+(val('wed-spd')*60*BASE.spd_min*m.spd.sub)+(val('wed-pow')*1000*BASE.pow_pt*m.tec.sub)+(val('wed-mdl')*BASE.honor_medal*m.exp.all);
-            for(let i=1; i<=7; i++) s += (val('wed-b'+i)||0) * (BASE.boxes[i]||0) * m.exp.all;
-        }
+        else if(d==='wed') { s += (val('wed-radar')*BASE.radar*m.rad.sub)+(val('wed-spd')*60*BASE.spd_min*m.spd.sub)+(val('wed-pow')*1000*BASE.pow_pt*m.tec.sub)+(val('wed-mdl')*BASE.honor_medal*m.exp.all); for(let i=1;i<=7;i++) s += (val('wed-b'+i)||0)*BASE.boxes[i]*m.exp.all; }
         else if(d==='thu') s += (val('thu-tkt')*BASE.recruit*m.rec.sub)+(val('thu-ur')*BASE.ur_shard*m.exp.all)+(val('thu-ssr')*BASE.ssr_shard*m.exp.all)+(val('thu-sr')*BASE.sr_shard*m.exp.all)+(val('thu-sk')*BASE.skill_medal*m.exp.all)+(val('thu-exp')*1000000*BASE.exp_unit*m.exp.all);
-        else if(d==='fri') {
-            s += (val('fri-radar')*BASE.radar*m.rad.sub) + (val('fri-spd-con')*60*BASE.spd_min*m.spd.sub) + (val('fri-spd-tec')*60*BASE.spd_min*m.spd.sub) + (val('fri-spd-trn')*60*BASE.spd_min*m.spd.sub) + (val('fri-pow-con')*1000*BASE.pow_pt*m.con.sub) + (val('fri-pow-tec')*1000*BASE.pow_pt*m.tec.sub);
-            s += (val('fri-count')*BASE.trp[val('fri-lvl')]*m.trn.sub);
-        }
-        else if(d==='sat') {
+        else if(d==='fri') { s += (val('fri-radar')*BASE.radar*m.rad.sub) + (val('fri-spd-con')*60*BASE.spd_min*m.spd.sub) + (val('fri-spd-tec')*60*BASE.spd_min*m.spd.sub) + (val('fri-spd-trn')*60*BASE.spd_min*m.spd.sub) + (val('fri-pow-con')*1000*BASE.pow_pt*m.con.sub) + (val('fri-pow-tec')*1000*BASE.pow_pt*m.tec.sub); s += (val('fri-count')*BASE.trp[val('fri-lvl')]*m.trn.sub); }
+        else if(d==='sat') { 
             s += (val('sat-truck')*BASE.truck*m.exp.all) + (val('sat-sec')*BASE.secret*m.exp.all) + (val('sat-spd-all')*60*BASE.spd_min*m.spd.sub);
-            let kL = document.getElementById('sat-target').value === 'special' ? BASE.kil_spec : BASE.kil_gen;
-            s += (val('sat-kill')*kL[val('sat-elvl')]*m.kil.sub) + (val('sat-dth')*BASE.dth[val('sat-alvl')]*m.exp.all);
+            let tType = document.getElementById('sat-target').value;
+            let kLvl = val('sat-elvl');
+            let kScore = tType === 'special' ? BASE.kil_spec[kLvl] : BASE.kil_gen[kLvl];
+            s += (val('sat-kill')*kScore*m.kil.sub) + (val('sat-dth')*BASE.trp[val('sat-alvl')]*m.exp.all);
         }
-
         document.getElementById('score').innerText = s.toLocaleString(undefined, {minimumFractionDigits: 1});
         let pct = Math.min(100, (s/targetScore)*100); document.getElementById('bar').style.width = pct + '%';
-        let diff = targetScore - s; document.getElementById('diff').innerText = diff > 0 ? `남은 점수: ${diff.toLocaleString()}` : "🎉 오늘의 목표 달성 완료!";
+        let diff = targetScore - s; document.getElementById('diff').innerText = diff > 0 ? `남은 점수: ${diff.toLocaleString()}` : "🎉 목표 달성 완료!";
     }
     window.onload = init;
 </script>
