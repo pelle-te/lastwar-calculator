@@ -11,7 +11,16 @@
 <body>
     <div class="header-bar">
         <div class="logo">ALLIANCE MASTER</div>
-        <div class="live-counter"><div class="live-dot"></div><span id="user-count">연결 중...</span></div>
+        <div style="display: flex; align-items: center; gap: 15px;">
+            <div class="lang-selector" style="font-size: 0.8rem; font-weight: 800; cursor: pointer;">
+                <span id="lang-ko" onclick="changeLang('ko')" style="color: var(--primary);">KO</span> | 
+                <span id="lang-en" onclick="changeLang('en')" style="color: #94a3b8;">EN</span>
+            </div>
+            <div class="live-counter">
+                <div class="live-dot"></div>
+                <span id="user-count">연결 중...</span>
+            </div>
+        </div>
     </div>
 
     <nav class="nav-bar">
@@ -72,3 +81,4 @@
     <script src="board.js"></script>
 </body>
 </html>
+
