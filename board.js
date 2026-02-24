@@ -160,3 +160,39 @@ function deleteCurrentPost() {
         closeViewModal();
     }
 }
+
+// 1. 접속자 정보 기록 (30초마다 갱신)
+function updatePresence() {
+    const myPresenceRef = db.collection('presence').doc(myId);
+    myPresenceRef.set({ 
+        lastSeen: firebase.firestore.FieldValue.serverTimestamp() 
+    }).catch(err => console.error("Presence update error:", err));
+}
+
+// 2. 실시간 감시 및 UI 업데이트
+db.collection('presence').onSnapshot(snap => {
+    const now = Date.now();
+    let count = 0;
+    
+    snap.forEach(doc => {
+        const d = doc.data();
+        // 5분(300,000ms) 이내에 활동 기록이 있는 유저만 카운트
+        if (d.lastSeen && (now - d.lastSeen.toMillis() < 300000)) {
+            count++;
+        }
+    });
+
+    // index.html의 'user-count' 요소를 찾아 텍스트 변경
+    const countEl = document.getElementById('user-count');
+    if (countEl) {
+        countEl.innerText = count + "명 접속 중";
+    }
+}, err => {
+    console.error("Presence snapshot error:", err);
+    const countEl = document.getElementById('user-count');
+    if (countEl) countEl.innerText = "연결 오류";
+});
+
+// 초기 실행 및 주기적 실행
+updatePresence();
+setInterval(updatePresence, 30000);
