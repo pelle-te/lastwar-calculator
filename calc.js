@@ -137,8 +137,29 @@ function val(id) { let el = document.getElementById(id); return el ? parseFloat(
 function getM(subId) { let e = val('t-expert') * 0.05, s = val(subId) * 0.05; return { all: 1 + e, sub: 1 + e + s }; }
 
 function updateAll() {
-    const d = currentDay; let s = val(d+'-dia') * 30;
-    let m = { rad: getM('t-radar'), spd: getM('t-spd'), rec: getM('t-rec'), con: getM('t-con'), tec: getM('t-tec'), trn: getM('t-trn'), kil: getM('t-kil'), exp: getM('t-expert') };
+    const d = currentDay; 
+    let s = val(d+'-dia') * 30;
+    
+    // [추가 로직] 현재 계산기 페이지가 활성화 상태인지 확인합니다.
+    const calcPage = document.getElementById('page-calc');
+    const resultBar = document.querySelector('.result-bar');
+    
+    // 계산기 탭이 아닐 때는 배너를 숨기고 함수를 종료합니다.
+    if (calcPage && !calcPage.classList.contains('active')) {
+        if (resultBar) resultBar.style.display = 'none';
+        return; 
+    } else {
+        // 계산기 탭일 때만 배너를 보여줍니다.
+        if (resultBar) resultBar.style.display = 'block';
+    }
+
+    // --- 기존 계산 로직 시작 ---
+    let m = { 
+        rad: getM('t-radar'), spd: getM('t-spd'), rec: getM('t-rec'), 
+        con: getM('t-con'), tec: getM('t-tec'), trn: getM('t-trn'), 
+        kil: getM('t-kil'), exp: getM('t-expert') 
+    };
+
     if(d==='mon') s += (val('mon-radar')*BASE.radar*m.rad.sub)+(val('mon-stam')*150*m.exp.all)+(val('mon-exp')*1000000*BASE.exp_unit*m.exp.all)+(val('mon-h-food')*BASE.h_gather*m.exp.all)+(val('mon-h-iron')*BASE.h_gather*m.exp.all)+(val('mon-h-gold')*BASE.h_gather*m.exp.all)+(val('mon-part')*BASE.drone_part*m.exp.all)+(val('mon-data')*1000*BASE.drone_data*m.exp.all);
     else if(d==='tue') s += (val('tue-truck')*BASE.truck*m.exp.all)+(val('tue-sec')*BASE.secret*m.exp.all)+(val('tue-surv')*BASE.surv*m.exp.all)+(val('tue-spd')*60*BASE.spd_min*m.spd.sub)+(val('tue-pow')*1000*BASE.pow_pt*m.con.sub);
     else if(d==='wed') { s += (val('wed-radar')*BASE.radar*m.rad.sub)+(val('wed-spd')*60*BASE.spd_min*m.spd.sub)+(val('wed-pow')*1000*BASE.pow_pt*m.tec.sub)+(val('wed-mdl')*BASE.honor_medal*m.exp.all); for(let i=1;i<=7;i++) s += (val('wed-b'+i)||0)*BASE.boxes[i]*m.exp.all; }
@@ -146,7 +167,9 @@ function updateAll() {
     else if(d==='fri') { s += (val('fri-radar')*BASE.radar*m.rad.sub) + (val('fri-spd-con')*60*BASE.spd_min*m.spd.sub) + (val('fri-spd-tec')*60*BASE.spd_min*m.spd.sub) + (val('fri-spd-trn')*60*BASE.spd_min*m.spd.sub) + (val('fri-pow-con')*1000*BASE.pow_pt*m.con.sub) + (val('fri-pow-tec')*1000*BASE.pow_pt*m.tec.sub); s += (val('fri-count')*BASE.trp[val('fri-lvl')]*m.trn.sub); }
     else if(d==='sat') { s += (val('sat-truck')*BASE.truck*m.exp.all) + (val('sat-sec')*BASE.secret*m.exp.all) + (val('sat-spd-all')*60*BASE.spd_min*m.spd.sub); let kType = document.getElementById('sat-target').value; let kLvl = val('sat-elvl'); let kScore = kType === 'special' ? BASE.kil_spec[kLvl] : BASE.kil_gen[kLvl]; s += (val('sat-kill')*kScore*m.kil.sub) + (val('sat-dth')*BASE.trp[val('sat-alvl')]*m.exp.all); }
     
+    // UI 업데이트
     document.getElementById('score').innerText = s.toLocaleString(undefined, {minimumFractionDigits: 1});
-    let pct = Math.min(100, (s/targetScore)*100); document.getElementById('bar').style.width = pct + '%';
+    let pct = Math.min(100, (s/targetScore)*100); 
+    document.getElementById('bar').style.width = pct + '%';
     document.getElementById('diff').innerText = (targetScore-s)>0 ? `${i18n[currentLang].rem}: ${(targetScore-s).toLocaleString()}` : i18n[currentLang].success;
 }
