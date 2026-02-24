@@ -71,28 +71,20 @@ function formatTime(minutes) {
     return `${d}${t.day} ${h}${t.hour} ${m}${t.min}`;
 }
 
-window.openSpdModal = function(id, label) {
-    const t = i18n[window.currentLang].modal;
-    const units = i18n[window.currentLang].units;
-    window.activeSpdId = id;
-    
-    document.getElementById('spd-title').innerText = `${t.title} (${label})`;
-    document.querySelector('#spdModal .btn-secondary').innerText = t.cancel;
-    document.querySelector('#spdModal .btn-primary').innerText = t.apply;
+// ... (i18n, BASE 설정 기존과 동일)
+window.validatePos = function(el) { if (el.value < 0) el.value = 0; };
 
-    const ids = ['lbl-m5', 'lbl-m15', 'lbl-h1', 'lbl-h3', 'lbl-h8'];
-    const labels = [`5${units.min}`, `15${units.min}`, `1${units.hour}`, `3${units.hour}`, `8${units.hour}`];
-    ids.forEach((id, idx) => {
-        const el = document.getElementById(id);
-        if(el) el.innerText = labels[idx];
-    });
-    
-    document.getElementById('spdModal').style.display = 'fles';
+window.openSpdModal = function(id, label) {
+    window.activeSpdId = id;
+    document.getElementById('spd-title').innerText = `가속 계산기 (${label})`;
     document.getElementById('spdModal').classList.add('active');
     ['m5','m15','h1','h3','h8'].forEach(k => { document.getElementById(k).value = 0; });
     calcSpdTotal();
 };
+window.closeSpdModal = function() { document.getElementById('spdModal').classList.remove('active'); };
 
+window.openTechModal = function() { document.getElementById('techModal').classList.add('active'); };
+window.closeTechModal = function() { document.getElementById('techModal').classList.remove('active'); updateAll(); };
 window.calcSpdTotal = function() {
     const t = i18n[window.currentLang].modal;
     const total = (val('m5')*5) + (val('m15')*15) + (val('h1')*60) + (val('h3')*180) + (val('h8')*480);
@@ -100,7 +92,9 @@ window.calcSpdTotal = function() {
     return total;
 };
 
-window.closeSpdModal = function() { document.getElementById('spdModal').classList.remove('active'); };
+window.closeSpdModal = function() { 
+    document.getElementById('spdModal').classList.remove('active'); 
+};
 
 window.applySpd = function() {
     const totalMin = calcSpdTotal();
@@ -316,21 +310,14 @@ window.updateAll = function() {
         setPt('dth', val('sat-dth')*BASE.trp[val('sat-alvl')]*m.exp.all);
     }
 
-// 1. 퍼센트 및 기본 점수 업데이트
-    const pct = Math.min(100, (totalScore / window.targetScore) * 100);
-    document.getElementById('dash-pct').innerText = Math.floor(pct) + '%';
-    document.getElementById('dash-score').innerText = totalScore.toLocaleString();
-    document.getElementById('dash-bar').style.width = pct + '%';
-
-    // 2. 상자 단계 계산 (7.2M 기준 9상자 예시)
-    // 각 상자당 필요 점수 (예: 80만점당 1상자라고 가정 시)
-    const boxStep = window.targetScore / 9;
-    const currentBox = Math.floor(totalScore / boxStep);
-    document.getElementById('dash-box').innerText = `${Math.min(9, currentBox)} / 9`;
-
-    // 3. 남은 점수 업데이트
+const pct = Math.min(100, (totalScore / window.targetScore) * 100);
+    document.getElementById('score').innerText = totalScore.toLocaleString();
+    document.getElementById('bar').style.width = pct + '%';
+    document.getElementById('pct-text').innerText = Math.floor(pct) + '%';
+    const currentBox = Math.floor(totalScore / (window.targetScore / 9));
+    document.getElementById('box-status').innerText = `${Math.min(9, currentBox)}/9`;
     const rem = window.targetScore - totalScore;
-    document.getElementById('dash-diff').innerText = rem > 0 ? `남은: ${rem.toLocaleString()}` : "목표 달성! 🎉";
+    document.getElementById('diff').innerText = rem > 0 ? `남은 점수: ${rem.toLocaleString()}` : "목표 달성 완료! 🎉";
 };
 
 window.setTarget = function(s) { 
