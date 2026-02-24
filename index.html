@@ -47,14 +47,28 @@
         <div id="page-qna" class="page-content"><div id="suggestions-list"></div></div>
     </div>
 
-    <div class="result-bar">
-        <div class="total-score" id="score">0.0</div>
-        <div class="progress-container"><div class="progress-fill" id="bar"></div></div>
-        <div id="diff" style="font-size:0.85rem; color:#cbd5e1; font-weight:600;">남은 점수: 7,200,000</div>
+<div id="side-dashboard" class="side-dashboard">
+    <div class="dash-handle" onclick="toggleDash()">
+        <span id="dash-pct">0%</span>
     </div>
-
-    <div id="float-btn" class="write-btn" style="display:none;" onclick="openModal()">+</div>
     
+    <div class="dash-content">
+        <div class="dash-item">
+            <span class="dash-label">현재 점수</span>
+            <span id="dash-score" class="dash-val">0</span>
+        </div>
+        <div class="dash-item">
+            <span class="dash-label">상자 단계</span>
+            <span id="dash-box" class="dash-val">0 / 9</span>
+        </div>
+        <div class="dash-progress-box">
+            <div class="dash-progress-bg">
+                <div id="dash-bar" class="dash-progress-fill"></div>
+            </div>
+        </div>
+        <div id="dash-diff" class="dash-rem">남은: 7,200,000</div>
+    </div>
+</div>
 
     <div id="viewModal" class="modal">
         <div class="modal-card">
