@@ -87,7 +87,8 @@ window.openSpdModal = function(id, label) {
         if(el) el.innerText = labels[idx];
     });
     
-    document.getElementById('spdModal').style.display = 'block';
+    document.getElementById('spdModal').style.display = 'fles';
+    document.getElementById('spdModal').classList.add('active');
     ['m5','m15','h1','h3','h8'].forEach(k => { document.getElementById(k).value = 0; });
     calcSpdTotal();
 };
@@ -99,7 +100,7 @@ window.calcSpdTotal = function() {
     return total;
 };
 
-window.closeSpdModal = function() { document.getElementById('spdModal').style.display = 'none'; };
+window.closeSpdModal = function() { document.getElementById('spdModal').classList.remove('active'); };
 
 window.applySpd = function() {
     const totalMin = calcSpdTotal();
