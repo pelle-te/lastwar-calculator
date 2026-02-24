@@ -1,80 +1,72 @@
+// [추가] Firebase 설정 및 db 변수 정의 (에러 해결 핵심)
+const firebaseConfig = { 
+    apiKey: "AIzaSyAbGdlE4KnelSrrKGLVaLcM5433ZZILVYE", 
+    authDomain: "lastwar-530f9.firebaseapp.com", 
+    projectId: "lastwar-530f9", 
+    storageBucket: "lastwar-530f9.firebasestorage.app", 
+    messagingSenderId: "135982056229", 
+    appId: "1:135982056229:web:92264d4601e5315cdd50cc" 
+};
+
+// 중복 초기화 방지를 위한 체크
+if (!firebase.apps.length) {
+    firebase.initializeApp(firebaseConfig);
+}
+const db = firebase.firestore(); // 여기서 db를 정의해야 ReferenceError가 사라집니다.
+
+// 기존 board.js 내용 시작...
 let currentDocData = null;
+const myId = localStorage.getItem('vs_auth_id') || 'u' + Math.random().toString(36).substr(2, 7);
+if(!localStorage.getItem('vs_auth_id')) localStorage.setItem('vs_auth_id', myId);
+let isAdmin = false;
 
 function showPage(pId) {
     document.querySelectorAll('.page-content').forEach(p => p.classList.remove('active'));
     document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
     document.getElementById('page-' + pId).classList.add('active');
     document.getElementById('nav-' + pId).classList.add('active');
-
-    const isFeedOrQna = (pId === 'board' || pId === 'qna');
-    document.getElementById('float-btn').style.display = isFeedOrQna ? 'flex' : 'none';
-    const adminBtn = document.querySelector('.admin-link');
-    if(adminBtn) adminBtn.style.display = (pId === 'board') ? 'block' : 'none';
-    const rb = document.querySelector('.result-bar');
-    if(rb) rb.style.display = (pId === 'calc') ? 'block' : 'none';
+    document.getElementById('float-btn').style.display = (pId === 'board' || pId === 'qna') ? 'flex' : 'none';
 }
 
 function openModal() {
     document.getElementById('edit-doc-id').value = "";
-    document.getElementById('post-text').value = "";
-    document.getElementById('modal-title').innerText = "전략 공유하기 🖋️";
-    document.getElementById('submit-btn').innerText = "게시하기";
-   document.getElementById('writeModal').classList.add('active');
+    document.getElementById('post-title').value = "";
+    document.getElementById('post-content').value = "";
+    document.getElementById('writeModal').classList.add('active');
 }
-
 function closeModal() { document.getElementById('writeModal').classList.remove('active'); }
 
 function openViewModal(col, docId, data, canDel, time) {
     currentDocData = { col, docId, data };
-    const modal = document.getElementById('viewModal');
+    const title = data.content.split('|||')[0] || "제목 없음";
+    const body = data.content.split('|||')[1] || "";
+    
+    document.getElementById('view-content').innerHTML = `<h2>${title}</h2><p style="white-space:pre-wrap;">${body}</p>`;
     const img = document.getElementById('view-img');
-    const content = document.getElementById('view-content');
+    if(data.image) { img.src = data.image; img.style.display = 'block'; } else { img.style.display = 'none'; }
     
-    if(data.image) { img.src = data.image; img.style.display = 'block'; } 
-    else { img.style.display = 'none'; }
-
-    const lines = data.content.split('\n');
-    content.innerHTML = `<h2 style="margin:0 0 15px 0; font-size:1.3rem;">${lines[0]}</h2>
-                         <p style="white-space:pre-wrap; color:#555; line-height:1.7;">${lines.slice(1).join('\n')}</p>`;
-    
-    document.getElementById('reply-container').style.display = 'flex';
     document.getElementById('edit-link').style.display = canDel ? 'inline' : 'none';
     document.getElementById('delete-area').style.display = canDel ? 'block' : 'none';
-
-    document.getElementById('view-reply-btn').onclick = () => {
-        const input = document.getElementById('view-reply-input');
-        if(!input.value.trim()) return;
-        addReply(col, docId, input.value);
-        input.value = "";
-    };
-
     loadReplies(col, docId, "view-replies");
-    modal.style.display = 'block';
     document.getElementById('viewModal').classList.add('active');
 }
-
-function closeViewModal() { document.getElementById('viewModal').style.display = 'none'; }
-function toggleReplySection() {
-    const rc = document.getElementById('reply-container');
-    rc.style.display = rc.style.display === 'none' ? 'block' : 'none';
-}
-
-function prepareEdit() {
-    const { docId, data } = currentDocData;
-    closeViewModal();
-    document.getElementById('writeModal').style.display = 'block';
-    document.getElementById('modal-title').innerText = "게시물 수정하기 ✏️";
-    document.getElementById('submit-btn').innerText = "수정 완료";
-    document.getElementById('edit-doc-id').value = docId;
-    document.getElementById('post-text').value = data.content;
-}
+function closeViewModal() { document.getElementById('viewModal').classList.remove('active'); }
 
 async function sendLivePost() {
+    // 현재 활성화된 페이지에 따라 저장할 컬렉션 결정
     const col = document.getElementById('page-board').classList.contains('active') ? 'posts' : 'suggestions';
-    const txt = document.getElementById('post-text').value;
+    
+    // index.html에 정의된 분리된 ID로 데이터 가져오기
+    const title = document.getElementById('post-title').value;
+    const content = document.getElementById('post-content').value;
     const file = document.getElementById('post-file').files[0];
     const editId = document.getElementById('edit-doc-id').value;
-    if(!txt.trim()) return;
+
+    // 필수 입력 체크
+    if(!title.trim() || !content.trim()) {
+        alert("제목과 내용을 모두 입력해주세요.");
+        return;
+    }
 
     let imgUrl = editId ? (currentDocData.data.image || "") : ""; 
     if(file) {
@@ -98,12 +90,34 @@ async function sendLivePost() {
         });
     }
 
-    if(editId) {
-        await db.collection(col).doc(editId).update({ content: txt, image: imgUrl });
-    } else {
-        await db.collection(col).add({ authorId: myId, content: txt, image: imgUrl, timestamp: firebase.firestore.FieldValue.serverTimestamp() });
+    // 제목과 본문을 구분자(|||)로 합쳐서 content 필드에 저장
+    const fullText = title + "|||" + content;
+
+    try {
+        if(editId) {
+            // 수정 모드
+            await db.collection(col).doc(editId).update({ 
+                content: fullText, 
+                image: imgUrl 
+            });
+        } else {
+            // 신규 게시 모드
+            await db.collection(col).add({ 
+                authorId: myId, 
+                content: fullText, 
+                image: imgUrl, 
+                timestamp: firebase.firestore.FieldValue.serverTimestamp() 
+            });
+        }
+        // 완료 후 모달 닫기 및 입력창 초기화
+        closeModal();
+        document.getElementById('post-title').value = "";
+        document.getElementById('post-content').value = "";
+        document.getElementById('post-file').value = "";
+    } catch (error) {
+        console.error("게시물 저장 중 오류 발생:", error);
+        alert("게시물 저장에 실패했습니다.");
     }
-    closeModal();
 }
 
 function loadLiveView(col) {
@@ -113,25 +127,15 @@ function loadLiveView(col) {
         list.innerHTML = "";
         snap.forEach(doc => {
             const d = doc.data();
-            const docId = doc.id;
-            const canDel = isAdmin || (d.authorId === myId);
-            const time = d.timestamp ? new Date(d.timestamp.seconds*1000).toLocaleString('ko-KR') : "방금 전";
-            
+            const title = d.content.split('|||')[0];
             const card = document.createElement('div');
             card.className = 'summary-card';
-            card.onclick = () => openViewModal(col, docId, d, canDel, time);
-            card.innerHTML = `
-                <div class="summary-img-wrapper">
-                    ${d.image ? `<img src="${d.image}">` : `<div style="height:100%; display:flex; align-items:center; justify-content:center; color:#cbd5e1; font-weight:800;">STRATEGY</div>`}
-                </div>
-                <div class="summary-body">
-                    <div class="summary-title">${d.content.split('\n')[0]}</div>
-                </div>`;
+            card.onclick = () => openViewModal(col, doc.id, d, (isAdmin || d.authorId === myId));
+            card.innerHTML = `<div class="summary-img-wrapper">${d.image ? `<img src="${d.image}">` : `<div style="height:100%; display:flex; align-items:center; justify-content:center; color:#ccc;">NO IMAGE</div>`}</div><div class="summary-title">${title}</div>`;
             list.appendChild(card);
         });
     });
 }
-
 async function addReply(col, postId, text) {
     await db.collection(col).doc(postId).collection('replies').add({
         authorId: myId, content: text, timestamp: firebase.firestore.FieldValue.serverTimestamp()
