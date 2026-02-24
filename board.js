@@ -25,6 +25,13 @@ function showPage(pId) {
     document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
     document.getElementById('page-' + pId).classList.add('active');
     document.getElementById('nav-' + pId).classList.add('active');
+
+    // 계산기 페이지('calc')일 때만 결과 바 표시
+    const rb = document.querySelector('.result-bar');
+    if(rb) {
+        rb.style.display = (pId === 'calc') ? 'flex' : 'none';
+    }
+
     document.getElementById('float-btn').style.display = (pId === 'board' || pId === 'qna') ? 'flex' : 'none';
 }
 
