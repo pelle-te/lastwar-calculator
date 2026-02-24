@@ -1,4 +1,4 @@
-
+/* 전반적인 폰트 및 배경 설정 */
 @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css');
 
 :root {
@@ -7,50 +7,71 @@
     --insta-border: #dbdbdb;
 }
 
-body { font-family: 'Pretendard', sans-serif; background-color: var(--bg); margin: 0; color: #262626; overflow-x: hidden; }
+body { font-family: 'Pretendard', sans-serif; background-color: var(--bg); margin: 0; padding: 0; color: #262626; overflow-x: hidden; }
 
-/* 네비게이션 & 헤더 */
+/* 상단 라이브 바 */
 .header-bar { background: white; border-bottom: 1px solid var(--insta-border); display: flex; align-items: center; justify-content: space-between; padding: 10px 20px; position: sticky; top: 0; z-index: 2000; }
-.logo { font-size: 1.1rem; font-weight: 900; background: linear-gradient(45deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+.logo { font-size: 1.1rem; font-weight: 900; background: linear-gradient(45deg, #f09433, #dc2743, #bc1888); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
 .live-counter { font-size: 0.75rem; font-weight: 700; color: #ed4956; display: flex; align-items: center; gap: 5px; }
 .live-dot { width: 7px; height: 7px; background: #ed4956; border-radius: 50%; animation: blink 1.2s infinite; }
 @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
 
+/* 네비게이션 메인 탭 */
 .nav-bar { background: white; display: flex; border-bottom: 1px solid var(--insta-border); }
-.nav-item { flex: 1; padding: 15px 0; text-align: center; color: #8e8e8e; font-weight: 700; cursor: pointer; font-size: 0.9rem; }
+.nav-item { flex: 1; padding: 15px 0; text-align: center; color: #8e8e8e; font-weight: 700; cursor: pointer; font-size: 0.9rem; transition: 0.2s; }
 .nav-item.active { color: #262626; border-bottom: 2px solid #262626; }
 
-/* 카드 및 레이아웃 */
-.container { max-width: 600px; margin: 0 auto; padding-bottom: 180px; }
-.page-content { display: none; padding: 15px; animation: fadeIn 0.3s ease; }
+/* 컨테이너 및 카드 */
+.container { max-width: 600px; margin: 0 auto; padding: 15px; padding-bottom: 180px; }
+.page-content { display: none; animation: fadeIn 0.3s ease; }
 .page-content.active { display: block; }
 @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
 .card { background: white; border-radius: 20px; padding: 20px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); border: 1px solid #e2e8f0; margin-bottom: 15px; }
 .section-title { font-size: 1rem; font-weight: 800; margin-bottom: 15px; color: var(--primary); display: flex; align-items: center; gap: 8px; }
 
-/* 입력 필드 */
+/* 목표 설정 버튼 */
+.target-selector { display: flex; gap: 6px; }
+.target-btn { flex: 1; padding: 12px; border-radius: 12px; border: 2px solid #f1f5f9; background: white; color: #64748b; font-weight: 800; cursor: pointer; transition: 0.2s; text-align: center; }
+.target-btn.active { border-color: var(--primary); background: #eef2ff; color: var(--primary); }
+
+/* 테크 그리드 */
+.tech-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.tech-item { background: #f8fafc; padding: 12px; border-radius: 12px; border: 1px solid #e2e8f0; display: flex; flex-direction: column; gap: 4px; }
+.tech-item label { font-size: 0.7rem; color: #64748b; font-weight: 700; }
+.tech-item select { width: 100%; border: none; background: transparent; font-weight: 800; color: var(--primary); outline: none; font-size: 0.85rem; cursor: pointer; }
+
+/* 요일 탭 */
+.day-tabs { display: grid; grid-template-columns: repeat(6, 1fr); gap: 4px; margin: 15px 0; }
+.day-btn { padding: 12px 0; border-radius: 10px; border: none; color: white; font-weight: 800; opacity: 0.3; font-size: 0.85rem; cursor: pointer; transition: 0.2s; }
+.day-btn.active { opacity: 1; transform: scale(1.05); box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+
+/* 입력창 카드 스타일 */
 .input-group { background: #f8fafc; padding: 15px; border-radius: 15px; border: 1px solid #e2e8f0; margin-bottom: 12px; }
 .input-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
-.input-row input { width: 85px; text-align: right; border: 2px solid #cbd5e1; border-radius: 8px; padding: 6px; font-weight: 800; color: var(--primary); outline: none; }
+.input-label { font-size: 0.9rem; font-weight: 700; color: #334155; }
+.input-row input { width: 85px; text-align: right; border: 2px solid #cbd5e1; border-radius: 8px; padding: 6px; font-weight: 800; color: var(--primary); outline: none; background: white; }
+
+/* 슬라이더 */
 input[type="range"] { width: 100%; height: 8px; border-radius: 10px; background: #e2e8f0; -webkit-appearance: none; outline: none; }
-input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width: 22px; height: 22px; background: var(--primary); border-radius: 50%; border: 3px solid white; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
+input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width: 22px; height: 22px; background: var(--primary); border-radius: 50%; border: 3px solid white; box-shadow: 0 2px 5px rgba(0,0,0,0.2); cursor: pointer; }
 
-/* 피드 스타일 */
-.insta-card { background: white; border: 1px solid var(--insta-border); border-radius: 12px; margin-bottom: 15px; overflow: hidden; }
-.insta-header { padding: 12px; display: flex; align-items: center; gap: 10px; }
-.avatar { width: 32px; height: 32px; background: linear-gradient(45deg, #f09433, #bc1888); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-size: 0.7rem; font-weight: 800; }
-.insta-img { width: 100%; display: block; }
-.insta-body { padding: 12px; }
-
-/* 버튼 및 모달 */
-.write-btn { position: fixed; bottom: 140px; right: 20px; width: 56px; height: 56px; background: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; box-shadow: 0 4px 15px rgba(0,0,0,0.2); z-index: 1000; cursor: pointer; }
-.modal { display: none; position: fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); z-index:4000; }
-.modal-card { background:white; width:90%; max-width:400px; margin: 50px auto; border-radius:20px; padding:20px; }
-#post-text { width:100%; height:120px; border:1px solid #dbdbdb; border-radius:12px; padding:12px; box-sizing:border-box; resize:none; font-family: inherit; }
-
-/* 결과 바 */
-.result-bar { position: fixed; bottom: 0; left: 0; right: 0; background: #1e293b; color: white; padding: 20px; border-radius: 25px 25px 0 0; text-align: center; z-index: 3000; }
+/* 하단 결과 바 */
+.result-bar { position: fixed; bottom: 0; left: 0; right: 0; background: #1e293b; color: white; padding: 20px; border-radius: 25px 25px 0 0; text-align: center; z-index: 3000; box-shadow: 0 -5px 20px rgba(0,0,0,0.3); }
 .total-score { font-size: 1.8rem; font-weight: 900; color: #fbbf24; }
 .progress-container { height: 10px; background: #334155; border-radius: 10px; margin: 10px 0; overflow: hidden; }
 .progress-fill { height: 100%; background: linear-gradient(90deg, var(--primary), #10b981); width: 0%; transition: 0.5s; }
+
+/* 인스타그램 스타일 피드 */
+.insta-card { background: white; border: 1px solid var(--insta-border); border-radius: 12px; margin-bottom: 15px; overflow: hidden; }
+.insta-header { padding: 12px; display: flex; align-items: center; gap: 10px; }
+.avatar { width: 32px; height: 32px; background: linear-gradient(45deg, #f09433, #bc1888); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-size: 0.7rem; font-weight: 800; }
+.insta-img { width: 100%; display: block; background: #fafafa; }
+.insta-body { padding: 12px; }
+.insta-content { font-size: 0.9rem; line-height: 1.5; white-space: pre-wrap; }
+.del-link { margin-left: auto; font-size: 0.7rem; color: #ed4956; font-weight: 700; cursor: pointer; }
+
+/* 글쓰기 버튼 */
+.write-btn { position: fixed; bottom: 140px; right: 20px; width: 56px; height: 56px; background: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; box-shadow: 0 4px 15px rgba(0,0,0,0.2); z-index: 1000; cursor: pointer; border: 1px solid #ddd; }
+.modal { display: none; position: fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); z-index:4000; }
+.modal-card { background:white; width:90%; max-width:400px; margin: 50px auto; border-radius:20px; padding:20px; }
