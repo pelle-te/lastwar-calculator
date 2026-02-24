@@ -1,156 +1,162 @@
-<!DOCTYPE html>
-<html lang="ko">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>라스트 워 VS 마스터 v8.5</title>
-    <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-firestore-compat.js"></script>
-    <link rel="stylesheet" href="style.css">
-</head>
-<body>
-    <div class="header-bar">
-        <div class="logo">ALLIANCE MASTER</div>
-        <div style="display: flex; align-items: center; gap: 15px;">
-            <div class="lang-selector" style="font-size: 0.8rem; font-weight: 800; cursor: pointer;">
-                <span id="lang-ko" onclick="changeLang('ko')" style="color: var(--primary);">KO</span> | 
-                <span id="lang-en" onclick="changeLang('en')" style="color: #94a3b8;">EN</span>
-            </div>
-            <div class="live-counter"><div class="live-dot"></div><span id="user-count">연결 중...</span></div>
-        </div>
-    </div>
+// [추가] Firebase 설정 및 db 변수 정의 (에러 해결 핵심)
+const firebaseConfig = { 
+    apiKey: "AIzaSyAbGdlE4KnelSrrKGLVaLcM5433ZZILVYE", 
+    authDomain: "lastwar-530f9.firebaseapp.com", 
+    projectId: "lastwar-530f9", 
+    storageBucket: "lastwar-530f9.firebasestorage.app", 
+    messagingSenderId: "135982056229", 
+    appId: "1:135982056229:web:92264d4601e5315cdd50cc" 
+};
 
-    <nav class="nav-bar">
-        <div id="nav-calc" class="nav-item active" onclick="showPage('calc')">📊 계산기</div>
-        <div id="nav-board" class="nav-item" onclick="showPage('board')">📱 피드</div>
-        <div id="nav-qna" class="nav-item" onclick="showPage('qna')">💬 건의</div>
-    </nav>
+// 중복 초기화 방지를 위한 체크
+if (!firebase.apps.length) {
+    firebase.initializeApp(firebaseConfig);
+}
+const db = firebase.firestore(); // 여기서 db를 정의해야 ReferenceError가 사라집니다.
 
-    <div class="container">
-        <div id="page-calc" class="page-content active">
-            <div class="card">
-                <div class="section-title">🎯 DAILY GOAL</div>
-                <div class="target-selector">
-                    <button class="target-btn" id="target-2300000" onclick="setTarget(2300000)">6상</button>
-                    <button class="target-btn" id="target-3600000" onclick="setTarget(3600000)">8상</button>
-                    <button class="target-btn active" id="target-7200000" onclick="setTarget(7200000)">9상</button>
-                </div>
-            </div>
-            <div class="card">
-                <div class="section-title">🔬 ALLIANCE TECH</div>
-                <div class="tech-grid" id="tech-inputs"></div>
-            </div>
-            <div class="day-tabs" id="day-tabs-container"></div>
-            <div id="input-container"></div>
-        </div>
-        <div id="page-board" class="page-content"><div id="posts-list"></div></div>
-        <div id="page-qna" class="page-content"><div id="suggestions-list"></div></div>
-    </div>
+// 기존 board.js 내용 시작...
+let currentDocData = null;
+const myId = localStorage.getItem('vs_auth_id') || 'u' + Math.random().toString(36).substr(2, 7);
+if(!localStorage.getItem('vs_auth_id')) localStorage.setItem('vs_auth_id', myId);
+let isAdmin = false;
 
-<div id="side-dashboard" class="side-dashboard">
-    <div class="dash-handle" onclick="toggleDash()">
-        <span id="dash-pct">0%</span>
-    </div>
+function showPage(pId) {
+    document.querySelectorAll('.page-content').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+    document.getElementById('page-' + pId).classList.add('active');
+    document.getElementById('nav-' + pId).classList.add('active');
+    document.getElementById('float-btn').style.display = (pId === 'board' || pId === 'qna') ? 'flex' : 'none';
+}
+
+function openModal() {
+    document.getElementById('edit-doc-id').value = "";
+    document.getElementById('post-title').value = "";
+    document.getElementById('post-content').value = "";
+    document.getElementById('writeModal').classList.add('active');
+}
+function closeModal() { document.getElementById('writeModal').classList.remove('active'); }
+
+function openViewModal(col, docId, data, canDel, time) {
+    currentDocData = { col, docId, data };
+    const title = data.content.split('|||')[0] || "제목 없음";
+    const body = data.content.split('|||')[1] || "";
     
-    <div class="dash-content">
-        <div class="dash-item">
-            <span class="dash-label">현재 점수</span>
-            <span id="dash-score" class="dash-val">0</span>
-        </div>
-        <div class="dash-item">
-            <span class="dash-label">상자 단계</span>
-            <span id="dash-box" class="dash-val">0 / 9</span>
-        </div>
-        <div class="dash-progress-box">
-            <div class="dash-progress-bg">
-                <div id="dash-bar" class="dash-progress-fill"></div>
-            </div>
-        </div>
-        <div id="dash-diff" class="dash-rem">남은: 7,200,000</div>
-    </div>
-</div>
+    document.getElementById('view-content').innerHTML = `<h2>${title}</h2><p style="white-space:pre-wrap;">${body}</p>`;
+    const img = document.getElementById('view-img');
+    if(data.image) { img.src = data.image; img.style.display = 'block'; } else { img.style.display = 'none'; }
+    
+    document.getElementById('edit-link').style.display = canDel ? 'inline' : 'none';
+    document.getElementById('delete-area').style.display = canDel ? 'block' : 'none';
+    loadReplies(col, docId, "view-replies");
+    document.getElementById('viewModal').classList.add('active');
+}
+function closeViewModal() { document.getElementById('viewModal').classList.remove('active'); }
 
-    <div id="viewModal" class="modal">
-        <div class="modal-card">
-            <span class="close-x" onclick="closeViewModal()">&times;</span>
-            <div id="view-body" style="margin-top:20px;">
-                <div id="view-content"></div>
-                <img id="view-img" style="width:100%; border-radius:12px; margin:20px 0; display:none;">
-            </div>
-            <div style="display:flex; gap:15px; margin-top:20px; border-top:1px solid #eee; padding-top:20px;">
-                <span onclick="toggleReplySection()" style="cursor:pointer; color:var(--primary); font-weight:800; font-size:0.9rem;">💬 댓글</span>
-                <span id="edit-link" style="display:none; cursor:pointer; color:var(--text-muted); font-size:0.9rem;" onclick="prepareEdit()">✏️ 수정</span>
-            </div>
-            <div id="reply-container" style="display:none; margin-top:20px;">
-                <div id="view-replies" class="reply-section"></div>
-                <div class="reply-input-group">
-                    <input type="text" id="view-reply-input" class="reply-input" placeholder="의견을 남겨주세요...">
-                    <button id="view-reply-btn" class="btn-primary" style="padding:10px 15px;">등록</button>
-                </div>
-            </div>
-            <div id="delete-area" style="display:none; text-align:right; margin-top:30px;">
-                <span style="font-size:0.75rem; color:#ccc; cursor:pointer;" onclick="deleteCurrentPost()">게시물 삭제</span>
-            </div>
-        </div>
-    </div>
+async function sendLivePost() {
+    // 현재 활성화된 페이지에 따라 저장할 컬렉션 결정
+    const col = document.getElementById('page-board').classList.contains('active') ? 'posts' : 'suggestions';
+    
+    // index.html에 정의된 분리된 ID로 데이터 가져오기
+    const title = document.getElementById('post-title').value;
+    const content = document.getElementById('post-content').value;
+    const file = document.getElementById('post-file').files[0];
+    const editId = document.getElementById('edit-doc-id').value;
 
-<div id="spdModal" class="modal">
-    <div class="modal-card">
-        <span class="close-x" onclick="closeSpdModal()">&times;</span>
-        <h3 id="spd-title" style="margin-top:0; margin-bottom:15px; font-size:1.1rem;">가속 계산기</h3>
-        
-        <div class="tech-grid">
-            <div class="tech-item">
-                <label id="lbl-m5">5분</label>
-                <input type="number" id="m5" class="compact-input" value="0" min="0" oninput="validatePos(this); calcSpdTotal()">
-            </div>
-            <div class="tech-item">
-                <label id="lbl-m15">15분</label>
-                <input type="number" id="m15" class="compact-input" value="0" min="0" oninput="validatePos(this); calcSpdTotal()">
-            </div>
-            <div class="tech-item">
-                <label id="lbl-h1">1시간</label>
-                <input type="number" id="h1" class="compact-input" value="0" min="0" oninput="validatePos(this); calcSpdTotal()">
-            </div>
-            <div class="tech-item">
-                <label id="lbl-h3">3시간</label>
-                <input type="number" id="h3" class="compact-input" value="0" min="0" oninput="validatePos(this); calcSpdTotal()">
-            </div>
-            <div class="tech-item" style="grid-column: span 2;">
-                <label id="lbl-h8">8시간</label>
-                <input type="number" id="h8" class="compact-input" value="0" min="0" oninput="validatePos(this); calcSpdTotal()">
-            </div>
-        </div>
-        <div id="spd-result-text" style="margin: 15px 0; text-align: center; color: var(--primary); font-weight: 800; font-size: 1.1rem;">총: 0일 0시 0분</div>
-        
-        <div style="display:grid; grid-template-columns: 1fr 1.5fr; gap:10px">
-            <button onclick="closeSpdModal()" class="btn-secondary">취소</button>
-            <button onclick="applySpd()" class="btn-primary">적용하기</button>
-        </div>
-    </div>
-</div>
+    // 필수 입력 체크
+    if(!title.trim() || !content.trim()) {
+        alert("제목과 내용을 모두 입력해주세요.");
+        return;
+    }
 
-<div id="writeModal" class="modal">
-    <div class="modal-card">
-        <span class="close-x" onclick="closeModal()">&times;</span>
-        <h3 id="modal-title" style="margin-top:0; margin-bottom:20px;">전략 공유하기 🖋️</h3>
-        <input type="hidden" id="edit-doc-id">
-        <input type="text" id="post-title" class="modern-input" placeholder="제목을 입력하세요">
-        <textarea id="post-content" class="modern-textarea" placeholder="공략 내용을 입력하세요"></textarea>
-        
-        <div class="file-upload-wrapper" style="margin-bottom:20px;">
-            <label for="post-file" class="custom-file-upload">🖼️ 이미지 첨부</label>
-            <input type="file" id="post-file" accept="image/*" onchange="updateFileName(this)">
-            <span id="file-name" style="font-size:0.8rem; color:var(--text-muted); margin-left:10px;">선택된 파일 없음</span>
-        </div>
-        
-        <button onclick="sendLivePost()" class="btn-primary modern-submit" style="width:100%;" id="submit-btn">게시하기</button>
-    </div>
-</div>
+    let imgUrl = editId ? (currentDocData.data.image || "") : ""; 
+    if(file) {
+        imgUrl = await new Promise(res => {
+            const reader = new FileReader();
+            reader.readAsDataURL(file);
+            reader.onload = e => {
+                const img = new Image();
+                img.src = e.target.result;
+                img.onload = () => {
+                    const canvas = document.createElement('canvas');
+                    const max_size = 800;
+                    let w = img.width, h = img.height;
+                    if (w > h) { if (w > max_size) { h *= max_size / w; w = max_size; } }
+                    else { if (h > max_size) { w *= max_size / h; h = max_size; } }
+                    canvas.width = w; canvas.height = h;
+                    canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+                    res(canvas.toDataURL('image/jpeg', 0.7));
+                };
+            };
+        });
+    }
 
-    <div class="admin-link" onclick="enableAdmin()">🛡️ Admin Mode</div>
+    // 제목과 본문을 구분자(|||)로 합쳐서 content 필드에 저장
+    const fullText = title + "|||" + content;
 
-    <script src="calc.js"></script>
-    <script src="board.js"></script>
-</body>
-</html>
+    try {
+        if(editId) {
+            // 수정 모드
+            await db.collection(col).doc(editId).update({ 
+                content: fullText, 
+                image: imgUrl 
+            });
+        } else {
+            // 신규 게시 모드
+            await db.collection(col).add({ 
+                authorId: myId, 
+                content: fullText, 
+                image: imgUrl, 
+                timestamp: firebase.firestore.FieldValue.serverTimestamp() 
+            });
+        }
+        // 완료 후 모달 닫기 및 입력창 초기화
+        closeModal();
+        document.getElementById('post-title').value = "";
+        document.getElementById('post-content').value = "";
+        document.getElementById('post-file').value = "";
+    } catch (error) {
+        console.error("게시물 저장 중 오류 발생:", error);
+        alert("게시물 저장에 실패했습니다.");
+    }
+}
+
+function loadLiveView(col) {
+    db.collection(col).orderBy("timestamp", "desc").onSnapshot(snap => {
+        const list = document.getElementById(col + '-list');
+        if(!list) return;
+        list.innerHTML = "";
+        snap.forEach(doc => {
+            const d = doc.data();
+            const title = d.content.split('|||')[0];
+            const card = document.createElement('div');
+            card.className = 'summary-card';
+            card.onclick = () => openViewModal(col, doc.id, d, (isAdmin || d.authorId === myId));
+            card.innerHTML = `<div class="summary-img-wrapper">${d.image ? `<img src="${d.image}">` : `<div style="height:100%; display:flex; align-items:center; justify-content:center; color:#ccc;">NO IMAGE</div>`}</div><div class="summary-title">${title}</div>`;
+            list.appendChild(card);
+        });
+    });
+}
+async function addReply(col, postId, text) {
+    await db.collection(col).doc(postId).collection('replies').add({
+        authorId: myId, content: text, timestamp: firebase.firestore.FieldValue.serverTimestamp()
+    });
+}
+
+function loadReplies(col, postId, targetId) {
+    db.collection(col).doc(postId).collection('replies').orderBy("timestamp", "asc").onSnapshot(snap => {
+        const rb = document.getElementById(targetId);
+        if(!rb) return;
+        rb.innerHTML = "";
+        snap.forEach(doc => {
+            const rd = doc.data();
+            rb.innerHTML += `<div class="reply-item"><b>연맹원</b> ${rd.content}</div>`;
+        });
+    });
+}
+
+function deleteCurrentPost() {
+    if(confirm("정말 삭제하시겠습니까?")) {
+        db.collection(currentDocData.col).doc(currentDocData.docId).delete();
+        closeViewModal();
+    }
+}
