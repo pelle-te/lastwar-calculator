@@ -151,12 +151,63 @@ body { font-family: 'Pretendard', sans-serif; background-color: #f1f5f9; margin:
 .reply-input-group { display: flex; gap: 10px; }
 .reply-input { flex: 1; border: 1.5px solid #eee; border-radius: 10px; padding: 10px; font-size: 0.9rem; outline: none; }
 
-/* 하단 바 & 플로팅 버튼 */
-.result-bar { position: fixed; bottom: 0; left: 0; right: 0; background: #1e293b; color: white; padding: 20px; border-radius: 28px 28px 0 0; text-align: center; z-index: 3000; }
-.total-score { font-size: 1.8rem; font-weight: 900; color: #fbbf24; }
-.progress-container { height: 10px; background: #334155; border-radius: 10px; margin: 10px 0; overflow: hidden; }
-.progress-fill { height: 100%; background: linear-gradient(90deg, var(--primary), #10b981); width: 0%; transition: 0.5s; }
+.side-dashboard {
+    position: fixed;
+    right: -180px; /* 평소에는 상세창을 숨김 */
+    top: 50%;
+    transform: translateY(-50%);
+    width: 230px; /* 전체 너비 (손잡이 포함) */
+    display: flex;
+    align-items: center;
+    z-index: 3000;
+    transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
 
+/* 펼쳐졌을 때의 상태 */
+.side-dashboard.active {
+    right: 0;
+}
+
+/* 손잡이 (항상 보이는 퍼센트 버튼) */
+.dash-handle {
+    width: 50px;
+    height: 50px;
+    background: var(--primary);
+    color: white;
+    border-radius: 15px 0 0 15px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-weight: 900;
+    font-size: 0.85rem;
+    box-shadow: -4px 0 15px rgba(0,0,0,0.1);
+}
+
+/* 상세 내용 박스 */
+.dash-content {
+    flex: 1;
+    background: #1e293b;
+    color: white;
+    padding: 15px;
+    border-radius: 0 0 0 15px;
+    box-shadow: -5px 5px 20px rgba(0,0,0,0.2);
+}
+
+.dash-item { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+.dash-label { font-size: 0.7rem; color: #94a3b8; }
+.dash-val { font-size: 0.9rem; font-weight: 800; color: #fbbf24; }
+
+.dash-progress-box { margin: 10px 0; }
+.dash-progress-bg { height: 6px; background: #334155; border-radius: 10px; overflow: hidden; }
+.dash-progress-fill { height: 100%; background: linear-gradient(90deg, #6366f1, #10b981); width: 0%; transition: 0.5s; }
+
+.dash-rem { font-size: 0.7rem; color: #cbd5e1; text-align: center; border-top: 1px solid #334155; pt: 8px; margin-top: 8px; }
+
+/* 모바일 대응 */
+@media (max-width: 600px) {
+    .side-dashboard { width: 210px; right: -160px; }
+}
 .write-btn { position: fixed; bottom: 140px; right: 30px; width: 60px; height: 60px; background: var(--primary); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 2rem; box-shadow: 0 10px 25px rgba(99, 102, 241, 0.4); border: none; cursor: pointer; z-index: 1000; transition: 0.3s; }
 .write-btn:hover { transform: scale(1.1) rotate(90deg); }
 
