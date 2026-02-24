@@ -22,16 +22,39 @@ function closeModal() { document.getElementById('writeModal').style.display = 'n
 function enableAdmin() { if(prompt("비밀번호") === "1234") { isAdmin = true; alert("관리자 모드 활성"); loadLiveView('posts'); } }
 
 // 게시글 작성
+// board.js 내 수정할 부분
 async function sendLivePost() {
     const col = document.getElementById('page-board').classList.contains('active') ? 'posts' : 'suggestions';
     const txt = document.getElementById('post-text').value;
     const file = document.getElementById('post-file').files[0];
     if(!txt.trim()) return;
-    let imgUrl = "";
-    if(file) imgUrl = await new Promise(res => { const r = new FileReader(); r.onload = e => res(e.target.result); r.readAsDataURL(file); });
-    db.collection(col).add({ authorId: myId, content: txt, image: imgUrl, timestamp: firebase.firestore.FieldValue.serverTimestamp() }).then(() => { closeModal(); document.getElementById('post-text').value=""; });
-}
 
+    let imgUrl = "";
+    if(file) {
+        // [이미지 압축 로직 추가]
+        imgUrl = await new Promise(res => {
+            const reader = new FileReader();
+            reader.readAsDataURL(file);
+            reader.onload = event => {
+                const img = new Image();
+                img.src = event.target.result;
+                img.onload = () => {
+                    const canvas = document.createElement('canvas');
+                    const max_size = 800; // 가로 세로 최대 800px로 제한
+                    let width = img.width;
+                    let height = img.height;
+                    if (width > height) { if (width > max_size) { height *= max_size / width; width = max_size; } }
+                    else { if (height > max_size) { width *= max_size / height; height = max_size; } }
+                    canvas.width = width; canvas.height = height;
+                    canvas.getContext('2d').drawImage(img, 0, 0, width, height);
+                    res(canvas.toDataURL('image/jpeg', 0.7)); // 화질 70%로 압축
+                };
+            };
+        });
+    }
+    db.collection(col).add({ authorId: myId, content: txt, image: imgUrl, timestamp: firebase.firestore.FieldValue.serverTimestamp() })
+    .then(() => { closeModal(); document.getElementById('post-text').value=""; });
+}
 // 피드 로드
 function loadLiveView(col) {
     db.collection(col).orderBy("timestamp", "desc").onSnapshot(snap => {
