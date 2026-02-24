@@ -97,7 +97,8 @@
 <div id="spdModal" class="modal">
     <div class="modal-card">
         <span class="close-x" onclick="closeSpdModal()">&times;</span>
-        <h3 id="spd-title" style="margin-top:0; margin-bottom:20px;">가속 계산기</h3>
+        <h3 id="spd-title" style="margin-top:0; margin-bottom:15px; font-size:1.1rem;">가속 계산기</h3>
+        
         <div class="tech-grid">
             <div class="tech-item">
                 <label id="lbl-m5">5분</label>
@@ -120,8 +121,9 @@
                 <input type="number" id="h8" class="compact-input" value="0" min="0" oninput="validatePos(this); calcSpdTotal()">
             </div>
         </div>
-        <div id="spd-result-text" style="margin: 25px 0; text-align: center; color: var(--primary); font-weight: 800; font-size: 1.3rem;">총: 0일 0시 0분</div>
-        <div style="display:grid; grid-template-columns: 1fr 2fr; gap:12px">
+        <div id="spd-result-text" style="margin: 15px 0; text-align: center; color: var(--primary); font-weight: 800; font-size: 1.1rem;">총: 0일 0시 0분</div>
+        
+        <div style="display:grid; grid-template-columns: 1fr 1.5fr; gap:10px">
             <button onclick="closeSpdModal()" class="btn-secondary">취소</button>
             <button onclick="applySpd()" class="btn-primary">적용하기</button>
         </div>
