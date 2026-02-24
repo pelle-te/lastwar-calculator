@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>라스트 워 VS 마스터 v7.4 (LIVE)</title>
+    <title>라스트 워 VS 마스터 v7.3 (LIVE)</title>
     <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-firestore-compat.js"></script>
     <style>
@@ -13,67 +13,32 @@
         }
         body { font-family: 'Pretendard', sans-serif; background-color: var(--bg); margin: 0; padding: 0; color: #1e293b; overflow-x: hidden; }
         
-        /* 상단 네비게이션 */
-        .nav-bar { background: #1e293b; display: flex; position: sticky; top: 0; z-index: 2000; padding: 5px; box-shadow: 0 2px 10px rgba(0,0,0,0.2); }
-        .nav-item { flex: 1; padding: 14px 0; text-align: center; color: #94a3b8; font-weight: 800; cursor: pointer; font-size: 0.9rem; transition: 0.3s; }
+        /* 네비게이션 */
+        .nav-bar { background: #1e293b; display: flex; position: sticky; top: 0; z-index: 1000; padding: 5px; box-shadow: 0 2px 10px rgba(0,0,0,0.2); }
+        .nav-item { flex: 1; padding: 12px 0; text-align: center; color: #94a3b8; font-weight: 800; cursor: pointer; font-size: 0.9rem; transition: 0.3s; }
         .nav-item.active { color: white; border-bottom: 3px solid var(--primary); }
 
-        .container { max-width: 600px; margin: 0 auto; padding-bottom: 160px; }
-        .page-content { display: none; padding: 15px; animation: fadeIn 0.3s ease; }
+        .page-content { display: none; padding: 15px; padding-bottom: 160px; animation: fadeIn 0.3s ease; }
         .page-content.active { display: block; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-        .card { background: white; border-radius: 20px; padding: 18px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); margin-bottom: 15px; border: 1px solid #e2e8f0; }
-        .section-title { font-size: 1rem; font-weight: 800; margin-bottom: 15px; color: var(--primary); }
+        .container { max-width: 600px; margin: 0 auto; }
+        .card { background: white; border-radius: 20px; padding: 16px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); margin-bottom: 15px; border: 1px solid #e2e8f0; }
+        .section-title { font-size: 1rem; font-weight: 800; margin-bottom: 15px; color: var(--primary); display: flex; align-items: center; gap: 8px; }
 
-        /* UI 깨짐 해결을 위한 새로운 입력 그룹 스타일 */
-        .input-group { 
-            background: #f8fafc; 
-            padding: 12px; 
-            border-radius: 12px; 
-            margin-bottom: 12px; 
-            border: 1px solid #e2e8f0;
-        }
-        .input-row { 
-            display: flex; 
-            justify-content: space-between; 
-            align-items: center; 
-            margin-bottom: 10px; 
-        }
-        .input-label { 
-            font-size: 0.9rem; 
-            font-weight: 700; 
-            color: #334155;
-            display: flex;
-            align-items: center;
-            gap: 5px;
-        }
-        .input-row input { 
-            width: 90px; 
-            text-align: right; 
-            border: 2px solid #cbd5e1; 
-            border-radius: 10px; 
-            padding: 6px 10px; 
-            font-weight: 800;
-            font-size: 0.95rem;
-            color: var(--primary);
-            outline: none;
-        }
-        .input-row input:focus { border-color: var(--primary); }
-
-        /* 슬라이더 스타일 */
-        input[type="range"] { width: 100%; height: 8px; border-radius: 10px; background: #e2e8f0; -webkit-appearance: none; outline: none; }
-        input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width: 22px; height: 22px; background: var(--primary); border-radius: 50%; border: 3px solid white; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
-
-        /* 목표 버튼 */
+        /* 목표 설정 버튼 - 보라색 하이라이트 고정 */
         .target-selector { display: flex; gap: 6px; }
-        .target-btn { flex: 1; padding: 12px; border-radius: 12px; border: 2px solid #ddd; background: white; color: #64748b; font-weight: 800; cursor: pointer; transition: 0.2s; text-align: center; }
+        .target-btn { flex: 1; padding: 12px; border-radius: 12px; border: 2px solid #ddd; background: white; color: #64748b; font-weight: 800; cursor: pointer; transition: 0.2s; text-align: center; outline: none; }
         .target-btn.active { border-color: var(--primary) !important; background: #eef2ff !important; color: var(--primary) !important; }
 
-        /* 요일 탭 */
+        /* 테크 및 요일 탭 */
+        .tech-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+        .tech-item { background: #f8fafc; padding: 10px; border-radius: 12px; border: 1px solid #e2e8f0; }
+        .tech-item label { font-size: 0.7rem; color: #64748b; display: block; margin-bottom: 4px; }
+        .tech-item select { width: 100%; border: none; background: transparent; font-weight: 800; color: var(--primary); outline: none; font-size: 0.85rem; }
         .day-tabs { display: grid; grid-template-columns: repeat(6, 1fr); gap: 4px; margin: 15px 0; }
-        .day-btn { padding: 12px 0; border-radius: 10px; border: none; color: white; font-weight: 800; opacity: 0.3; font-size: 0.85rem; cursor: pointer; }
-        .day-btn.active { opacity: 1; transform: scale(1.05); }
+        .day-btn { padding: 10px 0; border-radius: 10px; border: none; color: white; font-weight: 800; opacity: 0.3; font-size: 0.8rem; cursor: pointer; }
+        .day-btn.active { opacity: 1; transform: scale(1.05); box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
 
         /* 게시판 UI */
         .post-textarea { width: 100%; height: 100px; border: 1px solid #ddd; border-radius: 12px; padding: 12px; box-sizing: border-box; font-size: 0.95rem; margin-bottom: 10px; outline: var(--primary); resize: none; }
@@ -82,8 +47,8 @@
         .post-img { width: 100%; border-radius: 10px; margin-top: 10px; display: block; }
         .del-btn { position: absolute; top: 12px; right: 12px; background: #fee2e2; color: #ef4444; border: none; border-radius: 6px; padding: 5px 10px; font-size: 0.75rem; font-weight: 800; cursor: pointer; }
 
-        /* 하단 결과바 */
-        .result-bar { position: fixed; bottom: 0; left: 0; right: 0; background: #1e293b; color: white; padding: 18px; border-radius: 25px 25px 0 0; text-align: center; z-index: 3000; box-shadow: 0 -5px 20px rgba(0,0,0,0.3); }
+        /* 결과바 */
+        .result-bar { position: fixed; bottom: 0; left: 0; right: 0; background: #1e293b; color: white; padding: 18px; border-radius: 25px 25px 0 0; text-align: center; z-index: 2000; box-shadow: 0 -5px 20px rgba(0,0,0,0.3); }
         .total-score { font-size: 1.8rem; font-weight: 900; color: #fbbf24; }
         .progress-container { height: 10px; background: #334155; border-radius: 10px; margin: 8px 0; overflow: hidden; }
         .progress-fill { height: 100%; background: linear-gradient(90deg, var(--primary), #10b981); width: 0%; transition: 0.5s; }
@@ -156,7 +121,7 @@
 </div>
 
 <script>
-    // --- 1. Firebase 설정 ---
+    // --- 1. Firebase 및 사용자 인증 ---
     const firebaseConfig = {
         apiKey: "AIzaSyAbGdlE4KnelSrrKGLVaLcM5433ZZILVYE",
         authDomain: "lastwar-530f9.firebaseapp.com",
@@ -168,35 +133,32 @@
     firebase.initializeApp(firebaseConfig);
     const db = firebase.firestore();
 
-    if(!localStorage.getItem('vs_auth_token')) localStorage.setItem('vs_auth_token', 'token_' + Math.random().toString(36).substr(2, 12));
+    if(!localStorage.getItem('vs_auth_token')) {
+        localStorage.setItem('vs_auth_token', 'token_' + Math.random().toString(36).substr(2, 12));
+    }
     const myId = localStorage.getItem('vs_auth_token');
 
     let currentDay = 'mon', targetScore = 7200000;
 
-    // --- 2. 초기화 (테크 기본값 설정) ---
-    function init() {
-        const grid = document.getElementById('tech-inputs');
-        const techData = [
-            { id: 't-expert', label: '대결 전문가', def: 20 },
-            { id: 't-radar', label: '추당-레이더', def: 6 },
-            { id: 't-spd', label: '추당-가속', def: 6 },
-            { id: 't-rec', label: '추당-모집', def: 6 },
-            { id: 't-con', label: '추당-건설', def: 1 },
-            { id: 't-tec', label: '추당-테크', def: 1 },
-            { id: 't-trn', label: '추당-훈련', def: 6 },
-            { id: 't-kil', label: '추당-적처치', def: 6 }
-        ];
-        techData.forEach(t => {
-            grid.innerHTML += `<div class="tech-item"><label>${t.label}</label>
-                <select id="${t.id}" onchange="updateAll()">
-                ${Array.from({length: 21}, (_, lv) => `<option value="${lv}" ${lv===t.def?'selected':''}>Lv ${lv} (+${lv*5}%)</option>`).join('')}
-                </select></div>`;
+    // --- 2. 목표 설정 버튼 수정 (버그 해결 핵심) ---
+    function setTarget(score) {
+        targetScore = score;
+        
+        // 1. 모든 목표 버튼의 'active' 클래스 제거
+        document.querySelectorAll('.target-btn').forEach(btn => {
+            btn.classList.remove('active');
         });
-        switchTab('mon');
-        loadLiveView('posts');
-        loadLiveView('suggestions');
+        
+        // 2. 클릭된 점수에 해당하는 버튼에만 'active' 추가
+        const selectedBtn = document.getElementById('target-' + score);
+        if(selectedBtn) {
+            selectedBtn.classList.add('active');
+        }
+        
+        updateAll();
     }
 
+    // --- 3. 페이지 전환 및 공통 기능 ---
     function showPage(pageId) {
         document.querySelectorAll('.page-content').forEach(p => p.classList.remove('active'));
         document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
@@ -204,14 +166,6 @@
         document.getElementById('nav-' + pageId).classList.add('active');
     }
 
-    function setTarget(score) {
-        targetScore = score;
-        document.querySelectorAll('.target-btn').forEach(btn => btn.classList.remove('active'));
-        document.getElementById('target-' + score).classList.add('active');
-        updateAll();
-    }
-
-    // --- 3. 게시판 기능 ---
     async function sendLivePost(col) {
         const textElem = document.getElementById(col === 'posts' ? 'board-text' : 'qna-text');
         const fileElem = col === 'posts' ? document.getElementById('board-file') : null;
@@ -244,27 +198,54 @@
             snap.forEach(doc => {
                 const data = doc.data();
                 const time = data.timestamp ? new Date(data.timestamp.seconds*1000).toLocaleString('ko-KR', {month:'short', day:'numeric', hour:'2-digit', minute:'2-digit'}) : "방금 전";
-                const isMine = data.authorId === myId;
+                const canDelete = data.authorId === myId;
                 list.innerHTML += `
                     <div class="post-item">
                         <div class="post-time">${time}</div>
                         <div style="white-space:pre-wrap;">${data.content}</div>
                         ${data.image ? `<img src="${data.image}" class="post-img">` : ""}
-                        ${isMine ? `<button class="del-btn" onclick="deletePost('${col}', '${doc.id}')">삭제</button>` : ""}
+                        ${canDelete ? `<button class="del-btn" onclick="deletePost('${col}', '${doc.id}')">삭제</button>` : ""}
                     </div>`;
             });
         });
     }
 
-    function deletePost(col, id) { if(confirm("삭제하시겠습니까?")) db.collection(col).doc(id).delete(); }
-    function updateFileName(type) { const file = document.getElementById(type + '-file').files[0]; document.getElementById(type + '-filename').innerText = file ? "📸 " + file.name : ""; }
+    function deletePost(col, docId) {
+        if(confirm("이 글을 삭제하시겠습니까?")) db.collection(col).doc(docId).delete();
+    }
 
-    // --- 4. 계산기 점수 로직 ---
+    function updateFileName(type) {
+        const file = document.getElementById(type + '-file').files[0];
+        document.getElementById(type + '-filename').innerText = file ? "📸 " + file.name : "";
+    }
+
+    // --- 4. 계산기 핵심 로직 (정밀 역산 반영) ---
     const BASE = {
         radar: 10000, truck: 100000, secret: 75000, surv: 1500, spd_min: 50, pow_pt: 10,
-        exp_unit: 1.0/660, trp: [0, 20, 30, 40, 50, 60, 70, 80, 90, 100, 110],
-        kil_spec: [0, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55]
+        h_gather: 9523.5, drone_part: 2500, drone_data: 3, honor_medal: 300,
+        recruit: 1500, ur_shard: 10000, ssr_shard: 3500, sr_shard: 1000, skill_medal: 10, exp_unit: 1.0/660,
+        trp: [0, 20, 30, 40, 50, 60, 70, 80, 90, 100, 110],
+        kil_spec: [0, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55],
+        kil_gen: [0, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11],
+        dth: [0, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]
     };
+
+    function init() {
+        const grid = document.getElementById('tech-inputs');
+        const techLabels = ['대결 전문가','추당-레이더','추당-가속','추당-모집','추당-건설','추당-테크','추당-훈련','추당-적처치'];
+        const techDefs = ['t-expert','t-radar','t-spd','t-rec','t-con','t-tec','t-trn','t-kil'];
+        const techVals = [20, 6, 6, 6, 1, 1, 6, 6]; // 이미지 기준 디폴트
+        
+        techDefs.forEach((id, i) => {
+            grid.innerHTML += `<div class="tech-item"><label>${techLabels[i]}</label>
+                <select id="${id}" onchange="updateAll()">
+                ${Array.from({length: 21}, (_, lv) => `<option value="${lv}" ${lv===techVals[i]?'selected':''}>Lv ${lv} (+${lv*5}%)</option>`).join('')}
+                </select></div>`;
+        });
+        switchTab('mon');
+        loadLiveView('posts');
+        loadLiveView('suggestions');
+    }
 
     function switchTab(day) {
         currentDay = day;
@@ -291,16 +272,7 @@
         container.innerHTML = html;
     }
 
-    function renderRow(d, id, l, m) {
-        return `<div class="input-group">
-                    <div class="input-row">
-                        <div class="input-label">${l}</div>
-                        <input type="number" id="${d}-${id}" value="0" min="0" oninput="syncRange('${id}', this.value)">
-                    </div>
-                    <input type="range" id="range-${id}" min="0" max="${m}" value="0" step="1" oninput="syncInput('${id}', this.value)">
-                </div>`;
-    }
-
+    function renderRow(d, id, l, m) { return `<div class="input-group"><div class="input-row"><label>${l}</label><input type="number" id="${d}-${id}" value="0" min="0" oninput="syncRange('${id}', this.value)"></div><input type="range" id="range-${id}" min="0" max="${m}" value="0" step="1" oninput="syncInput('${id}', this.value)"></div>`; }
     function syncInput(id, v) { document.getElementById(`${currentDay}-${id}`).value = v; updateAll(); }
     function syncRange(id, v) { if(v<0) v=0; let r=document.getElementById('range-'+id); if(r) r.value=v; updateAll(); }
     function val(id) { let el = document.getElementById(id); return el ? parseFloat(el.value) || 0 : 0; }
@@ -308,12 +280,12 @@
     function updateAll() {
         const d = currentDay;
         let s = val(d+'-dia') * 30;
-        let m = { rad:val('t-radar')*0.05+val('t-expert')*0.05+1, exp:val('t-expert')*0.05+1 };
+        let m = { rad:val('t-radar')*0.05+val('t-expert')*0.05+1, spd:val('t-spd')*0.05+val('t-expert')*0.05+1, trn:val('t-trn')*0.05+val('t-expert')*0.05+1, exp:val('t-expert')*0.05+1 };
         
         if(d==='mon') s += (val('mon-radar')*BASE.radar*m.rad)+(val('mon-stam')*150*m.exp);
         else if(d==='tue') s += (val('tue-truck')*BASE.truck*m.exp)+(val('tue-sec')*BASE.secret*m.exp);
         else if(d==='wed') s += (val('wed-radar')*BASE.radar*m.rad);
-        else if(d==='fri') s += (val('fri-count')*BASE.trp[7]*m.exp);
+        else if(d==='fri') s += (val('fri-count')*BASE.trp[7]*m.trn);
         else if(d==='sat') s += (val('sat-kill')*BASE.kil_spec[7]*m.exp);
 
         document.getElementById('score').innerText = s.toLocaleString(undefined, {minimumFractionDigits: 1, maximumFractionDigits: 1});
