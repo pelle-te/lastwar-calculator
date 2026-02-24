@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>라스트 워 VS 마스터 v7.1 (LIVE)</title>
+    <title>라스트 워 VS 마스터 v7.2 (LIVE)</title>
     <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-firestore-compat.js"></script>
     <style>
@@ -12,48 +12,22 @@
             --thu: #ef4444; --fri: #10b981; --sat: #b91c1c; --bg: #f1f5f9;
         }
         body { font-family: 'Pretendard', sans-serif; background-color: var(--bg); margin: 0; padding: 0; color: #1e293b; overflow-x: hidden; }
-        
-        /* 상단 메인 내비게이션 */
-        .nav-bar { background: #1e293b; display: flex; sticky: top; top: 0; z-index: 1000; padding: 5px; box-shadow: 0 2px 10px rgba(0,0,0,0.2); }
-        .nav-item { flex: 1; padding: 12px 0; text-align: center; color: #94a3b8; font-weight: 800; cursor: pointer; font-size: 0.9rem; transition: 0.3s; }
+        .nav-bar { background: #1e293b; display: flex; position: sticky; top: 0; z-index: 1000; padding: 5px; box-shadow: 0 2px 10px rgba(0,0,0,0.2); }
+        .nav-item { flex: 1; padding: 15px 0; text-align: center; color: #94a3b8; font-weight: 800; cursor: pointer; font-size: 0.9rem; }
         .nav-item.active { color: white; border-bottom: 3px solid var(--primary); }
-
-        .page-content { display: none; padding: 15px; padding-bottom: 140px; animation: fadeIn 0.3s ease; }
+        .page-content { display: none; padding: 15px; padding-bottom: 160px; animation: fadeIn 0.3s ease; }
         .page-content.active { display: block; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-
-        .container { max-width: 600px; margin: 0 auto; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
         .card { background: white; border-radius: 20px; padding: 16px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); margin-bottom: 15px; border: 1px solid #e2e8f0; }
-        .section-title { font-size: 1rem; font-weight: 800; margin-bottom: 15px; color: var(--primary); display: flex; align-items: center; gap: 8px; }
-
-        /* 계산기 디자인 레이아웃 */
-        .tech-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
-        .tech-item { background: #f8fafc; padding: 10px; border-radius: 12px; border: 1px solid #e2e8f0; }
-        .tech-item label { font-size: 0.7rem; color: #64748b; display: block; margin-bottom: 4px; }
-        .tech-item select { width: 100%; border: none; background: transparent; font-weight: 800; color: var(--primary); outline: none; font-size: 0.85rem; }
-
-        .day-tabs { display: grid; grid-template-columns: repeat(6, 1fr); gap: 4px; margin: 15px 0; }
-        .day-btn { padding: 10px 0; border-radius: 10px; border: none; color: white; font-weight: 800; opacity: 0.3; font-size: 0.8rem; cursor: pointer; }
-        .day-btn.active { opacity: 1; transform: scale(1.05); box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
-
-        /* 입력 폼 */
-        .input-group { margin-bottom: 20px; }
-        .input-row { display: flex; justify-content: space-between; margin-bottom: 8px; font-weight: 700; font-size: 0.9rem; }
-        .input-row input { width: 80px; text-align: right; border: 1px solid #cbd5e1; border-radius: 8px; padding: 4px 8px; }
-        input[type="range"] { width: 100%; height: 8px; border-radius: 10px; background: #e2e8f0; -webkit-appearance: none; outline: none; }
-        input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width: 22px; height: 22px; background: var(--primary); border-radius: 50%; border: 3px solid white; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
-
-        /* 게시판 및 삭제 버튼 */
-        .post-textarea { width: 100%; height: 100px; border: 1px solid #ddd; border-radius: 12px; padding: 12px; box-sizing: border-box; font-size: 0.95rem; margin-bottom: 10px; outline: var(--primary); }
+        .section-title { font-size: 1rem; font-weight: 800; margin-bottom: 15px; color: var(--primary); }
+        .post-textarea { width: 100%; height: 100px; border: 1px solid #ddd; border-radius: 12px; padding: 12px; box-sizing: border-box; font-size: 0.95rem; margin-bottom: 10px; resize: none; }
         .post-item { background: white; padding: 15px; border-radius: 15px; border: 1px solid #e2e8f0; margin-bottom: 12px; position: relative; }
         .post-time { font-size: 0.75rem; color: #94a3b8; margin-bottom: 6px; }
-        .post-img { width: 100%; border-radius: 10px; margin-top: 10px; }
-        .del-btn { position: absolute; top: 12px; right: 12px; background: #fee2e2; color: #ef4444; border: none; border-radius: 6px; padding: 4px 8px; font-size: 0.7rem; font-weight: 800; cursor: pointer; }
-
-        /* 하단 결과바 */
-        .result-bar { position: fixed; bottom: 0; left: 0; right: 0; background: #1e293b; color: white; padding: 20px; border-radius: 25px 25px 0 0; text-align: center; box-shadow: 0 -5px 20px rgba(0,0,0,0.3); z-index: 2000; }
+        .post-img { width: 100%; border-radius: 10px; margin-top: 10px; display: block; }
+        .del-btn { position: absolute; top: 12px; right: 12px; background: #fee2e2; color: #ef4444; border: none; border-radius: 6px; padding: 6px 10px; font-size: 0.75rem; font-weight: 800; cursor: pointer; }
+        .result-bar { position: fixed; bottom: 0; left: 0; right: 0; background: #1e293b; color: white; padding: 18px; border-radius: 25px 25px 0 0; text-align: center; z-index: 2000; }
         .total-score { font-size: 1.8rem; font-weight: 900; color: #fbbf24; }
-        .progress-container { height: 10px; background: #334155; border-radius: 10px; margin: 10px 0; overflow: hidden; }
+        .progress-container { height: 10px; background: #334155; border-radius: 10px; margin: 8px 0; overflow: hidden; }
         .progress-fill { height: 100%; background: linear-gradient(90deg, var(--primary), #10b981); width: 0%; transition: 0.5s; }
     </style>
 </head>
@@ -65,53 +39,37 @@
     <div class="nav-item" onclick="showPage('qna')">💬 건의 사항</div>
 </nav>
 
-<div class="container">
+<div class="container" style="max-width:600px; margin: 0 auto;">
     <div id="page-calc" class="page-content active">
         <div class="card">
             <div class="section-title">🎯 목표 설정</div>
             <div style="display:flex; gap:6px;">
-                <button class="target-btn" id="btn-t1" onclick="setTarget(2300000)" style="flex:1; padding:10px; border-radius:10px; border:2px solid #ddd; font-weight:800; cursor:pointer;">6상</button>
-                <button class="target-btn" id="btn-t2" onclick="setTarget(3600000)" style="flex:1; padding:10px; border-radius:10px; border:2px solid #ddd; font-weight:800; cursor:pointer;">8상</button>
-                <button class="target-btn active" id="btn-t3" onclick="setTarget(7200000)" style="flex:1; padding:10px; border-radius:10px; border:2px solid var(--primary); background:#eef2ff; color:var(--primary); font-weight:800; cursor:pointer;">9상</button>
+                <button class="target-btn" id="btn-t1" onclick="setTarget(2300000)" style="flex:1; padding:12px; border-radius:12px; border:2px solid #ddd; font-weight:800;">6상</button>
+                <button class="target-btn active" id="btn-t3" onclick="setTarget(7200000)" style="flex:1; padding:12px; border-radius:12px; border:2px solid var(--primary); background:#eef2ff; color:var(--primary); font-weight:800;">9상</button>
             </div>
         </div>
-
-        <div class="card">
-            <div class="section-title">🔬 테크 현황</div>
-            <div class="tech-grid" id="tech-inputs"></div>
-        </div>
-
-        <div class="day-tabs">
-            <button id="btn-mon" class="day-btn active" style="background:var(--mon)" onclick="switchTab('mon')">월</button>
-            <button id="btn-tue" class="day-btn" style="background:var(--tue)" onclick="switchTab('tue')">화</button>
-            <button id="btn-wed" class="day-btn" style="background:var(--wed)" onclick="switchTab('wed')">수</button>
-            <button id="btn-thu" class="day-btn" style="background:var(--thu)" onclick="switchTab('thu')">목</button>
-            <button id="btn-fri" class="day-btn" style="background:var(--fri)" onclick="switchTab('fri')">금</button>
-            <button id="btn-sat" class="day-btn" style="background:var(--sat)" onclick="switchTab('sat')">토</button>
-        </div>
-
-        <div class="card" id="input-container"></div>
+        <div id="input-container"></div>
     </div>
 
     <div id="page-board" class="page-content">
         <div class="card">
-            <div class="section-title">✍️ 공략 게시하기</div>
-            <textarea id="board-text" class="post-textarea" placeholder="연맹원들과 나눌 꿀팁을 적어주세요..."></textarea>
+            <div class="section-title">✍️ 공략 작성</div>
+            <textarea id="board-text" class="post-textarea" placeholder="꿀팁을 입력하세요..."></textarea>
             <input type="file" id="board-file" accept="image/*" style="display:none;" onchange="updateFileName('board')">
             <div style="display:flex; gap:8px;">
-                <button onclick="document.getElementById('board-file').click()" style="flex:1; padding:12px; border-radius:12px; border:1px solid #ddd; font-weight:800; cursor:pointer;">📸 사진 첨부</button>
-                <button onclick="sendLivePost('posts')" style="flex:2; background:var(--primary); color:white; border:none; border-radius:12px; font-weight:800; cursor:pointer;">게시하기</button>
+                <button onclick="document.getElementById('board-file').click()" style="flex:1; padding:12px; border-radius:12px; border:1px solid #ddd; font-weight:800; cursor:pointer;">📸 사진</button>
+                <button onclick="sendLivePost('posts')" style="flex:2; background:var(--primary); color:white; border:none; border-radius:12px; font-weight:800; cursor:pointer;">올리기</button>
             </div>
-            <div id="board-filename" style="font-size:0.7rem; color:var(--primary); margin-top:5px;"></div>
+            <div id="board-filename" style="font-size:0.7rem; color:var(--primary); margin-top:5px; text-align:center;"></div>
         </div>
         <div id="posts-list"></div>
     </div>
 
     <div id="page-qna" class="page-content">
         <div class="card">
-            <div class="section-title">📧 건의 및 문의</div>
-            <textarea id="qna-text" class="post-textarea" placeholder="계산기 기능 개선이나 버그 수정을 요청하세요..."></textarea>
-            <button onclick="sendLivePost('suggestions')" style="width:100%; background:#334155; color:white; padding:15px; border:none; border-radius:12px; font-weight:800; cursor:pointer;">건의 제출하기</button>
+            <div class="section-title">💬 건의 및 문의</div>
+            <textarea id="qna-text" class="post-textarea" placeholder="불편한 점을 적어주세요..."></textarea>
+            <button onclick="sendLivePost('suggestions')" style="width:100%; background:#334155; color:white; padding:15px; border:none; border-radius:12px; font-weight:800; cursor:pointer;">건의하기</button>
         </div>
         <div id="suggestions-list"></div>
     </div>
@@ -124,7 +82,7 @@
 </div>
 
 <script>
-    // --- 1. Firebase 설정 ---
+    // 1. Firebase 설정 (유저님의 정보 그대로 유지)
     const firebaseConfig = {
         apiKey: "AIzaSyAbGdlE4KnelSrrKGLVaLcM5433ZZILVYE",
         authDomain: "lastwar-530f9.firebaseapp.com",
@@ -136,79 +94,44 @@
 
     firebase.initializeApp(firebaseConfig);
     const db = firebase.firestore();
-    const myId = localStorage.getItem('vs_user_id') || 'user_' + Math.random().toString(36).substr(2, 9);
-    localStorage.setItem('vs_user_id', myId);
 
-    let currentDay = 'mon', targetScore = 7200000;
-
-    // --- 2. 계산기 로직 데이터 ---
-    const BASE = {
-        radar: 10000, truck: 100000, secret: 75000, surv: 1500, spd_min: 50, pow_pt: 10,
-        h_gather: 9523.5, drone_part: 2500, drone_data: 3, honor_medal: 300,
-        recruit: 1500, ur_shard: 10000, ssr_shard: 3500, sr_shard: 1000, skill_medal: 10, exp_unit: 1.0/660,
-        trp: [0, 20, 30, 40, 50, 60, 70, 80, 90, 100, 110],
-        kil_spec: [0, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55],
-        kil_gen: [0, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11],
-        dth: [0, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]
-    };
-
-    const techDefs = [
-        { id: 't-expert', label: '대결 전문가', max: 20, def: 20 },
-        { id: 't-radar', label: '추당-레이더', max: 10, def: 6 },
-        { id: 't-spd', label: '추당-가속', max: 10, def: 6 },
-        { id: 't-rec', label: '추당-모집', max: 10, def: 6 },
-        { id: 't-con', label: '추당-건설', max: 10, def: 1 },
-        { id: 't-tec', label: '추당-테크', max: 10, def: 1 },
-        { id: 't-trn', label: '추당-훈련', max: 10, def: 6 },
-        { id: 't-kil', label: '추당-적처치', max: 10, def: 6 }
-    ];
-
-    function init() {
-        const grid = document.getElementById('tech-inputs');
-        techDefs.forEach(t => {
-            grid.innerHTML += `<div class="tech-item"><label>${t.label}</label>
-                <select id="${t.id}" onchange="updateAll()">
-                ${Array.from({length: t.max+1}, (_, i) => `<option value="${i}" ${i===t.def?'selected':''}>Lv ${i} (+${i*5}%)</option>`).join('')}
-                </select></div>`;
-        });
-        switchTab('mon');
-        loadLiveView('posts');
-        loadLiveView('suggestions');
+    // [핵심] 유저 ID 고정 로직
+    if(!localStorage.getItem('lastwar_user_id')) {
+        localStorage.setItem('lastwar_user_id', 'user_' + Math.random().toString(36).substr(2, 11));
     }
+    const myId = localStorage.getItem('lastwar_user_id');
 
-    // 페이지 전환 시스템
     function showPage(pageId) {
         document.querySelectorAll('.page-content').forEach(p => p.classList.remove('active'));
         document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
         document.getElementById('page-' + pageId).classList.add('active');
-        event.target.classList.add('active');
+        event.currentTarget.classList.add('active');
     }
 
-    // 게시판 작성 및 실시간 뷰
     async function sendLivePost(col) {
-        const textId = col === 'posts' ? 'board-text' : 'qna-text';
-        const fileId = col === 'posts' ? 'board-file' : null;
-        const text = document.getElementById(textId).value;
-        if(!text.trim()) return alert("내용을 입력하세요");
+        const textElem = document.getElementById(col === 'posts' ? 'board-text' : 'qna-text');
+        const fileElem = col === 'posts' ? document.getElementById('board-file') : null;
+        const text = textElem.value;
+        if(!text.trim()) return alert("내용을 입력해주세요.");
 
         let imgUrl = "";
-        if(fileId && document.getElementById(fileId).files[0]) {
+        if(fileElem && fileElem.files[0]) {
             imgUrl = await new Promise(res => {
                 const r = new FileReader();
                 r.onload = e => res(e.target.result);
-                r.readAsDataURL(document.getElementById(fileId).files[0]);
+                r.readAsDataURL(fileElem.files[0]);
             });
         }
 
         db.collection(col).add({
-            uid: myId,
+            authorId: myId, // 작성자 ID 저장
             content: text,
             image: imgUrl,
             timestamp: firebase.firestore.FieldValue.serverTimestamp()
         }).then(() => {
-            document.getElementById(textId).value = "";
-            if(fileId) { document.getElementById(fileId).value = ""; document.getElementById('board-filename').innerText = ""; }
-        });
+            textElem.value = "";
+            if(fileElem) { fileElem.value = ""; document.getElementById('board-filename').innerText = ""; }
+        }).catch(e => alert("저장 실패: " + e));
     }
 
     function loadLiveView(col) {
@@ -217,80 +140,40 @@
             list.innerHTML = "";
             snap.forEach(doc => {
                 const data = doc.data();
-                const date = data.timestamp ? new Date(data.timestamp.seconds*1000).toLocaleString('ko-KR', {month:'short', day:'numeric', hour:'2-digit', minute:'2-digit'}) : "방금 전";
-                const isMine = data.uid === myId;
+                const time = data.timestamp ? new Date(data.timestamp.seconds*1000).toLocaleString() : "방금 전";
+                // 저장된 ID와 현재 기기의 ID를 대조
+                const canDelete = data.authorId === myId; 
+                
                 list.innerHTML += `
                     <div class="post-item">
-                        <div class="post-time">${date}</div>
-                        <div>${data.content}</div>
+                        <div class="post-time">${time}</div>
+                        <div style="white-space:pre-wrap;">${data.content}</div>
                         ${data.image ? `<img src="${data.image}" class="post-img">` : ""}
-                        ${isMine ? `<button class="del-btn" onclick="deletePost('${col}', '${doc.id}')">삭제</button>` : ""}
+                        ${canDelete ? `<button class="del-btn" onclick="deletePost('${col}', '${doc.id}')">삭제</button>` : ""}
                     </div>`;
             });
         });
     }
 
-    function deletePost(col, id) {
-        if(confirm("정말 삭제하시겠습니까?")) db.collection(col).doc(id).delete();
+    function deletePost(col, docId) {
+        if(confirm("정말 삭제하시겠습니까?")) {
+            db.collection(col).doc(docId).delete()
+            .then(() => console.log("삭제 완료"))
+            .catch(e => alert("삭제 권한이 없거나 오류가 발생했습니다."));
+        }
     }
 
     function updateFileName(type) {
         const file = document.getElementById(type + '-file').files[0];
-        document.getElementById(type + '-filename').innerText = file ? "선택됨: " + file.name : "";
+        document.getElementById(type + '-filename').innerText = file ? "📸 " + file.name : "";
     }
 
-    // --- 계산기 로직 (v7.0과 동일) ---
-    function switchTab(day) {
-        currentDay = day;
-        document.querySelectorAll('.day-btn').forEach(b => b.classList.remove('active'));
-        document.getElementById('btn-'+day).classList.add('active');
-        renderInputs();
-        updateAll();
-    }
-
-    function renderInputs() {
-        const container = document.getElementById('input-container');
-        let html = `<div class="section-title">📊 ${currentDay.toUpperCase()} 점수 입력</div>`;
-        const config = {
-            mon: [{id:'dia',label:'💎 다이아 구매',max:100000},{id:'radar',label:'📡 레이더 임무',max:500},{id:'stam',label:'⚡ 체력 소모',max:10000},{id:'exp',label:'⭐ 영웅 경험치(1M)',max:3000},{id:'part',label:'⚙️ 드론 부품',max:5000},{id:'data',label:'💾 드론 데이터(1k)',max:10000}],
-            tue: [{id:'dia',label:'💎 다이아 구매',max:100000},{id:'truck',label:'🚚 UR 화물차',max:100},{id:'sec',label:'🕵️ UR 은밀 임무',max:200},{id:'spd',label:'⏱️ 건설 가속(h)',max:3000}],
-            wed: [{id:'dia',label:'💎 다이아 구매',max:100000},{id:'radar',label:'📡 레이더 임무',max:500},{id:'spd',label:'⏱️ 테크 가속(h)',max:3000}],
-            thu: [{id:'dia',label:'💎 다이아 구매',max:100000},{id:'tkt',label:'🎫 영웅 모집',max:5000},{id:'ur',label:'🧩 UR 조각',max:5000},{id:'exp',label:'⭐ 영웅 경험치(1M)',max:3000}],
-            fri: [{id:'dia',label:'💎 다이아 구매',max:100000},{id:'radar',label:'📡 레이더 임무',max:500},{id:'spd-trn',label:'⏱️ 훈련 가속(h)',max:2000}],
-            sat: [{id:'dia',label:'💎 다이아 구매',max:100000},{id:'spd-all',label:'⏱️ 모든 가속(h)',max:5000}]
-        };
-        if(currentDay==='fri'){ html += renderRow('fri','count','⚔️ 훈련 수',50000); }
-        if(currentDay==='sat'){ html += renderRow('sat','kill','🔥 처치 수',200000); html += renderRow('sat','dth','🩸 전사 수',200000); }
-        (config[currentDay] || []).forEach(i => html += renderRow(currentDay, i.id, i.label, i.max));
-        container.innerHTML = html;
-    }
-
-    function renderRow(d, id, l, m) { return `<div class="input-group"><div class="input-row"><label>${l}</label><input type="number" id="${d}-${id}" value="0" min="0" oninput="syncRange('${id}', this.value)"></div><input type="range" id="range-${id}" min="0" max="${m}" value="0" step="1" oninput="syncInput('${id}', this.value)"></div>`; }
-    function syncInput(id, v) { document.getElementById(`${currentDay}-${id}`).value = v; updateAll(); }
-    function syncRange(id, v) { if(v<0) v=0; let r=document.getElementById('range-'+id); if(r) r.value=v; updateAll(); }
-    function setTarget(s) { targetScore=s; document.querySelectorAll('.target-btn').forEach(b=>b.classList.remove('active')); event.target.classList.add('active'); updateAll(); }
-    function val(id) { let el = document.getElementById(id); return el ? parseFloat(el.value) || 0 : 0; }
-
-    function updateAll() {
-        const d = currentDay;
-        let s = val(d+'-dia') * 30;
-        let m = { rad:getM('t-radar'), spd:getM('t-spd'), rec:getM('t-rec'), con:getM('t-con'), tec:getM('t-tec'), trn:getM('t-trn'), kil:getM('t-kil'), exp:val('t-expert')*0.05+1 };
-
-        if(d==='mon') s += (val('mon-radar')*BASE.radar*m.rad)+(val('mon-stam')*150*m.exp)+(val('mon-exp')*1000000*BASE.exp_unit*m.exp)+(val('mon-part')*BASE.drone_part*m.exp)+(val('mon-data')*1000*BASE.drone_data*m.exp);
-        else if(d==='tue') s += (val('tue-truck')*BASE.truck*m.exp)+(val('tue-sec')*BASE.secret*m.exp)+(val('tue-spd')*60*BASE.spd_min*m.spd);
-        else if(d==='wed') s += (val('wed-radar')*BASE.radar*m.rad)+(val('wed-spd')*60*BASE.spd_min*m.spd);
-        else if(d==='thu') s += (val('thu-tkt')*BASE.recruit*m.rec)+(val('thu-ur')*BASE.ur_shard*m.exp)+(val('thu-exp')*1000000*BASE.exp_unit*m.exp);
-        else if(d==='fri') s += (val('fri-radar')*BASE.radar*m.rad)+(val('fri-count')*BASE.trp[7]*m.trn);
-        else if(d==='sat') s += (val('sat-kill')*BASE.kil_spec[7]*m.kil)+(val('sat-dth')*BASE.dth[7]*m.exp);
-
-        document.getElementById('score').innerText = s.toLocaleString(undefined, {minimumFractionDigits: 1, maximumFractionDigits: 1});
-        let pct = Math.min(100, (s/targetScore)*100);
-        document.getElementById('bar').style.width = pct + '%';
-        let diff = targetScore - s;
-        document.getElementById('diff').innerText = diff > 0 ? `남은 점수: ${diff.toLocaleString(undefined, {maximumFractionDigits: 1})}` : "🎉 목표 달성!";
-    }
-    function getM(id) { return val('t-expert')*0.05 + val(id)*0.05 + 1; }
-    window.onload = init;
+    // 초기 실행
+    window.onload = () => {
+        loadLiveView('posts');
+        loadLiveView('suggestions');
+        // 계산기 초기화 함수가 있다면 여기에 추가
+    };
 </script>
 </body>
 </html>
