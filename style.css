@@ -1,64 +1,100 @@
-/* 전반적인 폰트 및 배경 설정 */
-@import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css');
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>라스트 워 VS 마스터 v8.5</title>
+    <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-firestore-compat.js"></script>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="header-bar">
+        <div class="logo">ALLIANCE MASTER</div>
+        <div style="display: flex; align-items: center; gap: 15px;">
+            <div class="lang-selector" style="font-size: 0.8rem; font-weight: 800; cursor: pointer;">
+                <span id="lang-ko" onclick="changeLang('ko')" style="color: var(--primary);">KO</span> | 
+                <span id="lang-en" onclick="changeLang('en')" style="color: #94a3b8;">EN</span>
+            </div>
+            <div class="live-counter"><div class="live-dot"></div><span id="user-count">연결 중...</span></div>
+        </div>
+    </div>
 
-:root {
-    --primary: #4f46e5; --mon: #3b82f6; --tue: #f59e0b; --wed: #8b5cf6;
-    --thu: #ef4444; --fri: #10b981; --sat: #b91c1c; --bg: #f8fafc;
-    --insta-border: #dbdbdb;
-}
+    <nav class="nav-bar">
+        <div id="nav-calc" class="nav-item active" onclick="showPage('calc')">📊 계산기</div>
+        <div id="nav-board" class="nav-item" onclick="showPage('board')">📱 피드</div>
+        <div id="nav-qna" class="nav-item" onclick="showPage('qna')">💬 건의</div>
+    </nav>
 
-body { font-family: 'Pretendard', sans-serif; background-color: var(--bg); margin: 0; padding: 0; color: #262626; overflow-x: hidden; }
+    <div class="container">
+        <div id="page-calc" class="page-content active">
+            <div class="card">
+                <div class="section-title">🎯 DAILY GOAL</div>
+                <div class="target-selector">
+                    <button class="target-btn" id="target-2300000" onclick="setTarget(2300000)">6상</button>
+                    <button class="target-btn" id="target-3600000" onclick="setTarget(3600000)">8상</button>
+                    <button class="target-btn active" id="target-7200000" onclick="setTarget(7200000)">9상</button>
+                </div>
+            </div>
+            <div class="card">
+                <div class="section-title">🔬 ALLIANCE TECH</div>
+                <div class="tech-grid" id="tech-inputs"></div>
+            </div>
+            <div class="day-tabs" id="day-tabs-container"></div>
+            <div id="input-container"></div>
+        </div>
+        <div id="page-board" class="page-content"><div id="posts-list"></div></div>
+        <div id="page-qna" class="page-content"><div id="suggestions-list"></div></div>
+    </div>
 
-/* 상단 라이브 바 */
-.header-bar { background: white; border-bottom: 1px solid var(--insta-border); display: flex; align-items: center; justify-content: space-between; padding: 10px 20px; position: sticky; top: 0; z-index: 2000; }
-.logo { font-size: 1.1rem; font-weight: 900; background: linear-gradient(45deg, #f09433, #dc2743, #bc1888); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-.live-counter { font-size: 0.75rem; font-weight: 700; color: #ed4956; display: flex; align-items: center; gap: 5px; }
-.live-dot { width: 7px; height: 7px; background: #ed4956; border-radius: 50%; animation: blink 1.2s infinite; }
-@keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
+    <div class="result-bar">
+        <div class="total-score" id="score">0.0</div>
+        <div class="progress-container"><div class="progress-fill" id="bar"></div></div>
+        <div id="diff" style="font-size:0.85rem; color:#cbd5e1; font-weight:600;">남은 점수: 7,200,000</div>
+    </div>
 
-/* 네비게이션 메인 탭 */
-.nav-bar { background: white; display: flex; border-bottom: 1px solid var(--insta-border); }
-.nav-item { flex: 1; padding: 15px 0; text-align: center; color: #8e8e8e; font-weight: 700; cursor: pointer; font-size: 0.9rem; transition: 0.2s; }
-.nav-item.active { color: #262626; border-bottom: 2px solid #262626; }
+    <div id="float-btn" class="write-btn" style="display:none;" onclick="openModal()">+</div>
+    
+    <div id="writeModal" class="modal">
+        <div class="modal-card">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+                <h3 id="modal-title" style="margin:0;">전략 공유하기 🖋️</h3>
+                <span class="close-x" onclick="closeModal()">&times;</span>
+            </div>
+            <input type="hidden" id="edit-doc-id">
+            <textarea id="post-text" placeholder="첫 줄은 제목이 됩니다..."></textarea>
+            <div style="margin:20px 0;"><input type="file" id="post-file" accept="image/*"></div>
+            <button onclick="sendLivePost()" class="btn-primary" style="width:100%;" id="submit-btn">게시하기</button>
+        </div>
+    </div>
 
-/* 컨테이너 및 카드 */
-.container { max-width: 600px; margin: 0 auto; padding: 15px; padding-bottom: 180px; }
-.page-content { display: none; animation: fadeIn 0.3s ease; }
-.page-content.active { display: block; }
-@keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    <div id="viewModal" class="modal">
+        <div class="modal-card">
+            <span class="close-x" onclick="closeViewModal()">&times;</span>
+            <div id="view-body" style="margin-top:20px;">
+                <div id="view-content"></div>
+                <img id="view-img" style="width:100%; border-radius:12px; margin:20px 0; display:none;">
+            </div>
+            <div style="display:flex; gap:15px; margin-top:20px; border-top:1px solid #eee; padding-top:20px;">
+                <span onclick="toggleReplySection()" style="cursor:pointer; color:var(--primary); font-weight:800; font-size:0.9rem;">💬 댓글</span>
+                <span id="edit-link" style="display:none; cursor:pointer; color:var(--text-muted); font-size:0.9rem;" onclick="prepareEdit()">✏️ 수정</span>
+            </div>
+            <div id="reply-container" style="display:none; margin-top:20px;">
+                <div id="view-replies" class="reply-section"></div>
+                <div class="reply-input-group">
+                    <input type="text" id="view-reply-input" class="reply-input" placeholder="의견을 남겨주세요...">
+                    <button id="view-reply-btn" class="btn-primary" style="padding:10px 15px;">등록</button>
+                </div>
+            </div>
+            <div id="delete-area" style="display:none; text-align:right; margin-top:30px;">
+                <span style="font-size:0.75rem; color:#ccc; cursor:pointer;" onclick="deleteCurrentPost()">게시물 삭제</span>
+            </div>
+        </div>
+    </div>
 
-.card { background: white; border-radius: 20px; padding: 20px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); border: 1px solid #e2e8f0; margin-bottom: 15px; }
-.section-title { font-size: 1rem; font-weight: 800; margin-bottom: 15px; color: var(--primary); display: flex; align-items: center; gap: 8px; }
+    <div class="admin-link" onclick="enableAdmin()">🛡️ Admin Mode</div>
 
-/* 요일별 입력 그리드 */
-.input-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-.input-group-compact { background: #f8fafc; padding: 12px; border-radius: 15px; border: 1px solid #e2e8f0; display: flex; flex-direction: column; justify-content: space-between; }
-.input-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px; }
-.input-label-small { font-size: 0.8rem; font-weight: 700; color: #475569; line-height: 1.2; }
-.item-score-tag { font-size: 0.7rem; color: var(--primary); font-weight: 800; background: #eef2ff; padding: 2px 6px; border-radius: 6px; }
-.compact-input { width: 100%; border: 1px solid #cbd5e1; border-radius: 8px; padding: 8px; font-weight: 800; color: var(--primary); outline: none; text-align: right; box-sizing: border-box; }
-
-/* 가속 관련 스타일 */
-.spd-btn-mini { margin-top: 8px; font-size: 0.7rem; padding: 6px; background: white; border: 1px solid var(--primary); color: var(--primary); border-radius: 8px; cursor: pointer; font-weight: 700; transition: 0.2s; }
-.spd-btn-mini:hover { background: var(--primary); color: white; }
-.time-display { font-size: 0.7rem; color: #64748b; margin-top: 5px; font-weight: 600; text-align: center; }
-
-/* 나머지 기존 스타일... */
-.target-selector { display: flex; gap: 6px; }
-.target-btn { flex: 1; padding: 12px; border-radius: 12px; border: 2px solid #f1f5f9; background: white; color: #64748b; font-weight: 800; cursor: pointer; transition: 0.2s; text-align: center; }
-.target-btn.active { border-color: var(--primary); background: #eef2ff; color: var(--primary); }
-.tech-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-.tech-item { background: #f8fafc; padding: 12px; border-radius: 12px; border: 1px solid #e2e8f0; display: flex; flex-direction: column; gap: 4px; }
-.tech-item label { font-size: 0.7rem; color: #64748b; font-weight: 700; }
-.tech-item input, .tech-item select { width: 100%; border: none; background: transparent; font-weight: 800; color: var(--primary); outline: none; font-size: 0.85rem; }
-.day-tabs { display: grid; grid-template-columns: repeat(6, 1fr); gap: 4px; margin: 15px 0; }
-.day-btn { padding: 12px 0; border-radius: 10px; border: none; color: white; font-weight: 800; opacity: 0.3; font-size: 0.85rem; cursor: pointer; transition: 0.2s; }
-.day-btn.active { opacity: 1; transform: scale(1.05); box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
-.result-bar { position: fixed; bottom: 0; left: 0; right: 0; background: #1e293b; color: white; padding: 20px; border-radius: 25px 25px 0 0; text-align: center; z-index: 3000; box-shadow: 0 -5px 20px rgba(0,0,0,0.3); }
-.total-score { font-size: 1.8rem; font-weight: 900; color: #fbbf24; }
-.progress-container { height: 10px; background: #334155; border-radius: 10px; margin: 10px 0; overflow: hidden; }
-.progress-fill { height: 100%; background: linear-gradient(90deg, var(--primary), #10b981); width: 0%; transition: 0.5s; }
-.modal { display: none; position: fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); z-index:4000; }
-.modal-card { background:white; width:90%; max-width:400px; margin: 50px auto; border-radius:20px; padding:20px; }
-.btn-secondary { background: #f1f5f9; border: none; padding: 12px; border-radius: 10px; font-weight: 700; cursor: pointer; }
-textarea { width: 100%; height: 100px; border: 1px solid #ddd; border-radius: 10px; padding: 10px; box-sizing: border-box; resize: none; }
+    <script src="calc.js"></script>
+    <script src="board.js"></script>
+</body>
+</html>
