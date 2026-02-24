@@ -138,35 +138,39 @@ body { font-family: 'Pretendard', sans-serif; background-color: #f1f5f9; margin:
 /* [복구] 최하단 고정 슬림 바 디자인 */
 .result-bar.slim-version {
     position: fixed;
-    bottom: 0; left: 0; right: 0;
-    background: #1e293b; /* 어두운 네이비 */
-    padding: 10px 20px;
+    bottom: 0; 
+    left: 0; 
+    right: 0;
+    background: #1e293b; /* 진한 네이비 배경 */
+    padding: 8px 15px; /* 높이를 더 줄여서 슬림하게 */
     display: flex;
     flex-direction: column;
-    gap: 6px;
-    z-index: 3000;
+    gap: 4px;
+    z-index: 9999; /* 다른 카드보다 무조건 위에 표시 */
     border-top: 1px solid rgba(255,255,255,0.1);
-    box-shadow: 0 -4px 20px rgba(0,0,0,0.3);
+    box-shadow: 0 -4px 15px rgba(0,0,0,0.3);
 }
 
+/* 내부 정보 가로 정렬 */
 .result-info {
     display: flex;
-    justify-content: space-around;
+    justify-content: space-between;
     align-items: center;
+    padding: 0 5px;
 }
 
-.info-group { display: flex; align-items: baseline; gap: 8px; }
-.info-label { font-size: 0.65rem; color: #94a3b8; font-weight: 700; }
-.info-val { font-size: 1rem; font-weight: 900; color: #fbbf24; } /* 금색 점수 */
+.info-group { display: flex; align-items: baseline; gap: 6px; }
+.info-label { font-size: 0.6rem; color: #94a3b8; font-weight: 800; }
+.info-val { font-size: 0.9rem; font-weight: 900; color: #fbbf24; } /* 금색 점수 */
 
-.progress-section { display: flex; flex-direction: column; gap: 4px; }
-
+/* 슬림한 게이지 바 */
 .progress-container {
-    height: 12px; /* 높이를 줄여서 더 슬림하게 */
+    height: 8px; /* 최대한 얇게 설정 */
     background: #334155;
     border-radius: 50px;
     overflow: hidden;
     position: relative;
+    width: 100%;
 }
 
 .progress-fill {
@@ -177,24 +181,18 @@ body { font-family: 'Pretendard', sans-serif; background-color: #f1f5f9; margin:
 }
 
 .progress-text {
-    position: absolute;
-    top: 50%; left: 50%;
-    transform: translate(-50%, -50%);
-    font-size: 0.6rem;
-    font-weight: 900;
-    color: white;
+    display: none; /* 슬림 버전에서는 텍스트 숨김 (가독성 위해) */
 }
 
 .remaining-text {
-    font-size: 0.7rem;
+    font-size: 0.65rem;
     color: #cbd5e1;
     text-align: center;
     font-weight: 600;
 }
 
-/* 바에 가려지지 않도록 컨테이너 하단 여백 확보 */
-.container { padding-bottom: 120px !important; }
-
+/* 바에 가려지는 마지막 카드를 위한 여백 추가 */
+.container { padding-bottom: 100px !important; }
 /* 모바일 최적화 */
 @media (max-width: 600px) {
     .result-bar.slim-version { padding: 8px 15px; }
