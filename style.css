@@ -135,36 +135,34 @@ body { font-family: 'Pretendard', sans-serif; background-color: #f1f5f9; margin:
 .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 12px 20px rgba(99, 102, 241, 0.4); }
 .btn-secondary { background: #f1f5f9; color: var(--text-muted); border: none; padding: 14px 25px; border-radius: 16px; font-weight: 700; cursor: pointer; }
 
-/* 결과 바 카드 래퍼 */
-.result-card-wrapper {
-    background: #1e293b !important; /* 다시 어두운 테마로 복구 */
-    padding: 20px !important;
-    margin-top: 20px;
-    border: none !important;
-}
-
-/* 결과 바 카드 래퍼: 어두운 테마 적용 */
-.result-card-wrapper {
-    background: #1e293b !important;
-    padding: 20px !important;
-    margin-top: 20px;
-    border: none !important;
+/* [복구] 최하단 고정 슬림 바 디자인 */
+.result-bar.slim-version {
+    position: fixed;
+    bottom: 0; left: 0; right: 0;
+    background: #1e293b; /* 어두운 네이비 */
+    padding: 10px 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    z-index: 3000;
+    border-top: 1px solid rgba(255,255,255,0.1);
+    box-shadow: 0 -4px 20px rgba(0,0,0,0.3);
 }
 
 .result-info {
     display: flex;
-    justify-content: space-between; /* SCORE와 BOX 양 끝 배치 */
+    justify-content: space-around;
     align-items: center;
 }
 
-.info-val {
-    font-size: 1.1rem;
-    font-weight: 900;
-    color: #fbbf24; /* 금색 점수 */
-}
-/* 프로그레스 바 디자인 복구 */
+.info-group { display: flex; align-items: baseline; gap: 8px; }
+.info-label { font-size: 0.65rem; color: #94a3b8; font-weight: 700; }
+.info-val { font-size: 1rem; font-weight: 900; color: #fbbf24; } /* 금색 점수 */
+
+.progress-section { display: flex; flex-direction: column; gap: 4px; }
+
 .progress-container {
-    height: 14px;
+    height: 12px; /* 높이를 줄여서 더 슬림하게 */
     background: #334155;
     border-radius: 50px;
     overflow: hidden;
@@ -182,17 +180,25 @@ body { font-family: 'Pretendard', sans-serif; background-color: #f1f5f9; margin:
     position: absolute;
     top: 50%; left: 50%;
     transform: translate(-50%, -50%);
-    font-size: 0.65rem;
+    font-size: 0.6rem;
     font-weight: 900;
     color: white;
 }
 
 .remaining-text {
-    font-size: 0.75rem;
+    font-size: 0.7rem;
     color: #cbd5e1;
     text-align: center;
-    margin-top: 6px;
     font-weight: 600;
+}
+
+/* 바에 가려지지 않도록 컨테이너 하단 여백 확보 */
+.container { padding-bottom: 120px !important; }
+
+/* 모바일 최적화 */
+@media (max-width: 600px) {
+    .result-bar.slim-version { padding: 8px 15px; }
+    .info-val { font-size: 0.95rem; }
 }
 
 /* 8. 기타 UI */
