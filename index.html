@@ -84,6 +84,34 @@
         </div>
     </div>
 
+    <div id="viewModal" class="modal">
+    <div class="modal-card">
+        <span class="close-x" onclick="closeViewModal()">&times;</span>
+        
+        <div id="view-body" style="margin-top:20px;">
+            <div id="view-content"></div>
+            <img id="view-img" style="width:100%; border-radius:12px; margin:20px 0; display:none;">
+        </div>
+
+        <div style="display:flex; gap:15px; margin-top:20px; border-top:1px solid #eee; padding-top:20px;">
+            <span id="edit-link" style="display:none; cursor:pointer; color:var(--text-muted); font-size:0.9rem;" onclick="prepareEdit()">✏️ 수정</span>
+        </div>
+
+        <div id="reply-container" style="margin-top:20px;">
+            
+            <div id="view-replies" class="reply-section"></div>
+            <div class="reply-input-group" style="display: flex; gap: 8px; margin-top: 15px;">
+                <input type="text" id="view-reply-input" class="modern-input" style="margin-bottom:0; flex:1;" placeholder="댓글을 입력하세요...">
+                <button onclick="submitReply()" class="btn-primary" style="padding: 10px 15px;">등록</button>
+            </div>
+        </div>
+
+        <div id="delete-area" style="display:none; text-align:right; margin-top:30px;">
+            <span style="font-size:0.8rem; color:var(--danger); cursor:pointer; font-weight:800;" onclick="deleteCurrentPost()">게시물 삭제하기</span>
+        </div>
+    </div>
+</div>
+
     <div id="writeModal" class="modal">
         <div class="modal-card">
             <span class="close-x" onclick="closeModal()">&times;</span><h3 style="margin-top:0">전략 공유 🖋️</h3>
