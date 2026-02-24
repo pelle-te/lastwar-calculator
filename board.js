@@ -19,10 +19,10 @@ function openModal() {
     document.getElementById('post-text').value = "";
     document.getElementById('modal-title').innerText = "전략 공유하기 🖋️";
     document.getElementById('submit-btn').innerText = "게시하기";
-    document.getElementById('writeModal').style.display = 'block';
+   document.getElementById('writeModal').classList.add('active');
 }
 
-function closeModal() { document.getElementById('writeModal').style.display = 'none'; }
+function closeModal() { document.getElementById('writeModal').classList.remove('active'); }
 
 function openViewModal(col, docId, data, canDel, time) {
     currentDocData = { col, docId, data };
@@ -37,7 +37,7 @@ function openViewModal(col, docId, data, canDel, time) {
     content.innerHTML = `<h2 style="margin:0 0 15px 0; font-size:1.3rem;">${lines[0]}</h2>
                          <p style="white-space:pre-wrap; color:#555; line-height:1.7;">${lines.slice(1).join('\n')}</p>`;
     
-    document.getElementById('reply-container').style.display = 'none';
+    document.getElementById('reply-container').style.display = 'flex';
     document.getElementById('edit-link').style.display = canDel ? 'inline' : 'none';
     document.getElementById('delete-area').style.display = canDel ? 'block' : 'none';
 
@@ -50,6 +50,7 @@ function openViewModal(col, docId, data, canDel, time) {
 
     loadReplies(col, docId, "view-replies");
     modal.style.display = 'block';
+    document.getElementById('viewModal').classList.add('active');
 }
 
 function closeViewModal() { document.getElementById('viewModal').style.display = 'none'; }
