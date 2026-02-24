@@ -47,6 +47,12 @@ function openViewModal(col, docId, data, canDel, time) {
     currentDocData = { col, docId, data };
     const title = data.content.split('|||')[0] || "제목 없음";
     const body = data.content.split('|||')[1] || "";
+    const deleteArea = document.getElementById('delete-area');
+    if(deleteArea) {
+        deleteArea.style.display = canDel ? 'block' : 'none'; // 작성자일 때만 노출
+    }
+    
+    document.getElementById('viewModal').classList.add('active');
     
     document.getElementById('view-content').innerHTML = `<h2>${title}</h2><p style="white-space:pre-wrap;">${body}</p>`;
     const img = document.getElementById('view-img');
@@ -58,6 +64,19 @@ function openViewModal(col, docId, data, canDel, time) {
     document.getElementById('viewModal').classList.add('active');
 }
 function closeViewModal() { document.getElementById('viewModal').classList.remove('active'); }
+
+async function submitReply() {
+    const input = document.getElementById('view-reply-input');
+    const text = input.value.trim();
+    if(!text || !currentDocData) return;
+
+    try {
+        await addReply(currentDocData.col, currentDocData.docId, text);
+        input.value = "";
+    } catch (error) {
+        console.error("댓글 등록 실패:", error);
+    }
+}
 
 async function sendLivePost() {
     // 현재 활성화된 페이지에 따라 저장할 컬렉션 결정
