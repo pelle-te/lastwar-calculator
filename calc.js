@@ -147,13 +147,68 @@ function initCalc() {
     updateAll();
 }
 
-window.switchTab = function(day) { 
-    window.currentDay = day; 
+window.saveAllData = function() {
+    const inputs = document.querySelectorAll('.compact-input');
+    const data = JSON.parse(localStorage.getItem('lastwar_data') || '{}');
+    
+    inputs.forEach(input => {
+        data[input.id] = input.value;
+    });
+    
+    localStorage.setItem('lastwar_data', JSON.stringify(data));
+};
+
+window.loadAllData = function() {
+    const data = JSON.parse(localStorage.getItem('lastwar_data') || '{}');
+    const inputs = document.querySelectorAll('.compact-input');
+    
+    inputs.forEach(input => {
+        if (data[input.id] !== undefined) {
+            input.value = data[input.id];
+        }
+    });
+};
+
+// [수정] 현재 선택된 요일의 데이터만 초기화하는 기능
+window.resetDayData = function() {
+    const dayNames = {
+        mon: "월요일", tue: "화요일", wed: "수요일",
+        thu: "목요일", fri: "금요일", sat: "토요일"
+    };
+    
+    if(confirm(`${dayNames[window.currentDay]} 데이터를 초기화하시겠습니까?`)) {
+        const data = JSON.parse(localStorage.getItem('lastwar_data') || '{}');
+        const inputs = document.querySelectorAll('.compact-input');
+        
+        // 현재 화면에 보이는(현재 요일의) 입력창만 0으로 변경하고 저장소에서도 삭제
+        inputs.forEach(input => {
+            input.value = 0;
+            delete data[input.id]; 
+        });
+        
+        localStorage.setItem('lastwar_data', JSON.stringify(data));
+        
+        // 초기화 후 점수 즉시 갱신
+        updateAll();
+        alert(`${dayNames[window.currentDay]} 데이터가 초기화되었습니다.`);
+    }
+};
+
+// [수정] 요일 전환 함수: 탭을 넘길 때 저장된 데이터를 불러오도록 수정
+window.switchTab = function(day) {
+    window.currentDay = day;
+    
+    // 버튼 활성화 스타일 처리
     document.querySelectorAll('.day-btn').forEach(b => b.classList.remove('active'));
-    const activeBtn = document.getElementById('btn-'+day);
-    if(activeBtn) activeBtn.classList.add('active'); 
-    renderInputs(); 
-    updateAll(); 
+    const activeBtn = document.getElementById('btn-' + day);
+    if(activeBtn) activeBtn.classList.add('active');
+    
+    // 1. 입력창 그리기
+    renderInputs();
+    // 2. 이전에 저장했던 데이터가 있다면 불러와서 채우기
+    loadAllData();
+    // 3. 점수 계산기 실행
+    updateAll();
 };
 
 function renderInputs() {
@@ -309,6 +364,11 @@ window.updateAll = function() {
         setPt('kill', val('sat-kill')*kScore*m.kil.sub);
         setPt('dth', val('sat-dth')*BASE.trp[val('sat-alvl')]*m.exp.all);
     }
+    saveAllData();
+
+    // 점수 표시 및 프로그레스 바 업데이트
+    const scoreEl = document.getElementById('score');
+    if(scoreEl) scoreEl.innerText = totalScore.toLocaleString();
 
 const pct = Math.min(100, (totalScore / window.targetScore) * 100);
     document.getElementById('score').innerText = totalScore.toLocaleString();
@@ -338,6 +398,7 @@ window.validatePos = function(el) {
 function renderInputs() {
     const t = i18n[window.currentLang];
     const container = document.getElementById('input-container');
+    const dayNames = { mon: "월요일", tue: "화요일", wed: "수요일", thu: "목요일", fri: "금요일", sat: "토요일" };
     const config = { 
         mon:[{id:'dia',l:t.inputs.dia},{id:'radar',l:t.inputs.radar_task},{id:'stam',l:t.inputs.stam},{id:'exp',l:t.inputs.exp},{id:'part',l:t.inputs.part},{id:'data',l:t.inputs.data},{id:'h-food',l:t.inputs.food},{id:'h-iron',l:t.inputs.iron},{id:'h-gold',l:t.inputs.gold}], 
         tue:[{id:'dia',l:t.inputs.dia},{id:'truck',l:t.inputs.truck},{id:'sec',l:t.inputs.sec},{id:'surv',l:t.inputs.surv},{id:'spd',l:t.inputs.build_spd,isSpd:true},{id:'pow',l:t.inputs.pow_con}], 
@@ -346,8 +407,18 @@ function renderInputs() {
         fri:[{id:'dia',l:t.inputs.dia},{id:'radar',l:t.inputs.radar_task},{id:'spd-con',l:t.inputs.build_spd,isSpd:true},{id:'spd-tec',l:t.inputs.tec_spd,isSpd:true},{id:'spd-trn',l:t.inputs.trn_spd,isSpd:true},{id:'pow-con',l:t.inputs.pow_con},{id:'pow-tec',l:t.inputs.pow_tec}], 
         sat:[{id:'dia',l:t.inputs.dia},{id:'truck',l:t.inputs.truck},{id:'sec',l:t.inputs.sec},{id:'spd-all',l:t.inputs.kill_spd,isSpd:true}] 
     };
+
+    let html = `
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+            <div class="section-title" style="margin:0;">📊 ${window.currentDay.toUpperCase()} INPUT</div>
+            <button onclick="resetDayData()" class="btn-secondary" 
+                style="background-color: #fee2e2; color: #ef4444; border: 1px solid #fecaca; padding: 4px 10px; font-size: 0.75rem; font-weight: 800; border-radius: 8px; cursor:pointer;">
+                ${dayNames[window.currentDay]} 초기화
+            </button>
+        </div>
+        <div class="input-grid">`;
     
-    let html = `<div class="section-title">📊 ${window.currentDay.toUpperCase()} INPUT</div><div class="input-grid">`;
+    // [수정된 부분] 반복문 시작
     (config[window.currentDay] || []).forEach(i => {
         html += `
             <div class="input-group-compact">
