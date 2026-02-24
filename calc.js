@@ -328,3 +328,40 @@ window.setTarget = function(s) {
 };
 
 window.onload = () => { if(typeof initCalc === 'function') initCalc(); loadLiveView('posts'); loadLiveView('suggestions'); };
+
+// [추가] 음수 입력 방지 헬퍼 함수
+window.validatePos = function(el) {
+    if (el.value < 0) el.value = 0;
+};
+
+function renderInputs() {
+    const t = i18n[window.currentLang];
+    const container = document.getElementById('input-container');
+    const config = { 
+        mon:[{id:'dia',l:t.inputs.dia},{id:'radar',l:t.inputs.radar_task},{id:'stam',l:t.inputs.stam},{id:'exp',l:t.inputs.exp},{id:'part',l:t.inputs.part},{id:'data',l:t.inputs.data},{id:'h-food',l:t.inputs.food},{id:'h-iron',l:t.inputs.iron},{id:'h-gold',l:t.inputs.gold}], 
+        tue:[{id:'dia',l:t.inputs.dia},{id:'truck',l:t.inputs.truck},{id:'sec',l:t.inputs.sec},{id:'surv',l:t.inputs.surv},{id:'spd',l:t.inputs.build_spd,isSpd:true},{id:'pow',l:t.inputs.pow_con}], 
+        wed:[{id:'dia',l:t.inputs.dia},{id:'radar',l:t.inputs.radar_task},{id:'spd',l:t.inputs.tec_spd,isSpd:true},{id:'pow',l:t.inputs.pow_tec},{id:'mdl',l:t.inputs.medal}], 
+        thu:[{id:'dia',l:t.inputs.dia},{id:'tkt',l:t.inputs.tkt},{id:'ur',l:t.inputs.ur},{id:'ssr',l:t.inputs.ssr},{id:'sr',l:t.inputs.sr},{id:'sk',l:t.inputs.sk},{id:'exp',l:t.inputs.exp}], 
+        fri:[{id:'dia',l:t.inputs.dia},{id:'radar',l:t.inputs.radar_task},{id:'spd-con',l:t.inputs.build_spd,isSpd:true},{id:'spd-tec',l:t.inputs.tec_spd,isSpd:true},{id:'spd-trn',l:t.inputs.trn_spd,isSpd:true},{id:'pow-con',l:t.inputs.pow_con},{id:'pow-tec',l:t.inputs.pow_tec}], 
+        sat:[{id:'dia',l:t.inputs.dia},{id:'truck',l:t.inputs.truck},{id:'sec',l:t.inputs.sec},{id:'spd-all',l:t.inputs.kill_spd,isSpd:true}] 
+    };
+    
+    let html = `<div class="section-title">📊 ${window.currentDay.toUpperCase()} INPUT</div><div class="input-grid">`;
+    (config[window.currentDay] || []).forEach(i => {
+        html += `
+            <div class="input-group-compact">
+                <div class="input-header">
+                    <span class="input-label-small">${i.l}</span>
+                    <span class="item-score-tag" id="pts-${i.id}">0</span>
+                </div>
+                <input type="number" id="${window.currentDay}-${i.id}" class="compact-input" value="0" min="0" oninput="validatePos(this); updateAll()">
+                ${i.isSpd ? `
+                    <button class="spd-btn-mini" onclick="openSpdModal('${i.id}','${i.l}')">${t.modal.btn_open}</button>
+                    <div style="text-align:center;">
+                        <div class="time-display" id="time-${i.id}">0${t.units.day} 0${t.units.hour} 0${t.units.min}</div>
+                    </div>` : ''}
+            </div>`;
+    });
+    html += `</div>`;
+    container.innerHTML = html;
+}
