@@ -1,92 +1,157 @@
+let currentDocData = null;
 
-// Firebase 설정 (이미지 기반)
-const firebaseConfig = { apiKey: "AIzaSyAbGdlE4KnelSrrKGLVaLcM5433ZZILVYE", authDomain: "lastwar-530f9.firebaseapp.com", projectId: "lastwar-530f9", storageBucket: "lastwar-530f9.firebasestorage.app", messagingSenderId: "135982056229", appId: "1:135982056229:web:92264d4601e5315cdd50cc" };
-firebase.initializeApp(firebaseConfig);
-const db = firebase.firestore();
-
-if(!localStorage.getItem('vs_auth_id')) localStorage.setItem('vs_auth_id', 'u' + Math.random().toString(36).substr(2, 7));
-const myId = localStorage.getItem('vs_auth_id');
-let isAdmin = false;
-
-// 페이지 전환
-// board.js 파일의 showPage 함수 수정
 function showPage(pId) {
     document.querySelectorAll('.page-content').forEach(p => p.classList.remove('active'));
     document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-    
     document.getElementById('page-' + pId).classList.add('active');
     document.getElementById('nav-' + pId).classList.add('active');
-    
-    // 글쓰기 버튼 표시 제어
-    document.getElementById('float-btn').style.display = pId === 'calc' ? 'none' : 'flex';
 
-    // [추가] 하단 결과 바(배너) 표시 제어
-    const resultBar = document.querySelector('.result-bar');
-    if (resultBar) {
-        resultBar.style.display = pId === 'calc' ? 'block' : 'none';
-    }
-
-    window.scrollTo(0,0);
+    const isFeedOrQna = (pId === 'board' || pId === 'qna');
+    document.getElementById('float-btn').style.display = isFeedOrQna ? 'flex' : 'none';
+    const adminBtn = document.querySelector('.admin-link');
+    if(adminBtn) adminBtn.style.display = (pId === 'board') ? 'block' : 'none';
+    const rb = document.querySelector('.result-bar');
+    if(rb) rb.style.display = (pId === 'calc') ? 'block' : 'none';
 }
-function openModal() { document.getElementById('writeModal').style.display = 'block'; }
-function closeModal() { document.getElementById('writeModal').style.display = 'none'; }
-function enableAdmin() { if(prompt("비밀번호") === "1234") { isAdmin = true; alert("관리자 모드 활성"); loadLiveView('posts'); } }
 
-// 게시글 작성
-// board.js 내 수정할 부분
+function openModal() {
+    document.getElementById('edit-doc-id').value = "";
+    document.getElementById('post-text').value = "";
+    document.getElementById('modal-title').innerText = "전략 공유하기 🖋️";
+    document.getElementById('submit-btn').innerText = "게시하기";
+    document.getElementById('writeModal').style.display = 'block';
+}
+
+function closeModal() { document.getElementById('writeModal').style.display = 'none'; }
+
+function openViewModal(col, docId, data, canDel, time) {
+    currentDocData = { col, docId, data };
+    const modal = document.getElementById('viewModal');
+    const img = document.getElementById('view-img');
+    const content = document.getElementById('view-content');
+    
+    if(data.image) { img.src = data.image; img.style.display = 'block'; } 
+    else { img.style.display = 'none'; }
+
+    const lines = data.content.split('\n');
+    content.innerHTML = `<h2 style="margin:0 0 15px 0; font-size:1.3rem;">${lines[0]}</h2>
+                         <p style="white-space:pre-wrap; color:#555; line-height:1.7;">${lines.slice(1).join('\n')}</p>`;
+    
+    document.getElementById('reply-container').style.display = 'none';
+    document.getElementById('edit-link').style.display = canDel ? 'inline' : 'none';
+    document.getElementById('delete-area').style.display = canDel ? 'block' : 'none';
+
+    document.getElementById('view-reply-btn').onclick = () => {
+        const input = document.getElementById('view-reply-input');
+        if(!input.value.trim()) return;
+        addReply(col, docId, input.value);
+        input.value = "";
+    };
+
+    loadReplies(col, docId, "view-replies");
+    modal.style.display = 'block';
+}
+
+function closeViewModal() { document.getElementById('viewModal').style.display = 'none'; }
+function toggleReplySection() {
+    const rc = document.getElementById('reply-container');
+    rc.style.display = rc.style.display === 'none' ? 'block' : 'none';
+}
+
+function prepareEdit() {
+    const { docId, data } = currentDocData;
+    closeViewModal();
+    document.getElementById('writeModal').style.display = 'block';
+    document.getElementById('modal-title').innerText = "게시물 수정하기 ✏️";
+    document.getElementById('submit-btn').innerText = "수정 완료";
+    document.getElementById('edit-doc-id').value = docId;
+    document.getElementById('post-text').value = data.content;
+}
+
 async function sendLivePost() {
     const col = document.getElementById('page-board').classList.contains('active') ? 'posts' : 'suggestions';
     const txt = document.getElementById('post-text').value;
     const file = document.getElementById('post-file').files[0];
+    const editId = document.getElementById('edit-doc-id').value;
     if(!txt.trim()) return;
 
-    let imgUrl = "";
+    let imgUrl = editId ? (currentDocData.data.image || "") : ""; 
     if(file) {
-        // [이미지 압축 로직 추가]
         imgUrl = await new Promise(res => {
             const reader = new FileReader();
             reader.readAsDataURL(file);
-            reader.onload = event => {
+            reader.onload = e => {
                 const img = new Image();
-                img.src = event.target.result;
+                img.src = e.target.result;
                 img.onload = () => {
                     const canvas = document.createElement('canvas');
-                    const max_size = 800; // 가로 세로 최대 800px로 제한
-                    let width = img.width;
-                    let height = img.height;
-                    if (width > height) { if (width > max_size) { height *= max_size / width; width = max_size; } }
-                    else { if (height > max_size) { width *= max_size / height; height = max_size; } }
-                    canvas.width = width; canvas.height = height;
-                    canvas.getContext('2d').drawImage(img, 0, 0, width, height);
-                    res(canvas.toDataURL('image/jpeg', 0.7)); // 화질 70%로 압축
+                    const max_size = 800;
+                    let w = img.width, h = img.height;
+                    if (w > h) { if (w > max_size) { h *= max_size / w; w = max_size; } }
+                    else { if (h > max_size) { w *= max_size / h; h = max_size; } }
+                    canvas.width = w; canvas.height = h;
+                    canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+                    res(canvas.toDataURL('image/jpeg', 0.7));
                 };
             };
         });
     }
-    db.collection(col).add({ authorId: myId, content: txt, image: imgUrl, timestamp: firebase.firestore.FieldValue.serverTimestamp() })
-    .then(() => { closeModal(); document.getElementById('post-text').value=""; });
+
+    if(editId) {
+        await db.collection(col).doc(editId).update({ content: txt, image: imgUrl });
+    } else {
+        await db.collection(col).add({ authorId: myId, content: txt, image: imgUrl, timestamp: firebase.firestore.FieldValue.serverTimestamp() });
+    }
+    closeModal();
 }
-// 피드 로드
+
 function loadLiveView(col) {
     db.collection(col).orderBy("timestamp", "desc").onSnapshot(snap => {
-        const list = document.getElementById(col + '-list'); list.innerHTML = "";
+        const list = document.getElementById(col + '-list');
+        if(!list) return;
+        list.innerHTML = "";
         snap.forEach(doc => {
-            const d = doc.data(); const canDel = isAdmin || (d.authorId === myId);
-            const time = d.timestamp ? new Date(d.timestamp.seconds*1000).toLocaleString('ko-KR', {month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'}) : "방금 전";
-            list.innerHTML += `<div class="insta-card"><div class="insta-header"><div class="avatar">${d.authorId?d.authorId.substr(1,2).toUpperCase():'W'}</div><div style="font-size:0.85rem; font-weight:700">연맹원_${d.authorId?d.authorId.substr(1,4):'익명'}</div>${canDel?`<div class="del-link" onclick="deletePost('${col}','${doc.id}')">삭제</div>`:""}</div>${d.image?`<img src="${d.image}" class="insta-img">`:""}<div class="insta-body"><div style="display:flex; gap:12px; margin-bottom:8px; font-size:1.2rem"><span>🤍</span><span>💬</span><span>✈️</span></div><div class="insta-content"><b>연맹원_${d.authorId?d.authorId.substr(1,4):'익명'}</b> ${d.content}</div><div class="insta-time">${time}</div></div></div>`;
+            const d = doc.data();
+            const docId = doc.id;
+            const canDel = isAdmin || (d.authorId === myId);
+            const time = d.timestamp ? new Date(d.timestamp.seconds*1000).toLocaleString('ko-KR') : "방금 전";
+            
+            const card = document.createElement('div');
+            card.className = 'summary-card';
+            card.onclick = () => openViewModal(col, docId, d, canDel, time);
+            card.innerHTML = `
+                <div class="summary-img-wrapper">
+                    ${d.image ? `<img src="${d.image}">` : `<div style="height:100%; display:flex; align-items:center; justify-content:center; color:#cbd5e1; font-weight:800;">STRATEGY</div>`}
+                </div>
+                <div class="summary-body">
+                    <div class="summary-title">${d.content.split('\n')[0]}</div>
+                </div>`;
+            list.appendChild(card);
         });
     });
 }
-function deletePost(col, id) { if(confirm("삭제?")) db.collection(col).doc(id).delete(); }
 
-// 라이브 접속자 로직
-function updatePresence() { db.collection('presence').doc(myId).set({ lastSeen: firebase.firestore.FieldValue.serverTimestamp() }); }
-setInterval(updatePresence, 30000); updatePresence();
-db.collection('presence').onSnapshot(snap => {
-    const now = Date.now(); let count = 0;
-    snap.forEach(doc => { if(doc.data().lastSeen && (now - doc.data().lastSeen.toMillis() < 300000)) count++; });
-    document.getElementById('user-count').innerText = count + "명 접속 중";
-});
+async function addReply(col, postId, text) {
+    await db.collection(col).doc(postId).collection('replies').add({
+        authorId: myId, content: text, timestamp: firebase.firestore.FieldValue.serverTimestamp()
+    });
+}
 
-// 초기 실행
-window.onload = () => { initCalc(); loadLiveView('posts'); loadLiveView('suggestions'); };
+function loadReplies(col, postId, targetId) {
+    db.collection(col).doc(postId).collection('replies').orderBy("timestamp", "asc").onSnapshot(snap => {
+        const rb = document.getElementById(targetId);
+        if(!rb) return;
+        rb.innerHTML = "";
+        snap.forEach(doc => {
+            const rd = doc.data();
+            rb.innerHTML += `<div class="reply-item"><b>연맹원</b> ${rd.content}</div>`;
+        });
+    });
+}
+
+function deleteCurrentPost() {
+    if(confirm("정말 삭제하시겠습니까?")) {
+        db.collection(currentDocData.col).doc(currentDocData.docId).delete();
+        closeViewModal();
+    }
+}
