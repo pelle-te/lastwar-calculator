@@ -43,9 +43,51 @@ body { font-family: 'Pretendard', sans-serif; background-color: #f1f5f9; margin:
 .day-btn.active { opacity: 1; transform: scale(1.05); box-shadow: 0 5px 12px rgba(0,0,0,0.15); }
 
 /* 4. 입력창 및 그리드 설정 */
-.input-grid, .tech-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-.input-group-compact, .tech-item { background: #ffffff; padding: 14px; border-radius: 18px; border: 1px solid #e2e8f0; display: flex; flex-direction: column; box-shadow: 0 2px 4px rgba(0,0,0,0.02); }
-.compact-input { width: 100%; border: 1px solid #cbd5e1; border-radius: 10px; padding: 10px; font-weight: 800; color: var(--primary); text-align: right; box-sizing: border-box; outline: none; font-size: 1rem; }
+.input-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.input-group-compact { background: #ffffff; padding: 14px; border-radius: 18px; border: 1px solid #e2e8f0; display: flex; flex-direction: column; box-shadow: 0 2px 4px rgba(0,0,0,0.02); }
+/* [수정] 가속 계산기용 아이템 스타일 통합 */
+.tech-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr; /* PC/모바일 기본 2열 */
+    gap: 12px;
+    width: 100%;
+}
+
+.tech-item {
+    background: #ffffff;
+    padding: 12px;
+    border-radius: 16px;
+    border: 1px solid #e2e8f0;
+    display: flex;
+    flex-direction: column;
+    box-sizing: border-box; /* 패딩이 너비에 영향을 주지 않도록 설정 */
+}
+
+/* [핵심] 모든 입력창의 너비를 부모에 맞게 100%로 고정 */
+.compact-input {
+    width: 100% !important; 
+    border: 1px solid #cbd5e1;
+    border-radius: 10px;
+    padding: 10px;
+    font-weight: 800;
+    color: var(--primary);
+    text-align: right;
+    box-sizing: border-box; /* 너비 계산 오류 방지 */
+    outline: none;
+    font-size: 1rem !important;
+}
+
+/* 모바일 전용: 8시간(마지막 칸)이 길게 나오는 것 방지 */
+@media (max-width: 480px) {
+    .tech-grid {
+        grid-template-columns: 1fr 1fr; /* 모바일에서도 가로 2개씩 배치 (짤림 방지용) */
+        gap: 8px;
+    }
+    .modal-card {
+        padding: 20px 15px;
+        width: 92%; /* 화면에 꽉 차게 조절 */
+    }
+}
 .item-score-tag { font-size: 0.75rem; color: var(--primary); font-weight: 800; background: var(--primary-soft); padding: 3px 8px; border-radius: 8px; align-self: flex-end; margin-bottom: 4px; }
 
 /* 가속 시간 배지 및 미니 버튼 */
