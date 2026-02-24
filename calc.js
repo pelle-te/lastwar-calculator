@@ -242,6 +242,11 @@ function renderInputs() {
 function val(id) { let el = document.getElementById(id); return el ? parseFloat(el.value) || 0 : 0; }
 function getM(subId) { let e = val('t-expert') * 0.05, s = val(subId) * 0.05; return { all: 1 + e, sub: 1 + e + s }; }
 
+// 사이드바 토글 함수
+window.toggleDash = function() {
+    document.getElementById('side-dashboard').classList.toggle('active');
+};
+
 window.updateAll = function() {
     const d = window.currentDay;
     let totalScore = 0;
@@ -310,13 +315,21 @@ window.updateAll = function() {
         setPt('dth', val('sat-dth')*BASE.trp[val('sat-alvl')]*m.exp.all);
     }
 
-    const scoreEl = document.getElementById('score');
-    if(scoreEl) scoreEl.innerText = totalScore.toLocaleString(undefined, {maximumFractionDigits: 0});
-    let pct = Math.min(100, (totalScore/window.targetScore)*100); 
-    const barEl = document.getElementById('bar');
-    if(barEl) barEl.style.width = pct + '%';
-    const diffEl = document.getElementById('diff');
-    if(diffEl) diffEl.innerText = (window.targetScore-totalScore)>0 ? `${i18n[window.currentLang].rem}: ${(window.targetScore-totalScore).toLocaleString()}` : i18n[window.currentLang].success;
+// 1. 퍼센트 및 기본 점수 업데이트
+    const pct = Math.min(100, (totalScore / window.targetScore) * 100);
+    document.getElementById('dash-pct').innerText = Math.floor(pct) + '%';
+    document.getElementById('dash-score').innerText = totalScore.toLocaleString();
+    document.getElementById('dash-bar').style.width = pct + '%';
+
+    // 2. 상자 단계 계산 (7.2M 기준 9상자 예시)
+    // 각 상자당 필요 점수 (예: 80만점당 1상자라고 가정 시)
+    const boxStep = window.targetScore / 9;
+    const currentBox = Math.floor(totalScore / boxStep);
+    document.getElementById('dash-box').innerText = `${Math.min(9, currentBox)} / 9`;
+
+    // 3. 남은 점수 업데이트
+    const rem = window.targetScore - totalScore;
+    document.getElementById('dash-diff').innerText = rem > 0 ? `남은: ${rem.toLocaleString()}` : "목표 달성! 🎉";
 };
 
 window.setTarget = function(s) { 
