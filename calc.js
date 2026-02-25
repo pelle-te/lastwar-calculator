@@ -42,6 +42,20 @@ const BASE = {
     kil_gen: [0, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]
 };
 
+// [추가] 앱 전체의 숫자 입력 필드에서 음수(-) 및 불필요한 기호를 원천 차단
+document.addEventListener('keydown', function(e) {
+    if (e.target && e.target.type === 'number') {
+        if (e.key === '-' || e.key === 'e' || e.key === '+' || e.key === '.') {
+            e.preventDefault();
+        }
+    }
+});
+document.addEventListener('input', function(e) {
+    if (e.target && e.target.type === 'number') {
+        if (e.target.value < 0) e.target.value = 0;
+    }
+});
+
 function getVal(cid) {
     const data = JSON.parse(localStorage.getItem('lastwar_data') || '{}');
     if (data[cid] !== undefined) return data[cid];
@@ -53,7 +67,7 @@ function renderDroneInputs() {
     if(!container) return;
     let html = '';
     for(let i=1; i<=7; i++) {
-        html += `<div class="tech-item"><label>Lv.${i}</label><input type="number" id="drone-b${i}" class="compact-input" value="${getVal('drone-b'+i)}" oninput="updateAll()"></div>`;
+        html += `<div class="tech-item"><label>Lv.${i}</label><input type="number" id="drone-b${i}" class="compact-input" min="0" value="${getVal('drone-b'+i)}" oninput="updateAll()"></div>`;
     }
     container.innerHTML = html;
 }
@@ -334,18 +348,14 @@ window.updateAll = function() {
                 const rightRatio = window.customRatio / 10;
 
                 const existingSlider = document.getElementById('inner-ratio');
-                
-                // [핵심 변경점] 현재 그려져 있는 요일과 선택된 요일이 같은지 확인합니다.
                 const renderedDay = recBox.getAttribute('data-rendered-day');
                 
                 if (existingSlider && renderedDay === window.currentDay) {
-                    // 같은 요일 안에서 값만 바뀔 때는 숫자 텍스트만 갱신 (슬라이더 포커스 유지)
                     document.getElementById('rec-val-1').innerText = Math.ceil(rem/v1).toLocaleString() + "개";
                     document.getElementById('rec-val-2').innerText = Math.ceil(rem/v2).toLocaleString() + "개";
                     document.getElementById('rec-ratio-title').innerText = `나만의 맞춤 배분 (${10-window.customRatio}:${window.customRatio})`;
                     document.getElementById('rec-ratio-val').innerText = `${Math.ceil((rem * leftRatio)/v1).toLocaleString()} / ${Math.ceil((rem * rightRatio)/v2).toLocaleString()}`;
                 } else {
-                    // 처음 그리거나, 요일이 변경되었을 때는 전체 HTML을 덮어씌웁니다.
                     recBox.setAttribute('data-rendered-day', window.currentDay);
                     recBox.innerHTML = `
                         <div class="recommend-card">
@@ -435,7 +445,7 @@ function renderInputs() {
 
     if(window.currentDay === 'mon') {
         const sVal = getVal('mon-squads'); const gVal = getVal('mon-gather');
-        html += `<div class="input-group-compact"><div class="input-header"><span class="input-label-small">${t.inputs.squads}</span></div><select id="mon-squads" class="compact-input" onchange="updateAll()">${[1,2,3,4,5].map(n => `<option value="${n}" ${sVal==n?'selected':''}>${n}${t.inputs.squads_unit}</option>`).join('')}</select></div><div class="input-group-compact"><div class="input-header"><span class="input-label-small">${t.inputs.gather}</span><span class="item-score-tag" id="pts-gather">0</span></div><input type="number" id="mon-gather" class="compact-input" value="${gVal}" oninput="updateAll()"></div>`;
+        html += `<div class="input-group-compact"><div class="input-header"><span class="input-label-small">${t.inputs.squads}</span></div><select id="mon-squads" class="compact-input" onchange="updateAll()">${[1,2,3,4,5].map(n => `<option value="${n}" ${sVal==n?'selected':''}>${n}${t.inputs.squads_unit}</option>`).join('')}</select></div><div class="input-group-compact"><div class="input-header"><span class="input-label-small">${t.inputs.gather}</span><span class="item-score-tag" id="pts-gather">0</span></div><input type="number" id="mon-gather" class="compact-input" min="0" value="${gVal}" oninput="updateAll()"></div>`;
     }
     if(window.currentDay === 'wed') {
         html += `<div class="input-group-compact full-mobile-item"><div class="input-header"><span class="input-label-small">📦 ${t.modal.drone}</span><span class="item-score-tag" id="pts-drone-box">0</span></div><button class="spd-btn-mini" onclick="openDroneModal()">${t.modal.btn_open}</button></div>`;
@@ -446,16 +456,16 @@ function renderInputs() {
 
     (config[window.currentDay] || []).forEach(i => {
         const cid = `${window.currentDay}-${i.id}`;
-        html += `<div class="input-group-compact"><div class="input-header" style="display:flex; justify-content:space-between;"><span class="input-label-small">${i.l}</span><span class="item-score-tag" id="pts-${i.id}">0</span></div><input type="number" id="${cid}" class="compact-input" value="${getVal(cid)}" oninput="updateAll()">${i.isSpd ? `<button class="spd-btn-mini" onclick="openSpdModal('${i.id}','${i.l}')">${t.modal.btn_open}</button>` : ''}</div>`;
+        html += `<div class="input-group-compact"><div class="input-header"><span class="input-label-small">${i.l}</span><span class="item-score-tag" id="pts-${i.id}">0</span></div><input type="number" id="${cid}" class="compact-input" min="0" value="${getVal(cid)}" oninput="updateAll()">${i.isSpd ? `<button class="spd-btn-mini" onclick="openSpdModal('${i.id}','${i.l}')">${t.modal.btn_open}</button>` : ''}</div>`;
     });
 
     if(window.currentDay === 'fri') {
         const lvl = getVal('fri-lvl') || "8";
-        html += `<div class="input-group-compact"><div class="input-header"><span class="input-label-small">${t.inputs.trn_lvl}</span></div><select id="fri-lvl" class="compact-input" onchange="updateAll()">${Array.from({length:10},(_,i)=>`<option value="${i+1}" ${i+1==lvl?'selected':''}>Lv ${i+1}</option>`).join('')}</select></div><div class="input-group-compact"><div class="input-header"><span class="input-label-small">${t.inputs.trn_cnt}</span><span class="item-score-tag" id="pts-count">0</span></div><input type="number" id="fri-count" class="compact-input" value="${getVal('fri-count')}" oninput="updateAll()"></div>`;
+        html += `<div class="input-group-compact"><div class="input-header"><span class="input-label-small">${t.inputs.trn_lvl}</span></div><select id="fri-lvl" class="compact-input" onchange="updateAll()">${Array.from({length:10},(_,i)=>`<option value="${i+1}" ${i+1==lvl?'selected':''}>Lv ${i+1}</option>`).join('')}</select></div><div class="input-group-compact"><div class="input-header"><span class="input-label-small">${t.inputs.trn_cnt}</span><span class="item-score-tag" id="pts-count">0</span></div><input type="number" id="fri-count" class="compact-input" min="0" value="${getVal('fri-count')}" oninput="updateAll()"></div>`;
     }
     if(window.currentDay === 'sat') {
         const target = getVal('sat-target') || "special";
-        html += `<div class="input-group-compact"><div class="input-header"><span class="input-label-small">${t.inputs.kill_target}</span></div><select id="sat-target" class="compact-input" onchange="updateAll()"><option value="special" ${target=='special'?'selected':''}>${t.inputs.target_spec}</option><option value="general" ${target=='general'?'selected':''}>${t.inputs.target_gen}</option></select></div><div class="input-group-compact"><div class="input-header"><span class="input-label-small">${t.inputs.kill_lvl}</span></div><select id="sat-elvl" class="compact-input" onchange="updateAll()">${Array.from({length:10},(_,i)=>`<option value="${i+1}" ${i+1==(getVal('sat-elvl')||8)?'selected':''}>Lv ${i+1}</option>`).join('')}</select></div><div class="input-group-compact"><div class="input-header"><span class="input-label-small">${t.inputs.kill_cnt}</span><span class="item-score-tag" id="pts-kill">0</span></div><input type="number" id="sat-kill" class="compact-input" value="${getVal('sat-kill')}" oninput="updateAll()"></div><div class="input-group-compact"><div class="input-header"><span class="input-label-small">${t.inputs.dth_lvl}</span></div><select id="sat-alvl" class="compact-input" onchange="updateAll()">${Array.from({length:10},(_,i)=>`<option value="${i+1}" ${i+1==(getVal('sat-alvl')||8)?'selected':''}>Lv ${i+1}</option>`).join('')}</select></div><div class="input-group-compact"><div class="input-header"><span class="input-label-small">${t.inputs.dth_cnt}</span><span class="item-score-tag" id="pts-dth">0</span></div><input type="number" id="sat-dth" class="compact-input" value="${getVal('sat-dth')}" oninput="updateAll()"></div>`;
+        html += `<div class="input-group-compact"><div class="input-header"><span class="input-label-small">${t.inputs.kill_target}</span></div><select id="sat-target" class="compact-input" onchange="updateAll()"><option value="special" ${target=='special'?'selected':''}>${t.inputs.target_spec}</option><option value="general" ${target=='general'?'selected':''}>${t.inputs.target_gen}</option></select></div><div class="input-group-compact"><div class="input-header"><span class="input-label-small">${t.inputs.kill_lvl}</span></div><select id="sat-elvl" class="compact-input" onchange="updateAll()">${Array.from({length:10},(_,i)=>`<option value="${i+1}" ${i+1==(getVal('sat-elvl')||8)?'selected':''}>Lv ${i+1}</option>`).join('')}</select></div><div class="input-group-compact"><div class="input-header"><span class="input-label-small">${t.inputs.kill_cnt}</span><span class="item-score-tag" id="pts-kill">0</span></div><input type="number" id="sat-kill" class="compact-input" min="0" value="${getVal('sat-kill')}" oninput="updateAll()"></div><div class="input-group-compact"><div class="input-header"><span class="input-label-small">${t.inputs.dth_lvl}</span></div><select id="sat-alvl" class="compact-input" onchange="updateAll()">${Array.from({length:10},(_,i)=>`<option value="${i+1}" ${i+1==(getVal('sat-alvl')||8)?'selected':''}>Lv ${i+1}</option>`).join('')}</select></div><div class="input-group-compact"><div class="input-header"><span class="input-label-small">${t.inputs.dth_cnt}</span><span class="item-score-tag" id="pts-dth">0</span></div><input type="number" id="sat-dth" class="compact-input" min="0" value="${getVal('sat-dth')}" oninput="updateAll()"></div>`;
     }
     html += `</div>`;
     container.innerHTML = html;
@@ -469,6 +479,21 @@ window.saveAllData = function() {
 };
 
 function initCalc() {
+    // 💡 테크 설정 강제 리셋 (기존에 10렙 넘게 저장된 것 초기화 방지)
+    if (!localStorage.getItem('tech_init_v3')) {
+        const data = JSON.parse(localStorage.getItem('lastwar_data') || '{}');
+        data['t-expert'] = 20;
+        data['t-radar'] = 6;
+        data['t-spd'] = 6;
+        data['t-rec'] = 6;
+        data['t-con'] = 1;
+        data['t-tec'] = 1;
+        data['t-trn'] = 6;
+        data['t-kil'] = 6;
+        localStorage.setItem('lastwar_data', JSON.stringify(data));
+        localStorage.setItem('tech_init_v3', 'true');
+    }
+
     const t = i18n[window.currentLang];
     
     const savedTheme = localStorage.getItem('theme') || 'light';
@@ -488,10 +513,28 @@ function initCalc() {
     };
     Object.keys(uiMap).forEach(id => { const el = document.getElementById(id); if(el) el.innerText = uiMap[id]; });
 
+    // 💡 [수정] 대결 전문가(max: 20), 나머지(max: 10) 설정
     const techGrid = document.getElementById('tech-inputs');
     if(techGrid) {
-        const techs = [{id:'t-expert',l:t.expert}, {id:'t-radar',l:t.radar}, {id:'t-spd',l:t.spd}, {id:'t-rec',l:t.rec}, {id:'t-con',l:t.con}, {id:'t-tec',l:t.tec}, {id:'t-trn',l:t.trn}, {id:'t-kil',l:t.kil}];
-        techGrid.innerHTML = techs.map(item => `<div class="tech-item"><label style="font-size:0.85rem; margin-bottom:5px;">${item.l}</label><select id="${item.id}" class="compact-input" onchange="updateAll()">${Array.from({length:21},(_,i)=>`<option value="${i}" ${i===20?'selected':''}>Lv ${i}</option>`).join('')}</select></div>`).join('');
+        const techs = [
+            {id:'t-expert', l:t.expert, def: 20, max: 20},
+            {id:'t-radar', l:t.radar, def: 6, max: 10},
+            {id:'t-spd', l:t.spd, def: 6, max: 10},
+            {id:'t-rec', l:t.rec, def: 6, max: 10},
+            {id:'t-con', l:t.con, def: 1, max: 10},
+            {id:'t-tec', l:t.tec, def: 1, max: 10},
+            {id:'t-trn', l:t.trn, def: 6, max: 10},
+            {id:'t-kil', l:t.kil, def: 6, max: 10}
+        ];
+        
+        const savedData = JSON.parse(localStorage.getItem('lastwar_data') || '{}');
+        
+        techGrid.innerHTML = techs.map(item => {
+            let currentVal = savedData[item.id] !== undefined ? parseInt(savedData[item.id]) : item.def;
+            if(currentVal > item.max) currentVal = item.max; // 10렙 넘는 이전 값이 있으면 10으로 강제 보정
+            
+            return `<div class="tech-item"><label style="font-size:0.85rem; margin-bottom:5px; font-weight:700;">${item.l}</label><select id="${item.id}" class="compact-input" onchange="updateAll()">${Array.from({length:item.max + 1},(_,i)=>`<option value="${i}" ${i===currentVal?'selected':''}>Lv ${i}</option>`).join('')}</select></div>`;
+        }).join('');
     }
 
     const dayTabs = document.getElementById('day-tabs-container');
