@@ -209,6 +209,63 @@ window.resetDayData = function() {
     });
 };
 
+// ✅ 쾌속 입력(Quick Input) 로직
+window.openQuickInputModal = function() {
+    const t = i18n[window.currentLang] || i18n['ko'];
+    const container = document.getElementById('quick-input-container');
+    const day = window.currentDay;
+    let html = '';
+    
+    // 현재 요일에 필요한 입력 항목들 세팅
+    const config = { 
+        mon:[{id:'dia',l:t.inputs.dia},{id:'radar',l:t.inputs.radar_task},{id:'stam',l:t.inputs.stam},{id:'exp',l:t.inputs.exp},{id:'part',l:t.inputs.part},{id:'data',l:t.inputs.data},{id:'gather',l:t.inputs.gather}], 
+        tue:[{id:'dia',l:t.inputs.dia},{id:'truck',l:t.inputs.truck},{id:'sec',l:t.inputs.sec},{id:'surv',l:t.inputs.surv},{id:'spd',l:t.inputs.build_spd},{id:'pow',l:t.inputs.pow_con}], 
+        wed:[{id:'dia',l:t.inputs.dia},{id:'radar',l:t.inputs.radar_task},{id:'spd',l:t.inputs.tec_spd},{id:'pow',l:t.inputs.pow_tec},{id:'mdl',l:t.inputs.medal}], 
+        thu:[{id:'dia',l:t.inputs.dia},{id:'tkt',l:t.inputs.tkt},{id:'exp',l:t.inputs.exp},{id:'sk',l:t.inputs.sk}], 
+        fri:[{id:'dia',l:t.inputs.dia},{id:'radar',l:t.inputs.radar_task},{id:'spd-con',l:t.inputs.build_spd},{id:'spd-tec',l:t.inputs.tec_spd},{id:'spd-trn',l:t.inputs.trn_spd},{id:'pow-con',l:t.inputs.pow_con},{id:'pow-tec',l:t.inputs.pow_tec},{id:'count',l:t.inputs.trn_cnt}], 
+        sat:[{id:'dia',l:t.inputs.dia},{id:'truck',l:t.inputs.truck},{id:'sec',l:t.inputs.sec},{id:'spd-all',l:t.inputs.kill_spd},{id:'kill',l:t.inputs.kill_cnt},{id:'dth',l:t.inputs.dth_cnt}] 
+    };
+    
+    let items = config[day] || [];
+    
+    // 숨겨져 있는 드론 상자, 영웅 조각 항목도 쾌속 입력에서는 바로 보이게 추가
+    if(day === 'wed') { for(let i=1; i<=7; i++) items.push({id: `drone-b${i}`, l: `드론 상자 Lv.${i}`, isDirect: true}); }
+    if(day === 'thu') { items.push({id: 'hero-ur', l: t.labels.ur, isDirect: true}); items.push({id: 'hero-ssr', l: t.labels.ssr, isDirect: true}); items.push({id: 'hero-sr', l: t.labels.sr, isDirect: true}); }
+
+    items.forEach(item => {
+        const cid = item.isDirect ? item.id : `${day}-${item.id}`;
+        const val = getVal(cid);
+        // 이모지 제거 정규식으로 라벨을 더 짧고 깔끔하게 만듦
+        const cleanLabel = item.l.replace(/[\u2700-\u27BF]|[\uE000-\uF8FF]|\uD83C[\uDC00-\uDFFF]|\uD83D[\uDC00-\uDFFF]|[\u2011-\u26FF]|\uD83E[\uDD10-\uDDFF]/g, '').trim();
+        html += `<div class="quick-item">
+                    <label>${cleanLabel}</label> 
+                    <input type="number" id="qi-${cid}" class="quick-input-field" min="0" value="${val}" onfocus="this.select()">
+                 </div>`;
+    });
+
+    container.innerHTML = html;
+    document.getElementById('quickInputModal').classList.add('active');
+};
+
+window.closeQuickInputModal = function() { document.getElementById('quickInputModal').classList.remove('active'); };
+
+window.applyQuickInput = function() {
+    const inputs = document.querySelectorAll('.quick-input-field');
+    const data = JSON.parse(localStorage.getItem('lastwar_data') || '{}');
+    
+    inputs.forEach(input => {
+        const cid = input.id.replace('qi-', '');
+        data[cid] = input.value || "0";
+        // 기존 메인 화면의 input 값도 덮어쓰기
+        const mainInput = document.getElementById(cid);
+        if(mainInput) mainInput.value = data[cid];
+    });
+    
+    localStorage.setItem('lastwar_data', JSON.stringify(data));
+    updateAll();
+    closeQuickInputModal();
+};
+
 window.getSpdData = function(fullId) { const data = JSON.parse(localStorage.getItem('lastwar_spd_data') || '{}'); return data[fullId] || { m5:0, m15:0, h1:0, h3:0, h8:0 }; };
 window.openSpdModal = (cid, label) => { window.activeSpdId = `${window.currentDay}-${cid}`; const titleEl = document.getElementById('spd-title'); if(titleEl) titleEl.innerText = label; renderSpdStepper(); window.calcSpdTotal(); document.getElementById('spdModal')?.classList.add('active'); };
 window.openTechModal = () => document.getElementById('techModal').classList.add('active');
@@ -357,7 +414,14 @@ window.toggleDarkMode = function() { const body = document.body; if(body.classLi
 function renderInputs() {
     const t = i18n[window.currentLang] || i18n['ko']; const container = document.getElementById('input-container'); if(!container) return;
     const config = { mon:[{id:'dia',l:t.inputs.dia},{id:'radar',l:t.inputs.radar_task},{id:'stam',l:t.inputs.stam},{id:'exp',l:t.inputs.exp},{id:'part',l:t.inputs.part},{id:'data',l:t.inputs.data}], tue:[{id:'dia',l:t.inputs.dia},{id:'truck',l:t.inputs.truck},{id:'sec',l:t.inputs.sec},{id:'surv',l:t.inputs.surv},{id:'spd',l:t.inputs.build_spd,isSpd:true},{id:'pow',l:t.inputs.pow_con}], wed:[{id:'dia',l:t.inputs.dia},{id:'radar',l:t.inputs.radar_task},{id:'spd',l:t.inputs.tec_spd,isSpd:true},{id:'pow',l:t.inputs.pow_tec},{id:'mdl',l:t.inputs.medal}], thu:[{id:'dia',l:t.inputs.dia},{id:'tkt',l:t.inputs.tkt},{id:'exp',l:t.inputs.exp},{id:'sk',l:t.inputs.sk}], fri:[{id:'dia',l:t.inputs.dia},{id:'radar',l:t.inputs.radar_task},{id:'spd-con',l:t.inputs.build_spd,isSpd:true},{id:'spd-tec',l:t.inputs.tec_spd,isSpd:true},{id:'spd-trn',l:t.inputs.trn_spd,isSpd:true},{id:'pow-con',l:t.inputs.pow_con},{id:'pow-tec',l:t.inputs.pow_tec}], sat:[{id:'dia',l:t.inputs.dia},{id:'truck',l:t.inputs.truck},{id:'sec',l:t.inputs.sec},{id:'spd-all',l:t.inputs.kill_spd,isSpd:true}] };
-    let html = `<div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;"><div class="section-title" style="margin:0;">📝 ${window.currentDay.toUpperCase()} INPUT</div><div style="display:flex; gap:8px;"><button onclick="setFixedValues()" class="btn-primary-small">${t.fixed}</button><button onclick="resetDayData()" class="btn-primary-small" style="background:var(--input-bg); color:var(--danger);">${t.reset}</button></div></div><div class="input-grid">`;
+    let html = `<div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px; flex-wrap:wrap; gap:10px;">
+                    <div class="section-title" style="margin:0;">📝 ${window.currentDay.toUpperCase()} INPUT</div>
+                    <div style="display:flex; gap:6px;">
+                        <button onclick="openQuickInputModal()" class="btn-primary-small" style="background:#FFD60A; color:#000; box-shadow: 0 4px 10px rgba(255,214,10,0.3);">⚡ 쾌속</button>
+                        <button onclick="setFixedValues()" class="btn-primary-small">${t.fixed}</button>
+                        <button onclick="resetDayData()" class="btn-primary-small" style="background:var(--input-bg); color:var(--danger);">${t.reset}</button>
+                    </div>
+                </div><div class="input-grid">`;
 
     if(window.currentDay === 'mon') { 
         const sVal = getVal('mon-squads');
