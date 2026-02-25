@@ -1,4 +1,4 @@
-// Firebase 설정 (기존 정보 유지)
+// Firebase 설정 (기존 키 유지)
 const firebaseConfig = { 
     apiKey: "AIzaSyAbGdlE4KnelSrrKGLVaLcM5433ZZILVYE", 
     authDomain: "lastwar-530f9.firebaseapp.com", 
@@ -26,7 +26,6 @@ function showPage(pId) {
     if(rb) rb.style.display = (pId === 'calc') ? 'flex' : 'none';
     
     if(pId === 'board') loadLiveView('posts');
-    if(pId === 'qna') loadLiveView('suggestions');
 }
 
 function openModal() {
@@ -46,8 +45,14 @@ function openViewModal(col, docId, data, canDel) {
     if(deleteArea) deleteArea.style.display = canDel ? 'block' : 'none';
     
     document.getElementById('view-content').innerHTML = `<h2 style="margin-top:0; color:var(--text-main); font-weight:800;">${title}</h2><p style="white-space:pre-wrap; line-height:1.6; color:var(--text-muted);">${body}</p>`;
+    
     const img = document.getElementById('view-img');
-    if(data.image) { img.src = data.image; img.style.display = 'block'; } 
+    if(data.image) { 
+        img.src = data.image; 
+        img.style.display = 'block'; 
+        img.style.cursor = 'zoom-in'; 
+        img.onclick = () => openLightbox(data.image); 
+    } 
     else { img.style.display = 'none'; }
     
     document.getElementById('edit-link').style.display = canDel ? 'inline' : 'none';
@@ -65,13 +70,13 @@ async function submitReply() {
 }
 
 async function sendLivePost() {
-    const col = document.getElementById('page-board').classList.contains('active') ? 'posts' : 'suggestions';
+    const col = 'posts'; // 건의(suggestions) 삭제됨
     const title = document.getElementById('post-title').value.replace(/\|\|\|/g, '');
     const content = document.getElementById('post-content').value.replace(/\|\|\|/g, '');
     const file = document.getElementById('post-file').files[0];
     const editId = document.getElementById('edit-doc-id').value;
 
-    if(!title.trim() || !content.trim()) { alert("제목과 내용을 모두 입력해주세요."); return; }
+    if(!title.trim() || !content.trim()) { customAlert("제목과 내용을 모두 입력해주세요."); return; }
 
     let imgUrl = editId ? (currentDocData.data.image || "") : ""; 
     if(file) {
@@ -96,7 +101,7 @@ async function sendLivePost() {
         if(editId) await db.collection(col).doc(editId).update({ content: fullText, image: imgUrl });
         else await db.collection(col).add({ authorId: myId, content: fullText, image: imgUrl, timestamp: firebase.firestore.FieldValue.serverTimestamp() });
         closeModal();
-    } catch (error) { alert("게시물 저장에 실패했습니다."); }
+    } catch (error) { customAlert("게시물 저장에 실패했습니다."); }
 }
 
 function loadLiveView(col) {
@@ -109,8 +114,6 @@ function loadLiveView(col) {
             const card = document.createElement('div');
             card.className = 'summary-card';
             card.onclick = () => openViewModal(col, doc.id, d, (isAdmin || d.authorId === myId));
-            
-            // 핀터레스트 스타일을 위해 사진 높이를 고정하지 않고 자동 조절되도록 수정
             card.innerHTML = `
                 ${d.image ? `<div class="summary-img-wrapper"><img src="${d.image}" loading="lazy"></div>` : ''}
                 <div class="summary-title">${title}</div>
@@ -133,7 +136,13 @@ function loadReplies(col, postId, targetId) {
     });
 }
 
-function deleteCurrentPost() { if(confirm("정말 삭제하시겠습니까?")) { db.collection(currentDocData.col).doc(currentDocData.docId).delete(); closeViewModal(); } }
+// 삭제 확인 모달 연동
+window.deletePostUI = function() {
+    customConfirm("정말 삭제하시겠습니까?", () => {
+        db.collection(currentDocData.col).doc(currentDocData.docId).delete(); 
+        closeViewModal();
+    });
+};
 
 function updatePresence() {
     db.collection('presence').doc(myId).set({ lastSeen: firebase.firestore.FieldValue.serverTimestamp() }).catch(err => console.error(err));
@@ -146,3 +155,17 @@ db.collection('presence').onSnapshot(snap => {
 });
 
 updatePresence(); setInterval(updatePresence, 30000);
+
+let currentScale = 1; let initialPinchDistance = null;
+window.openLightbox = function(src) {
+    const lb = document.getElementById('lightboxModal'); const lbImg = document.getElementById('lightbox-img');
+    if(lb && lbImg) {
+        lbImg.src = src; currentScale = 1; lbImg.style.transform = 'scale(1)'; lb.classList.add('active');
+        lbImg.ontouchstart = (e) => { if(e.touches.length === 2) initialPinchDistance = Math.hypot(e.touches[0].pageX - e.touches[1].pageX, e.touches[0].pageY - e.touches[1].pageY); };
+        lbImg.ontouchmove = (e) => { if(e.touches.length === 2 && initialPinchDistance) { e.preventDefault(); const currentDistance = Math.hypot(e.touches[0].pageX - e.touches[1].pageX, e.touches[0].pageY - e.touches[1].pageY); let newScale = currentScale * (currentDistance / initialPinchDistance); newScale = Math.min(Math.max(1, newScale), 4); lbImg.style.transform = `scale(${newScale})`; } };
+        lbImg.ontouchend = (e) => { if(e.touches.length < 2) { initialPinchDistance = null; const match = lbImg.style.transform.match(/scale\(([^)]+)\)/); if(match) currentScale = parseFloat(match[1]); } };
+        let lastTap = 0;
+        lbImg.onclick = (e) => { e.stopPropagation(); const currentTime = new Date().getTime(); const tapLength = currentTime - lastTap; if (tapLength < 300 && tapLength > 0) { currentScale = currentScale > 1 ? 1 : 2.5; lbImg.style.transform = `scale(${currentScale})`; } lastTap = currentTime; };
+    }
+};
+window.closeLightbox = function(e) { if(e.target.id === 'lightboxModal' || e.target.classList.contains('close-x')) document.getElementById('lightboxModal').classList.remove('active'); };
