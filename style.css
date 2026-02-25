@@ -95,7 +95,19 @@ input[type="number"] { -moz-appearance: textfield; }
 .item-score-tag { font-size: 0.75rem; color: var(--primary); font-weight: 800; background: var(--primary-soft); padding: 4px 8px; border-radius: 8px; white-space: nowrap; }
 
 .stepper-container { display: flex; align-items: center; background: var(--input-bg); border-radius: 12px; overflow: hidden; width: 100%; }
-.stepper-btn { background: transparent; border: none; color: var(--primary); font-size: 1.4rem; font-weight: 400; padding: 10px 18px; cursor: pointer; user-select: none; touch-action: manipulation; transition: 0.1s; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.stepper-btn { 
+    background: transparent; border: none; color: var(--primary); 
+    font-size: 1.4rem; font-weight: 400; padding: 10px 18px; 
+    cursor: pointer; 
+    
+    /* 추가된 부분: 모바일 꾹 누르기 기본 동작 방지 */
+    -webkit-touch-callout: none; 
+    -webkit-user-select: none;   
+    user-select: none;           
+    
+    touch-action: manipulation; transition: 0.1s; display: flex; 
+    align-items: center; justify-content: center; flex-shrink: 0; 
+}
 .stepper-btn:active { background: rgba(0,0,0,0.1); }
 .dark-theme .stepper-btn:active { background: rgba(255,255,255,0.1); }
 .compact-input { border: none; border-radius: 12px; font-weight: 800; color: var(--text-main); outline: none; font-size: 1.15rem; transition: 0.2s; width: 100%; }
