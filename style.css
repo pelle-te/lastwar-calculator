@@ -416,14 +416,27 @@ body {
     transition: 0.3s; 
 }
 
-/* 9. 반응형 최적화 통합 */
-@media (max-width: 900px) { 
-    #posts-list, #suggestions-list { grid-template-columns: repeat(2, 1fr); } 
-}
-
+/* style.css 미디어 쿼리 수정 */
 @media (max-width: 600px) { 
     #posts-list, #suggestions-list { grid-template-columns: 1fr; } 
-    .input-grid, .tech-grid { grid-template-columns: 1fr; } 
+    
+    /* 입력창 그리드를 모바일에서 2열로 유지하되, 내부 요소가 삐져나가지 않게 함 */
+    .input-grid { 
+        grid-template-columns: 1fr 1fr; 
+        gap: 8px; 
+    } 
+
+    /* [핵심] 수요일/목요일 특수 항목이 모바일에서 2칸을 다 먹어서 짤리는 현상 방지 */
+    .full-width-mobile {
+        grid-column: span 2 !important;
+    }
+    
+    /* 화면이 아주 작은 기기에서는 1열로 전환 */
+    @media (max-width: 380px) {
+        .input-grid { grid-template-columns: 1fr; }
+        .full-width-mobile { grid-column: span 1 !important; }
+    }
+
     .modal-card { width: 92%; padding: 20px 15px; }
     .result-bar.slim-version { padding: 8px 15px; }
     .info-val { font-size: 0.95rem; }
