@@ -109,7 +109,11 @@ window.stepVal = function(id, delta) {
 };
 
 let stepSpeed = 150;
-window.startStep = function(id, delta) {
+
+window.startStep = function(e, id, delta) {
+    // 꾹 누르기 시 발생하는 브라우저 기본 동작(복사, 돋보기 등) 완벽 차단!
+    if (e && e.preventDefault) e.preventDefault(); 
+    
     stepVal(id, delta); 
     stepSpeed = 150;
     let count = 0;
@@ -131,10 +135,10 @@ window.addEventListener('mouseup', window.stopStep);
 window.addEventListener('touchend', window.stopStep);
 
 function createStepper(id, value) {
-    return `<div class="stepper-container">
-              <button class="stepper-btn" oncontextmenu="return false;" onmousedown="startStep('${id}', -1)" ontouchstart="startStep('${id}', -1)">-</button>
+    return `<div class="stepper-container" style="-webkit-user-select: none; user-select: none; -webkit-touch-callout: none;">
+              <button class="stepper-btn" oncontextmenu="return false;" onmousedown="startStep(event, '${id}', -1)" ontouchstart="startStep(event, '${id}', -1)">-</button>
               <input type="number" id="${id}" class="compact-input" min="0" value="${value}" oninput="updateAll()">
-              <button class="stepper-btn" oncontextmenu="return false;" onmousedown="startStep('${id}', 1)" ontouchstart="startStep('${id}', 1)">+</button>
+              <button class="stepper-btn" oncontextmenu="return false;" onmousedown="startStep(event, '${id}', 1)" ontouchstart="startStep(event, '${id}', 1)">+</button>
             </div>`;
 }
 
