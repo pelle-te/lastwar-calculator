@@ -3,18 +3,21 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>라스트 워 VS 마스터 v8.5</title>
+    <title>라스트 워 VS 마스터 v9.1</title>
     <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-firestore-compat.js"></script>
     <link rel="stylesheet" href="style.css">
 </head>
-<body>
+<body class="light-theme">
     <div class="header-bar">
         <div class="logo">ALLIANCE MASTER</div>
-        <div style="display: flex; align-items: center; gap: 15px;">
+        <div style="display: flex; align-items: center; gap: 10px;">
+            <button onclick="toggleDarkMode()" class="icon-btn" title="테마 변경">🌓</button>
+            <button onclick="syncToCloud()" class="icon-btn" title="클라우드 저장">☁️</button>
+            <button onclick="showWeeklyReport()" class="icon-btn" title="주간 결산">📊</button>
             <div class="lang-selector">
-                <span id="lang-ko" onclick="changeLang('ko')" style="color: var(--primary); cursor:pointer;">KO</span> | 
-                <span id="lang-en" onclick="changeLang('en')" style="color: #94a3b8; cursor:pointer;">EN</span>
+                <span id="lang-ko" onclick="changeLang('ko')" style="cursor:pointer; font-weight: 800;">KO</span> | 
+                <span id="lang-en" onclick="changeLang('en')" style="cursor:pointer;">EN</span>
             </div>
             <div class="live-counter"><div class="live-dot"></div><span id="user-count">연결 중...</span></div>
         </div>
@@ -28,6 +31,7 @@
 
     <div class="container">
         <div id="page-calc" class="page-content active">
+            <div id="recommend-box"></div>
             <div class="card">
                 <div class="section-title">🎯 DAILY GOAL</div>
                 <div class="target-selector">
@@ -39,20 +43,38 @@
             <div class="card">
                 <div style="display:flex; justify-content:space-between; align-items:center;">
                     <div class="section-title" id="tech-title" style="margin-bottom:0;">🔬 ALLIANCE TECH</div>
-                    <button onclick="openTechModal()" class="btn-primary" style="padding:8px 15px; font-size:0.8rem;">설정하기</button>
+                    <button id="tech-open-btn" onclick="openTechModal()" class="btn-primary" style="padding:8px 15px; font-size:0.8rem;">설정하기</button>
                 </div>
             </div>
             <div class="day-tabs" id="day-tabs-container"></div>
             <div id="input-container"></div>
         </div>
-        <div id="page-board" class="page-content"><div id="posts-list"></div></div>
-        <div id="page-qna" class="page-content"><div id="suggestions-list"></div></div>
+        
+        <div id="page-board" class="page-content">
+            <div style="margin-bottom: 15px; text-align: right;">
+                <button onclick="openModal()" class="btn-primary" style="padding: 10px 20px;">📝 글쓰기</button>
+            </div>
+            <div id="posts-list"></div>
+        </div>
+        
+        <div id="page-qna" class="page-content">
+            <div style="margin-bottom: 15px; text-align: right;">
+                <button onclick="openModal()" class="btn-primary" style="padding: 10px 20px;">💡 건의하기</button>
+            </div>
+            <div id="suggestions-list"></div>
+        </div>
     </div>
 
     <div class="result-bar slim-version">
         <div class="result-info">
-            <div class="info-group"><span class="info-label">SCORE</span><span id="score" class="info-val">0</span></div>
-            <div class="info-group"><span class="info-label">BOX</span><span id="box-status" class="info-val">0 / 9</span></div>
+            <div class="info-group">
+                <span class="info-label" id="score-label">SCORE</span>
+                <span id="score" class="info-val">0</span>
+            </div>
+            <div class="info-group">
+                <span class="info-label" id="box-label">BOX</span>
+                <span id="box-status" class="info-val">0 / 9</span>
+            </div>
         </div>
         <div class="progress-section">
             <div class="progress-container">
@@ -64,70 +86,81 @@
     </div>
 
     <div id="modal-container">
-        <div id="techModal" class="modal"><div class="modal-card"><span class="close-x" onclick="closeTechModal()">&times;</span><h3 id="tech-modal-title" style="margin-top:0">연맹 테크 설정</h3><div class="tech-grid" id="tech-inputs"></div><button onclick="closeTechModal()" class="btn-primary" style="width:100%; margin-top:20px;">적용 완료</button></div></div>
-        
-        <div id="spdModal" class="modal">
-             <div class="modal-card">
-                <span class="close-x" onclick="closeSpdModal()">&times;</span>
-                 <h3 id="spd-title" style="margin-top:0; font-size:1.1rem;">가속 계산기</h3>
-                <div class="tech-grid">
-                     <div class="tech-item"><label>5분</label><input type="number" id="m5" class="compact-input" value="0" min="0" oninput="window.calcSpdTotal()"></div>
-                     <div class="tech-item"><label>15분</label><input type="number" id="m15" class="compact-input" value="0" min="0" oninput="window.calcSpdTotal()"></div>
-                    <div class="tech-item"><label>1시간</label><input type="number" id="h1" class="compact-input" value="0" min="0" oninput="window.calcSpdTotal()"></div>
-                     <div class="tech-item"><label>3시간</label><input type="number" id="h3" class="compact-input" value="0" min="0" oninput="window.calcSpdTotal()"></div>
-                     <div class="tech-item"><label>8시간</label><input type="number" id="h8" class="compact-input" value="0" min="0" oninput="window.calcSpdTotal()"></div>
-                </div>
-             <div id="spd-result-text" style="margin: 15px 0; text-align: center; color: var(--primary); font-weight: 800;">총: 0일 0시 0분</div>
-             <div style="display:grid; grid-template-columns: 1fr 1.5fr; gap:10px">
-                 <button onclick="closeSpdModal()" class="btn-secondary">취소</button>
-                 <button onclick="applySpd()" class="btn-primary">적용</button>
-              </div>
-         </div>
-        </div>
-        <div id="viewModal" class="modal">
+        <div id="writeModal" class="modal">
             <div class="modal-card">
+                <span class="close-x" onclick="closeModal()">&times;</span>
+                <h3 style="margin-top:0">게시물 작성</h3>
+                <input type="hidden" id="edit-doc-id">
+                <input type="text" id="post-title" class="modern-input" placeholder="제목을 입력하세요">
+                <textarea id="post-content" class="modern-textarea" rows="5" placeholder="내용을 입력하세요"></textarea>
+                <input type="file" id="post-file" accept="image/*" style="margin-bottom: 15px; width: 100%;">
+                <button onclick="sendLivePost()" class="btn-primary" style="width:100%;">등록하기</button>
+            </div>
+        </div>
+
+        <div id="viewModal" class="modal">
+            <div class="modal-card" style="max-height: 90vh; overflow-y: auto;">
                 <span class="close-x" onclick="closeViewModal()">&times;</span>
-                <div id="view-body" style="margin-top:20px;">
-                    <div id="view-content"></div>
-                    <img id="view-img" style="width:100%; border-radius:12px; margin:20px 0; display:none;">
+                <div id="view-content" style="margin-bottom: 15px;"></div>
+                <img id="view-img" style="max-width: 100%; border-radius: 12px; display: none; margin-bottom: 15px;">
+                <div id="delete-area" style="text-align: right; margin-bottom: 15px; display: none;">
+                    <a href="#" id="edit-link" onclick="openModal(); closeViewModal();" style="color: var(--primary); font-size: 0.85rem; margin-right: 10px;">수정</a>
+                    <a href="#" onclick="deleteCurrentPost()" style="color: var(--danger); font-size: 0.85rem;">삭제</a>
                 </div>
-                <div style="display:flex; gap:15px; margin-top:20px; border-top:1px solid #eee; padding-top:20px;">
-                    <span id="edit-link" style="display:none; cursor:pointer; color:var(--text-muted); font-size:0.9rem;" onclick="prepareEdit()">✏️ 수정</span>
-                </div>
-                <div id="reply-container" style="margin-top:20px;">
-                    <div id="view-replies" class="reply-section"></div>
-                    <div class="reply-input-group" style="display: flex; gap: 8px; margin-top: 15px;">
-                        <input type="text" id="view-reply-input" class="modern-input" style="margin-bottom:0; flex:1;" placeholder="댓글을 입력하세요...">
-                        <button onclick="submitReply()" class="btn-primary" style="padding: 10px 15px;">등록</button>
+                <div style="border-top: 1px solid var(--insta-border); padding-top: 15px;">
+                    <h4 style="margin: 0 0 10px 0;">댓글</h4>
+                    <div id="view-replies" style="max-height: 150px; overflow-y: auto; margin-bottom: 10px; font-size: 0.85rem;"></div>
+                    <div style="display: flex; gap: 8px;">
+                        <input type="text" id="view-reply-input" class="modern-input" style="margin: 0; padding: 8px;" placeholder="댓글 입력">
+                        <button onclick="submitReply()" class="btn-primary" style="padding: 8px 15px;">등록</button>
                     </div>
-                </div>
-                <div id="delete-area" style="display:none; text-align:right; margin-top:30px;">
-                    <span style="font-size:0.8rem; color:var(--danger); cursor:pointer; font-weight:800;" onclick="deleteCurrentPost()">게시물 삭제하기</span>
                 </div>
             </div>
         </div>
 
-        <div id="writeModal" class="modal">
+        <div id="weeklyModal" class="modal">
             <div class="modal-card">
-                <span class="close-x" onclick="closeModal()">&times;</span><h3 id="write-modal-title" style="margin-top:0">전략 공유 🖋️</h3>
-                <input type="hidden" id="edit-doc-id"><input type="text" id="post-title" class="modern-input" placeholder="제목"><textarea id="post-content" class="modern-textarea" placeholder="내용"></textarea><input type="file" id="post-file" accept="image/*"><button onclick="sendLivePost()" class="btn-primary" style="width:100%; margin-top:15px;">게시하기</button>
+                <span class="close-x" onclick="closeWeeklyModal()">&times;</span>
+                <h3 id="weekly-modal-title" style="margin-top:0">이번 주 대결 리포트 📈</h3>
+                <div id="weekly-report-content"></div>
+                <button id="weekly-close-btn" onclick="closeWeeklyModal()" class="btn-primary" style="width:100%; margin-top:20px;">닫기</button>
+            </div>
+        </div>
+
+        <div id="techModal" class="modal">
+            <div class="modal-card">
+                <span class="close-x" onclick="closeTechModal()">&times;</span>
+                <h3 id="tech-modal-title" style="margin-top:0">연맹 테크 설정</h3>
+                <div class="tech-grid" id="tech-inputs"></div>
+                <button id="tech-confirm-btn" onclick="closeTechModal()" class="btn-primary" style="width:100%; margin-top:20px;">적용 완료</button>
+            </div>
+        </div>
+        
+        <div id="spdModal" class="modal">
+             <div class="modal-card">
+                <span class="close-x" onclick="closeSpdModal()">&times;</span>
+                <h3 id="spd-title" style="margin-top:0; font-size:1.1rem;">가속 계산기</h3>
+                <div class="tech-grid">
+                    <div class="tech-item"><label id="label-m5">5분</label><input type="number" id="m5" class="compact-input" value="0" min="0" oninput="window.calcSpdTotal()"></div>
+                    <div class="tech-item"><label id="label-m15">15분</label><input type="number" id="m15" class="compact-input" value="0" min="0" oninput="window.calcSpdTotal()"></div>
+                    <div class="tech-item"><label id="label-h1">1시간</label><input type="number" id="h1" class="compact-input" value="0" min="0" oninput="window.calcSpdTotal()"></div>
+                    <div class="tech-item"><label id="label-h3">3시간</label><input type="number" id="h3" class="compact-input" value="0" min="0" oninput="window.calcSpdTotal()"></div>
+                    <div class="tech-item"><label id="label-h8">8시간</label><input type="number" id="h8" class="compact-input" value="0" min="0" oninput="window.calcSpdTotal()"></div>
+                </div>
+                <div id="spd-result-text" style="margin: 15px 0; text-align: center; color: var(--primary); font-weight: 800;">총: 0일 0시 0분</div>
+                <div style="display:grid; grid-template-columns: 1fr 1.5fr; gap:10px">
+                    <button id="spd-cancel-btn" onclick="closeSpdModal()" class="btn-secondary">취소</button>
+                    <button id="spd-apply-btn" onclick="applySpd()" class="btn-primary">적용</button>
+                </div>
             </div>
         </div>
 
         <div id="droneModal" class="modal">
             <div class="modal-card">
                 <span class="close-x" onclick="closeDroneModal()">&times;</span>
-                <h3 id="drone-modal-title" style="margin-top:0">드론 파츠 상자 입력</h3>
-                <div class="tech-grid">
-                    <div class="tech-item"><label>Lv.1</label><input type="number" id="drone-b1" class="compact-input" value="0" oninput="updateAll()"></div>
-                    <div class="tech-item"><label>Lv.2</label><input type="number" id="drone-b2" class="compact-input" value="0" oninput="updateAll()"></div>
-                    <div class="tech-item"><label>Lv.3</label><input type="number" id="drone-b3" class="compact-input" value="0" oninput="updateAll()"></div>
-                    <div class="tech-item"><label>Lv.4</label><input type="number" id="drone-b4" class="compact-input" value="0" oninput="updateAll()"></div>
-                    <div class="tech-item"><label>Lv.5</label><input type="number" id="drone-b5" class="compact-input" value="0" oninput="updateAll()"></div>
-                    <div class="tech-item"><label>Lv.6</label><input type="number" id="drone-b6" class="compact-input" value="0" oninput="updateAll()"></div>
-                    <div class="tech-item"><label>Lv.7</label><input type="number" id="drone-b7" class="compact-input" value="0" oninput="updateAll()"></div>
-                </div>
-                <button onclick="closeDroneModal()" class="btn-primary" style="width:100%; margin-top:20px;">확인</button>
+                <h3 id="drone-modal-title" style="margin-top:0">드론 파츠 상자</h3>
+                <div class="tech-grid" id="drone-inputs-container"></div>
+                <button id="drone-confirm-btn" onclick="closeDroneModal()" class="btn-primary" style="width:100%; margin-top:20px;">확인</button>
             </div>
         </div>
 
@@ -136,17 +169,14 @@
                 <span class="close-x" onclick="closeHeroModal()">&times;</span>
                 <h3 id="hero-modal-title" style="margin-top:0">영웅 조각 입력</h3>
                 <div class="tech-grid">
-                    <div class="tech-item"><label>UR 조각</label><input type="number" id="hero-ur" class="compact-input" value="0" min="0" oninput="updateAll()"></div>
-                    <div class="tech-item"><label>SSR 조각</label><input type="number" id="hero-ssr" class="compact-input" value="0" min="0" oninput="updateAll()"></div>
-                    <div class="tech-item"><label>SR 조각</label><input type="number" id="hero-sr" class="compact-input" value="0" min="0" oninput="updateAll()"></div>
+                    <div class="tech-item"><label id="label-ur">UR 조각</label><input type="number" id="hero-ur" class="compact-input" value="0" min="0" oninput="updateAll()"></div>
+                    <div class="tech-item"><label id="label-ssr">SSR 조각</label><input type="number" id="hero-ssr" class="compact-input" value="0" min="0" oninput="updateAll()"></div>
+                    <div class="tech-item"><label id="label-sr">SR 조각</label><input type="number" id="hero-sr" class="compact-input" value="0" min="0" oninput="updateAll()"></div>
                 </div>
-                <button onclick="closeHeroModal()" class="btn-primary" style="width:100%; margin-top:20px;">확인</button>
+                <button id="hero-confirm-btn" onclick="closeHeroModal()" class="btn-primary" style="width:100%; margin-top:20px;">확인</button>
             </div>
         </div>
     </div>
-
-    <div id="float-btn" class="write-btn" style="display:none;" onclick="openModal()">+</div>
-    
     <script src="calc.js"></script>
     <script src="board.js"></script>
 </body>
