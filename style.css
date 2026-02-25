@@ -136,6 +136,38 @@ body {
     box-shadow: 0 2px 4px rgba(0,0,0,0.02); 
 }
 
+/* 💡 [필독] 글자가 길어져도 파란색 숫자 박스가 늘어나지 않도록 고정한 부분입니다. */
+.input-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center; /* 세로 중앙 정렬 */
+    margin-bottom: 10px;
+    gap: 5px;
+}
+
+.input-label-small {
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: var(--text-main);
+    line-height: 1.3;
+    word-break: keep-all; /* 단어 단위 줄바꿈 유지 */
+}
+
+.item-score-tag { 
+    font-size: 0.75rem; 
+    color: var(--primary); 
+    font-weight: 800; 
+    background: var(--primary-soft); 
+    padding: 4px 8px; 
+    border-radius: 8px; 
+    white-space: nowrap; 
+    flex-shrink: 0; 
+    height: fit-content; /* 세로로 뚱뚱하게 늘어나는 현상 완벽 차단 */
+    line-height: 1; /* 박스 내부 위아래 여백 타이트하게 유지 */
+}
+
+.dark-theme .item-score-tag { background: rgba(99, 102, 241, 0.2); }
+
 .tech-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; width: 100%; }
 .tech-item { background: var(--card-bg); padding: 12px; border-radius: 16px; border: 1px solid var(--insta-border); display: flex; flex-direction: column; box-sizing: border-box; }
 
@@ -144,12 +176,6 @@ body {
     border-radius: 10px; padding: 10px; font-weight: 800; color: var(--primary);
     text-align: right; box-sizing: border-box; outline: none; font-size: 1rem !important;
 }
-
-.item-score-tag { 
-    font-size: 0.75rem; color: var(--primary); font-weight: 800; 
-    background: var(--primary-soft); padding: 3px 8px; border-radius: 8px; 
-}
-.dark-theme .item-score-tag { background: rgba(99, 102, 241, 0.2); }
 
 .spd-btn-mini { 
     margin-top: 8px; font-size: 0.75rem; padding: 8px; background: var(--card-bg); 
