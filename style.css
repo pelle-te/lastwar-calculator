@@ -243,3 +243,44 @@ input[type="number"] { -moz-appearance: textfield; }
 ::-webkit-scrollbar { width: 6px; }
 ::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb { background: rgba(142, 142, 147, 0.3); border-radius: 10px; }
+
+/* ⚡ 쾌속 입력 모달 전용 스타일 */
+.quick-input-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+    max-height: 55vh;
+    overflow-y: auto;
+    padding-right: 5px;
+}
+.quick-item {
+    display: flex;
+    flex-direction: column;
+    background: var(--input-bg);
+    padding: 10px 12px;
+    border-radius: 12px;
+}
+.quick-item label {
+    font-size: 0.8rem;
+    font-weight: 800;
+    color: var(--text-muted);
+    margin-bottom: 6px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.quick-input-field {
+    background: var(--card-bg);
+    border: 1px solid rgba(0,0,0,0.05);
+    border-radius: 8px;
+    padding: 8px 10px;
+    font-size: 1.1rem;
+    font-weight: 800;
+    color: var(--text-main);
+    width: 100%;
+    text-align: right;
+    outline: none;
+    transition: 0.2s;
+}
+.dark-theme .quick-input-field { border-color: rgba(255,255,255,0.05); }
+.quick-input-field:focus { border-color: var(--primary); box-shadow: 0 0 0 3px var(--primary-soft); }
