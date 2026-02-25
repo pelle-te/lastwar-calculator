@@ -2,132 +2,93 @@ window.currentLang = 'ko';
 window.currentDay = 'mon';
 window.targetScore = 7200000;
 window.activeSpdId = '';
-window.customRatio = 5; // 슬라이더 기본값
+// 정수비(1~10) 대신 0~100까지의 부드러운 슬라이더로 변경 (초기값 50%)
+window.customRatio = 50;
 
 const i18n = {
     ko: {
         nav: { calc: "📊 계산기", board: "📱 피드", qna: "💬 건의" },
         targets: { t6: "6상", t8: "8상", t9: "9상" },
-        fixed: "고정값", reset: "초기화",
+        fixed: "일일 기본값 입력", reset: "초기화",
         result: { score: "SCORE", box: "BOX", remain: "남은 점수" },
-        modal: { tech: "연맹 테크 설정", spd: "가속 계산기", drone: "드론 파츠 상자", hero: "영웅 조각", btn_close: "닫기", btn_apply: "적용", btn_cancel: "취소", btn_open: "입력하기", btn_confirm: "확인", total: "총", weekly: "이번 주 대결 리포트 📈" },
+        modal: { tech: "연맹 테크 설정", spd: "가속 시간 계산", drone: "드론 파츠 상자", hero: "영웅 조각", btn_close: "닫기", btn_apply: "적용", btn_cancel: "취소", btn_open: "계산/입력", btn_confirm: "확인", total: "총", weekly: "이번 주 대결 리포트 📈" },
         units: { day: "일", hour: "시", min: "분" },
         expert: "🏆 대결 전문가", radar: "📡 추당-레이더", spd: "⏱️ 추당-가속", rec: "🎫 추당-모집", con: "🏰 추당-건설", tec: "🔬 추당-테크", trn: "⚔️ 추당-훈련", kil: "🔥 추당-적처치",
         days: ["월", "화", "수", "목", "금", "토"],
         success: "🎉 목표 달성 완료!",
         labels: { m5: "5분", m15: "15분", h1: "1시간", h3: "3시간", h8: "8시간", ur: "UR 조각", ssr: "SSR 조각", sr: "SR 조각" },
         inputs: { squads: "🚜 채집 부대 수", squads_unit: "부대", gather: "⏱️ 시간당 채집(h)", dia: "💎 다이아 구매", radar_task: "📡 레이더 임무", stam: "⚡ 체력 소모", exp: "⭐ 영웅 경험치(1M)", part: "⚙️ 드론 부품", data: "💾 드론 데이터(1k)", truck: "🚚 UR 화물차", sec: "🕵️ UR 은밀 임무", surv: "🎫 생존자 모집", build_spd: "⏱️ 건설 가속(h)", pow_con: "🏰 건물 전투력(1k)", tec_spd: "⏱️ 테크 가속(h)", pow_tec: "🔬 테크 전투력(1k)", medal: "🏅 명예 훈장 소모", tkt: "🎫 영웅 모집", sk: "🏅 스킬 훈장", trn_spd: "⏱️ 훈련 가속(h)", trn_cnt: "⚔️ 훈련 수", trn_lvl: "🎯 훈련 레벨", kill_spd: "⏱️ 모든 가속(h)", kill_target: "⚔️ 처치 대상", kill_lvl: "🎯 처치 레벨", kill_cnt: "🔥 처치 수", dth_lvl: "💀 전사 레벨", dth_cnt: "🩸 전사 수", target_spec: "특정 매칭 연맹", target_gen: "일반 적군" },
-        rec: { success: "목표 달성! 자원을 아끼세요.", guide_title: "맞춤 가이드", only: "만", count: "개", custom_ratio: "나만의 맞춤 배분", target_goal: "목표" }
+        rec: { success: "목표를 넉넉하게 달성했습니다! 다음을 위해 자원을 아끼세요.", guide_title: "달성 가이드", desc: "남은 점수를 채우기 위해 두 자원을 어떻게 섞어 쓸지 슬라이더로 조절해보세요.", only: "", count: "개", target_goal: "목표" }
     },
     en: {
         nav: { calc: "📊 Calc", board: "📱 Feed", qna: "💬 Q&A" },
         targets: { t6: "6 Boxes", t8: "8 Boxes", t9: "9 Boxes" },
-        fixed: "Fixed", reset: "Reset",
+        fixed: "Daily Free/Basic", reset: "Reset",
         result: { score: "SCORE", box: "BOX", remain: "Remaining" },
-        modal: { tech: "Alliance Tech", spd: "Speed-up Calc", drone: "Drone Parts Box", hero: "Hero Shards", btn_close: "Close", btn_apply: "Apply", btn_cancel: "Cancel", btn_open: "Input", btn_confirm: "Confirm", total: "Total", weekly: "Weekly VS Report 📈" },
+        modal: { tech: "Alliance Tech", spd: "Speedup Calc", drone: "Drone Box", hero: "Hero Shards", btn_close: "Close", btn_apply: "Apply", btn_cancel: "Cancel", btn_open: "Input", btn_confirm: "Confirm", total: "Total", weekly: "Weekly Report 📈" },
         units: { day: "d", hour: "h", min: "m" },
-        expert: "🏆 VS Expert", radar: "📡 Radar Task", spd: "⏱️ Spd-Up Task", rec: "🎫 Recruit Task", con: "🏰 Build Task", tec: "🔬 Tech Task", trn: "⚔️ Train Task", kil: "🔥 Kill Task",
+        expert: "🏆 VS Expert", radar: "📡 Radar", spd: "⏱️ Speedup", rec: "🎫 Recruit", con: "🏰 Build", tec: "🔬 Tech", trn: "⚔️ Train", kil: "🔥 Kill",
         days: ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat"],
-        success: "🎉 Goal Achieved!",
+        success: "🎉 Target Achieved!",
         labels: { m5: "5m", m15: "15m", h1: "1h", h3: "3h", h8: "8h", ur: "UR Shard", ssr: "SSR Shard", sr: "SR Shard" },
-        inputs: { squads: "🚜 Gather Squads", squads_unit: " Units", gather: "⏱️ Hourly(h)", dia: "💎 Buy Diamonds", radar_task: "📡 Radar Tasks", stam: "⚡ Stamina Used", exp: "⭐ Hero EXP (1M)", part: "⚙️ Drone Parts", data: "💾 Drone Data (1k)", truck: "🚚 UR Truck", sec: "🕵️ UR Secret Task", surv: "🎫 Survivor Recruit", build_spd: "⏱️ Build Spd-up(h)", pow_con: "🏰 Build Power(1k)", tec_spd: "⏱️ Tech Spd-up(h)", pow_tec: "🔬 Tech Power(1k)", medal: "🏅 Honor Medals", tkt: "🎫 Hero Recruit", sk: "🏅 Skill Medals", trn_spd: "⏱️ Train Spd-up(h)", trn_cnt: "⚔️ Units Trained", trn_lvl: "🎯 Train Level", kill_spd: "⏱️ Universal Spd-up(h)", kill_target: "⚔️ Target Type", kill_lvl: "🎯 Kill Level", kill_cnt: "🔥 Kill Count", dth_lvl: "💀 Death Level", dth_cnt: "🩸 Death Count", target_spec: "Match Enemy", target_gen: "General Enemy" },
-        rec: { success: "Goal Achieved! Save your resources.", guide_title: "Custom Guide", only: " Only", count: "", custom_ratio: "Custom Ratio", target_goal: "Goal" }
+        inputs: { squads: "🚜 Gathering Squads", squads_unit: "", gather: "⏱️ Gather (h)", dia: "💎 Buy Diamonds", radar_task: "📡 Radar Tasks", stam: "⚡ Consume Stamina", exp: "⭐ Hero EXP (1M)", part: "⚙️ Drone Parts", data: "💾 Drone Data (1k)", truck: "🚚 UR Truck", sec: "🕵️ UR Secret Task", surv: "🎫 Recruit Survivors", build_spd: "⏱️ Build Speedup (h)", pow_con: "🏰 Build Power (1k)", tec_spd: "⏱️ Tech Speedup (h)", pow_tec: "🔬 Tech Power (1k)", medal: "🏅 Honor Medal", tkt: "🎫 Hero Ticket", sk: "🏅 Skill Medal", trn_spd: "⏱️ Train Speedup (h)", trn_cnt: "⚔️ Train Troops", trn_lvl: "🎯 Train Level", kill_spd: "⏱️ All Speedups (h)", kill_target: "⚔️ Kill Target", kill_lvl: "🎯 Kill Level", kill_cnt: "🔥 Kill Count", dth_lvl: "💀 Death Level", dth_cnt: "🩸 Death Count", target_spec: "Matched Alliance", target_gen: "General Enemy" },
+        rec: { success: "Target achieved! Save your resources.", guide_title: "Guide", desc: "Adjust the slider to see how to distribute your two resources to meet the target.", only: "", count: "", target_goal: "Target" }
+    }
+};
+const BASE = {
+    radar: 10000, truck: 100000, secret: 75000, surv: 1500, spd_min: 50, pow_pt: 10, h_gather: 9523.5, drone_part: 2500, drone_data: 3, honor_medal: 300, recruit: 1500, ur_shard: 10000, ssr_shard: 3500, sr_shard: 1000, skill_medal: 10, exp_unit: 1.0/660, boxes: [0, 1100, 3300, 10000, 30000, 90000, 270000, 810000], trp: [0, 20, 30, 40, 50, 60, 70, 80, 90, 100, 110], kil_spec: [0, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55], kil_gen: [0, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]
+};
+
+window.onclick = function(event) {
+    if (event.target.classList.contains('modal')) {
+        event.target.classList.remove('active');
+        if(event.target.id === 'techModal') updateAll(); 
     }
 };
 
-const BASE = {
-    radar: 10000, truck: 100000, secret: 75000, surv: 1500, spd_min: 50, pow_pt: 10, h_gather: 9523.5, drone_part: 2500, drone_data: 3, honor_medal: 300,
-    recruit: 1500, ur_shard: 10000, ssr_shard: 3500, sr_shard: 1000, skill_medal: 10, exp_unit: 1.0/660,
-    boxes: [0, 1100, 3300, 10000, 30000, 90000, 270000, 810000],
-    trp: [0, 20, 30, 40, 50, 60, 70, 80, 90, 100, 110], 
-    kil_spec: [0, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55],
-    kil_gen: [0, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]
-};
-
-// 숫자 입력 필드에서 음수(-) 및 불필요한 기호 원천 차단
 document.addEventListener('keydown', function(e) {
     if (e.target && e.target.type === 'number') {
-        if (e.key === '-' || e.key === 'e' || e.key === '+' || e.key === '.') {
-            e.preventDefault();
-        }
+        if (e.key === '-' || e.key === 'e' || e.key === '+' || e.key === '.') e.preventDefault();
     }
 });
 document.addEventListener('input', function(e) {
-    if (e.target && e.target.type === 'number') {
-        if (e.target.value < 0) e.target.value = 0;
-    }
+    if (e.target && e.target.type === 'number' && e.target.value < 0) e.target.value = 0;
 });
 
-function getVal(cid) {
-    const data = JSON.parse(localStorage.getItem('lastwar_data') || '{}');
-    if (data[cid] !== undefined) return data[cid];
-    return cid.includes('squads') ? "1" : "0";
-}
+function getVal(cid) { const data = JSON.parse(localStorage.getItem('lastwar_data') || '{}'); return data[cid] !== undefined ? data[cid] : (cid.includes('squads') ? "1" : "0"); }
+function renderDroneInputs() { const c = document.getElementById('drone-inputs-container'); if(!c) return; let h = ''; for(let i=1; i<=7; i++) { h += `<div class="tech-item"><label>Lv.${i}</label><input type="number" id="drone-b${i}" class="compact-input" min="0" value="${getVal('drone-b'+i)}" oninput="updateAll()"></div>`; } c.innerHTML = h; }
 
-function renderDroneInputs() {
-    const container = document.getElementById('drone-inputs-container');
-    if(!container) return;
-    let html = '';
-    for(let i=1; i<=7; i++) {
-        html += `<div class="tech-item"><label>Lv.${i}</label><input type="number" id="drone-b${i}" class="compact-input" min="0" value="${getVal('drone-b'+i)}" oninput="updateAll()"></div>`;
-    }
-    container.innerHTML = html;
-}
-
-window.changeLang = function(lang) {
-    window.currentLang = lang;
-    document.getElementById('lang-ko').style.fontWeight = lang === 'ko' ? '800' : 'normal';
-    document.getElementById('lang-en').style.fontWeight = lang === 'en' ? '800' : 'normal';
-    initCalc();
+window.changeLang = function(lang) { 
+    window.currentLang = lang; 
+    document.getElementById('lang-ko').classList.toggle('active', lang === 'ko'); 
+    document.getElementById('lang-en').classList.toggle('active', lang === 'en'); 
+    const recBox = document.getElementById('recommend-box');
+    if(recBox) { recBox.removeAttribute('data-rendered-day'); recBox.removeAttribute('data-rendered-lang'); }
+    initCalc(); 
 };
 
-window.setTarget = function(s) { 
-    window.targetScore = s; 
-    document.querySelectorAll('.target-btn').forEach(b => b.classList.remove('active'));
-    document.getElementById('target-' + s)?.classList.add('active'); 
-    updateAll(); 
-};
-
-window.switchTab = function(day) {
-    window.currentDay = day;
-    document.querySelectorAll('.day-btn').forEach(b => b.classList.remove('active'));
-    document.getElementById('btn-' + day)?.classList.add('active');
-    renderInputs();
-    updateAll();
-};
+window.setTarget = function(s) { window.targetScore = s; document.querySelectorAll('.target-btn').forEach(b => b.classList.remove('active')); document.getElementById('target-' + s)?.classList.add('active'); updateAll(); };
+window.switchTab = function(day) { window.currentDay = day; document.querySelectorAll('.day-btn').forEach(b => b.classList.remove('active')); document.getElementById('btn-' + day)?.classList.add('active'); renderInputs(); updateAll(); };
 
 window.setFixedValues = function() {
-    const msg = window.currentLang === 'ko' ? "고정 설정을 적용하시겠습니까?" : "Apply fixed settings?";
+    const msg = window.currentLang === 'ko' ? "매일 무료/기본 획득량을 일괄 적용하시겠습니까?" : "Apply daily free/basic settings?";
     if(confirm(msg)) {
         const data = JSON.parse(localStorage.getItem('lastwar_data') || '{}');
-        data['mon-squads'] = "2"; 
-        data['mon-gather'] = "24";
-        ['mon','tue','wed','thu','fri','sat'].forEach(d => {
-            data[`${d}-radar`] = "82";
-            if(d === 'tue' || d === 'sat') { data[`${d}-truck`] = "4"; data[`${d}-sec`] = "7"; }
-        });
-        localStorage.setItem('lastwar_data', JSON.stringify(data));
-        renderInputs(); 
-        updateAll();
+        data['mon-squads'] = "2"; data['mon-gather'] = "24";
+        ['mon','tue','wed','thu','fri','sat'].forEach(d => { data[`${d}-radar`] = "82"; if(d === 'tue' || d === 'sat') { data[`${d}-truck`] = "4"; data[`${d}-sec`] = "7"; } });
+        localStorage.setItem('lastwar_data', JSON.stringify(data)); renderInputs(); updateAll();
     }
 };
 
 window.resetDayData = function() {
-    const msg = window.currentLang === 'ko' ? "데이터를 초기화하시겠습니까?" : "Reset data?";
+    const msg = window.currentLang === 'ko' ? "현재 요일의 입력값을 0으로 초기화하시겠습니까?" : "Reset data for this day?";
     if(confirm(msg)) {
-        const data = JSON.parse(localStorage.getItem('lastwar_data') || '{}');
-        const spdData = JSON.parse(localStorage.getItem('lastwar_spd_data') || '{}');
-        const prefix = window.currentDay + '-';
-        
+        const data = JSON.parse(localStorage.getItem('lastwar_data') || '{}'); const spdData = JSON.parse(localStorage.getItem('lastwar_spd_data') || '{}'); const prefix = window.currentDay + '-';
         Object.keys(data).forEach(key => { if(key.startsWith(prefix)) data[key] = key.includes('squads') ? "1" : "0"; });
         Object.keys(spdData).forEach(key => { if(key.startsWith(prefix)) delete spdData[key]; });
-        
         if(window.currentDay === 'wed') { for(let i=1; i<=7; i++) { const el = document.getElementById('drone-b'+i); if(el) el.value = 0; } }
         if(window.currentDay === 'thu') { ['hero-ur','hero-ssr','hero-sr'].forEach(id => { const el = document.getElementById(id); if (el) el.value = 0; }); }
-        
-        localStorage.setItem('lastwar_data', JSON.stringify(data));
-        localStorage.setItem('lastwar_spd_data', JSON.stringify(spdData));
-        renderInputs(); updateAll();
+        localStorage.setItem('lastwar_data', JSON.stringify(data)); localStorage.setItem('lastwar_spd_data', JSON.stringify(spdData)); renderInputs(); updateAll();
     }
 };
 
@@ -181,18 +142,13 @@ window.calcSpdTotal = function() {
     const m = Math.round(totalMin % 60);
     
     const resText = document.getElementById('spd-result-text');
-    if(resText) {
-        const unit = t.units;
-        const totalLabel = t.modal ? t.modal.total : '총';
-        resText.innerText = `${totalLabel}: ${d}${unit.day} ${h}${unit.hour} ${m}${unit.min}`;
-    }
+    if(resText) { resText.innerText = `${t.modal.total}: ${d}${t.units.day} ${h}${t.units.hour} ${m}${t.units.min}`; }
     return totalMin;
 };
 
 window.applySpd = function() {
     const totalMin = window.calcSpdTotal();
     const targetInput = document.getElementById(window.activeSpdId); 
-    
     if(targetInput) { 
         targetInput.value = (totalMin / 60).toFixed(2); 
         const spdData = JSON.parse(localStorage.getItem('lastwar_spd_data') || '{}');
@@ -206,7 +162,6 @@ window.applySpd = function() {
     window.closeSpdModal();
 };
 
-// [수정] 맞춤가이드 라벨을 언어 설정에 맞게 동적으로 가져오기
 function getRecommendMap(t) {
     return {
         mon: [{ label: t.inputs.part, unit: (m) => BASE.drone_part * m.exp.all }, { label: t.inputs.data, unit: (m) => 1000 * BASE.drone_data * m.exp.all }],
@@ -278,11 +233,19 @@ window.updateAll = function() {
     const t = i18n[window.currentLang];
     let totalScore = 0;
     
+    ['mon','tue','wed','thu','fri','sat'].forEach(day => {
+        const btn = document.getElementById(`btn-${day}`);
+        if(btn) {
+            if (calculateDayScore(day) >= window.targetScore) btn.classList.add('completed');
+            else btn.classList.remove('completed');
+        }
+    });
+
     let m = { rad: getM('t-radar'), spd: getM('t-spd'), rec: getM('t-rec'), con: getM('t-con'), tec: getM('t-tec'), trn: getM('t-trn'), kil: getM('t-kil'), exp: getM('t-expert') };
 
     function setPt(id, pt) {
         const el = document.getElementById('pts-' + id);
-        if(el) el.innerText = Math.floor(pt).toLocaleString();
+        if(el) el.innerText = '+' + Math.floor(pt).toLocaleString() + ' pt';
         totalScore += pt;
     }
 
@@ -339,51 +302,58 @@ window.updateAll = function() {
     const recBox = document.getElementById('recommend-box');
     const dayName = t.days[['mon','tue','wed','thu','fri','sat'].indexOf(window.currentDay)];
 
+    // 가이드 박스 퍼센트 슬라이더(0~100) 렌더링
     if(recBox) {
         if(rem <= 0) {
-            // [수정] 성공 메시지 언어 연동
-            recBox.innerHTML = `<div class="recommend-card success" style="background:var(--fri); text-align:center; font-weight:800;">✅ [${dayName}] ${t.rec.success}</div>`;
+            recBox.innerHTML = `<div class="recommend-card" style="background:var(--fri); text-align:center; font-weight:800; border:2px solid #059669;">✅ [${dayName}] ${t.rec.success}</div>`;
         } else {
             const m_calc = { exp: getM('t-expert'), spd: getM('t-spd'), rad: getM('t-radar'), con: getM('t-con'), tec: getM('t-tec'), trn: getM('t-trn'), kil: getM('t-kil') };
-            const items = getRecommendMap(t)[window.currentDay]; // 언어 연동된 항목들 불러오기
+            const items = getRecommendMap(t)[window.currentDay]; 
             
             if (items) {
                 const v1 = items[0].unit(m_calc);
                 const v2 = items[1].unit(m_calc);
-                const leftRatio = (10 - window.customRatio) / 10;
-                const rightRatio = window.customRatio / 10;
+                // 100 퍼센트 기준으로 비율 세팅
+                const leftRatio = (100 - window.customRatio) / 100;
+                const rightRatio = window.customRatio / 100;
+                
+                const val1 = Math.ceil((rem * leftRatio)/v1).toLocaleString();
+                const val2 = Math.ceil((rem * rightRatio)/v2).toLocaleString();
 
                 const existingSlider = document.getElementById('inner-ratio');
                 const renderedDay = recBox.getAttribute('data-rendered-day');
-                const renderedLang = recBox.getAttribute('data-rendered-lang'); // 현재 렌더링된 언어 추적
+                const renderedLang = recBox.getAttribute('data-rendered-lang'); 
                 
-                // 목표 텍스트 언어 연동 (9상 -> 9 Boxes)
-                const targetText = window.targetScore === 7200000 ? (window.currentLang === 'ko' ? '9상' : '9 Boxes') : t.rec.target_goal;
-                
-                // 요일과 '언어'가 동일할 때만 숫자만 교체 (언어가 바뀌면 전체 덮어쓰기)
+                let targetLabel = "6상";
+                if(window.targetScore === 3600000) targetLabel = "8상";
+                else if(window.targetScore === 7200000) targetLabel = "9상";
+                const targetText = window.currentLang === 'en' ? targetLabel.replace('상', ' Boxes') : targetLabel;
+
+                // 이미 렌더링된 상태라면 텍스트 숫자만 변경
                 if (existingSlider && renderedDay === window.currentDay && renderedLang === window.currentLang) {
-                    document.getElementById('rec-val-1').innerText = Math.ceil(rem/v1).toLocaleString() + t.rec.count;
-                    document.getElementById('rec-val-2').innerText = Math.ceil(rem/v2).toLocaleString() + t.rec.count;
-                    document.getElementById('rec-ratio-title').innerText = `${t.rec.custom_ratio} (${10-window.customRatio}:${window.customRatio})`;
-                    document.getElementById('rec-ratio-val').innerText = `${Math.ceil((rem * leftRatio)/v1).toLocaleString()} / ${Math.ceil((rem * rightRatio)/v2).toLocaleString()}`;
+                    document.getElementById('rec-val-1').innerText = val1 + t.rec.count;
+                    document.getElementById('rec-val-2').innerText = val2 + t.rec.count;
                 } else {
                     recBox.setAttribute('data-rendered-day', window.currentDay);
                     recBox.setAttribute('data-rendered-lang', window.currentLang);
+                    
+                    // 설명이 포함된 100단계 정밀 슬라이더 구조
                     recBox.innerHTML = `
                         <div class="recommend-card">
-                            <span class="rec-title" style="font-weight:800; display:block; margin-bottom:10px;">💡 [${dayName}] ${targetText} ${t.rec.guide_title}</span>
-                            <div class="rec-grid">
-                                <div class="rec-item"><span>${items[0].label}${t.rec.only}</span><br><b id="rec-val-1">${Math.ceil(rem/v1).toLocaleString()}${t.rec.count}</b></div>
-                                <div class="rec-item"><span>${items[1].label}${t.rec.only}</span><br><b id="rec-val-2">${Math.ceil(rem/v2).toLocaleString()}${t.rec.count}</b></div>
-                                <div class="rec-item highlight ratio-integration">
-                                    <div class="ratio-info" style="width:100%;">
-                                        <span id="rec-ratio-title">${t.rec.custom_ratio} (${10-window.customRatio}:${window.customRatio})</span><br>
-                                        <b id="rec-ratio-val" style="font-size:0.95rem;">${Math.ceil((rem * leftRatio)/v1).toLocaleString()} / ${Math.ceil((rem * rightRatio)/v2).toLocaleString()}</b>
-                                    </div>
-                                    <div class="ratio-control" style="width:100%; margin-top:8px;">
-                                        <input type="range" id="inner-ratio" min="0" max="10" value="${window.customRatio}" step="1" 
-                                               class="vertical-slider" oninput="window.updateRatioText(this.value)">
-                                    </div>
+                            <div class="rec-title">
+                                <span>💡 [${dayName}] ${targetText} ${t.rec.guide_title}</span>
+                            </div>
+                            <div class="rec-desc">${t.rec.desc}</div>
+                            <div class="rec-slider-container">
+                                <div class="rec-slider-item">
+                                    <span class="rec-slider-label">${items[0].label}</span>
+                                    <span class="rec-slider-val" id="rec-val-1">${val1}${t.rec.count}</span>
+                                </div>
+                                <input type="range" id="inner-ratio" min="0" max="100" value="${window.customRatio}" step="1" 
+                                       class="modern-slider" oninput="window.updateRatioText(this.value)">
+                                <div class="rec-slider-item">
+                                    <span class="rec-slider-label">${items[1].label}</span>
+                                    <span class="rec-slider-val" id="rec-val-2">${val2}${t.rec.count}</span>
                                 </div>
                             </div>
                         </div>`;
@@ -398,6 +368,43 @@ window.updateAll = function() {
     if(document.getElementById('diff')) document.getElementById('diff').innerText = rem > 0 ? `${t.result.remain}: ${rem.toLocaleString()}` : t.success;
 };
 
+window.showWeeklyReport = function() {
+    const days = ['mon','tue','wed','thu','fri','sat'];
+    const currentT = i18n[window.currentLang];
+    let html = `<div class="weekly-container">`; 
+    let totalWeeklyScore = 0;
+
+    days.forEach((d, idx) => {
+        const dayLabel = currentT.days[idx];
+        const dayScore = calculateDayScore(d); 
+        totalWeeklyScore += dayScore;
+        
+        let badgeHTML = '';
+        if (dayScore >= 7200000) badgeHTML = `<span class="weekly-badge tier-9">9상 🎁</span>`;
+        else if (dayScore >= 3600000) badgeHTML = `<span class="weekly-badge tier-8">8상 📦</span>`;
+        else if (dayScore >= 2300000) badgeHTML = `<span class="weekly-badge tier-6">6상 📦</span>`;
+        else badgeHTML = `<span class="weekly-badge tier-fail">미달</span>`;
+        
+        html += `
+        <div class="weekly-row">
+            <div class="weekly-day-group">
+                <span class="weekly-day" style="color: var(--${d}); border: 1px solid var(--${d});">${dayLabel}</span>
+                ${badgeHTML}
+            </div>
+            <span class="weekly-score">${Math.floor(dayScore).toLocaleString()} <span>pt</span></span>
+        </div>`;
+    });
+
+    html += `
+        <div class="weekly-total">
+            <span>TOTAL</span>
+            <span>${Math.floor(totalWeeklyScore).toLocaleString()} pt</span>
+        </div>
+    </div>`;
+    
+    document.getElementById('weekly-report-content').innerHTML = html;
+    document.getElementById('weeklyModal').classList.add('active');
+};
 window.syncToCloud = async function() {
     const data = localStorage.getItem('lastwar_data');
     const spdData = localStorage.getItem('lastwar_spd_data');
@@ -421,10 +428,22 @@ window.showWeeklyReport = function() {
         const dayLabel = currentT.days[idx];
         const dayScore = calculateDayScore(d); 
         totalWeeklyScore += dayScore;
-        html += `<div class="weekly-row"><span class="weekly-day">${dayLabel}</span><span class="weekly-score">${Math.floor(dayScore).toLocaleString()} pt</span></div>`;
+        
+        // 요일별로 지정된 테마 색상을 글씨색으로 적용하여 직관성 향상
+        html += `
+        <div class="weekly-row">
+            <span class="weekly-day" style="color: var(--${d}); border: 1px solid var(--${d});">${dayLabel}</span>
+            <span class="weekly-score">${Math.floor(dayScore).toLocaleString()} <span>pt</span></span>
+        </div>`;
     });
 
-    html += `<div class="weekly-total"><span>TOTAL</span><span>${Math.floor(totalWeeklyScore).toLocaleString()} pt</span></div></div>`;
+    html += `
+        <div class="weekly-total">
+            <span>TOTAL</span>
+            <span>${Math.floor(totalWeeklyScore).toLocaleString()} pt</span>
+        </div>
+    </div>`;
+    
     document.getElementById('weekly-report-content').innerHTML = html;
     document.getElementById('weeklyModal').classList.add('active');
 };
@@ -441,9 +460,10 @@ window.toggleDarkMode = function() {
 };
 
 function renderInputs() {
-    const t = i18n[window.currentLang];
+    const t = i18n[window.currentLang] || i18n['ko'];
     const container = document.getElementById('input-container');
     if(!container) return;
+    
     const config = { 
         mon:[{id:'dia',l:t.inputs.dia},{id:'radar',l:t.inputs.radar_task},{id:'stam',l:t.inputs.stam},{id:'exp',l:t.inputs.exp},{id:'part',l:t.inputs.part},{id:'data',l:t.inputs.data}], 
         tue:[{id:'dia',l:t.inputs.dia},{id:'truck',l:t.inputs.truck},{id:'sec',l:t.inputs.sec},{id:'surv',l:t.inputs.surv},{id:'spd',l:t.inputs.build_spd,isSpd:true},{id:'pow',l:t.inputs.pow_con}], 
@@ -453,7 +473,7 @@ function renderInputs() {
         sat:[{id:'dia',l:t.inputs.dia},{id:'truck',l:t.inputs.truck},{id:'sec',l:t.inputs.sec},{id:'spd-all',l:t.inputs.kill_spd,isSpd:true}] 
     };
 
-    let html = `<div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;"><div class="section-title" style="margin:0;">📊 ${window.currentDay.toUpperCase()} INPUT</div><div style="display:flex; gap:8px;"><button onclick="setFixedValues()" class="btn-secondary" style="background:var(--primary-soft); color:var(--primary); padding:4px 10px; font-size:0.75rem; border-radius:8px;">${t.fixed}</button><button onclick="resetDayData()" class="btn-secondary" style="background:#fee2e2; color:#ef4444; padding:4px 10px; font-size:0.75rem; border-radius:8px;">${t.reset}</button></div></div><div class="input-grid">`;
+    let html = `<div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;"><div class="section-title" style="margin:0;">📝 ${window.currentDay.toUpperCase()} INPUT</div><div style="display:flex; gap:8px;"><button onclick="setFixedValues()" class="btn-primary-small">${t.fixed}</button><button onclick="resetDayData()" class="btn-primary-small" style="background:var(--danger); color:white; opacity: 0.9;">${t.reset}</button></div></div><div class="input-grid">`;
 
     if(window.currentDay === 'mon') {
         const sVal = getVal('mon-squads'); const gVal = getVal('mon-gather');
@@ -493,20 +513,13 @@ window.saveAllData = function() {
 function initCalc() {
     if (!localStorage.getItem('tech_init_v3')) {
         const data = JSON.parse(localStorage.getItem('lastwar_data') || '{}');
-        data['t-expert'] = 20;
-        data['t-radar'] = 6;
-        data['t-spd'] = 6;
-        data['t-rec'] = 6;
-        data['t-con'] = 1;
-        data['t-tec'] = 1;
-        data['t-trn'] = 6;
-        data['t-kil'] = 6;
+        data['t-expert'] = 20; data['t-radar'] = 6; data['t-spd'] = 6; data['t-rec'] = 6;
+        data['t-con'] = 1; data['t-tec'] = 1; data['t-trn'] = 6; data['t-kil'] = 6;
         localStorage.setItem('lastwar_data', JSON.stringify(data));
         localStorage.setItem('tech_init_v3', 'true');
     }
 
     const t = i18n[window.currentLang];
-    
     const savedTheme = localStorage.getItem('theme') || 'light';
     document.body.className = savedTheme + '-theme';
 
@@ -526,31 +539,17 @@ function initCalc() {
 
     const techGrid = document.getElementById('tech-inputs');
     if(techGrid) {
-        const techs = [
-            {id:'t-expert', l:t.expert, def: 20, max: 20},
-            {id:'t-radar', l:t.radar, def: 6, max: 10},
-            {id:'t-spd', l:t.spd, def: 6, max: 10},
-            {id:'t-rec', l:t.rec, def: 6, max: 10},
-            {id:'t-con', l:t.con, def: 1, max: 10},
-            {id:'t-tec', l:t.tec, def: 1, max: 10},
-            {id:'t-trn', l:t.trn, def: 6, max: 10},
-            {id:'t-kil', l:t.kil, def: 6, max: 10}
-        ];
-        
+        const techs = [ {id:'t-expert', l:t.expert, def: 20, max: 20}, {id:'t-radar', l:t.radar, def: 6, max: 10}, {id:'t-spd', l:t.spd, def: 6, max: 10}, {id:'t-rec', l:t.rec, def: 6, max: 10}, {id:'t-con', l:t.con, def: 1, max: 10}, {id:'t-tec', l:t.tec, def: 1, max: 10}, {id:'t-trn', l:t.trn, def: 6, max: 10}, {id:'t-kil', l:t.kil, def: 6, max: 10} ];
         const savedData = JSON.parse(localStorage.getItem('lastwar_data') || '{}');
-        
         techGrid.innerHTML = techs.map(item => {
             let currentVal = savedData[item.id] !== undefined ? parseInt(savedData[item.id]) : item.def;
             if(currentVal > item.max) currentVal = item.max; 
-            
             return `<div class="tech-item"><label style="font-size:0.85rem; margin-bottom:5px; font-weight:700;">${item.l}</label><select id="${item.id}" class="compact-input" onchange="updateAll()">${Array.from({length:item.max + 1},(_,i)=>`<option value="${i}" ${i===currentVal?'selected':''}>Lv ${i}</option>`).join('')}</select></div>`;
         }).join('');
     }
 
     const dayTabs = document.getElementById('day-tabs-container');
-    if(dayTabs) {
-        dayTabs.innerHTML = ['mon','tue','wed','thu','fri','sat'].map((d, i) => `<button id="btn-${d}" class="day-btn ${d===window.currentDay?'active':''}" style="background:var(--${d})" onclick="switchTab('${d}')">${t.days[i]}</button>`).join('');
-    }
+    if(dayTabs) { dayTabs.innerHTML = ['mon','tue','wed','thu','fri','sat'].map((d, i) => `<button id="btn-${d}" class="day-btn ${d===window.currentDay?'active':''}" style="background:var(--${d})" onclick="switchTab('${d}')">${t.days[i]}</button>`).join(''); }
 
     renderDroneInputs();
     renderInputs(); 
