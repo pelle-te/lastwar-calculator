@@ -246,12 +246,33 @@ function renderInputs() {
         const sVal = getVal('mon-squads'); const gVal = getVal('mon-gather');
         html += `<div class="input-group-compact"><div class="input-header"><span class="input-label-small">${t.inputs.squads}</span></div><select id="mon-squads" class="compact-input" onchange="updateAll()">${[1,2,3,4,5].map(n => `<option value="${n}" ${sVal==n?'selected':''}>${n}${t.inputs.squads_unit}</option>`).join('')}</select></div><div class="input-group-compact"><div class="input-header"><span class="input-label-small">${t.inputs.gather}</span><span class="item-score-tag" id="pts-gather">0</span></div><input type="number" id="mon-gather" class="compact-input" value="${gVal}" oninput="updateAll()"></div>`;
     }
+
+    // calc.js 내 renderInputs 함수 일부 수정
+
+    // 수요일 드론 파츠 상자 부분
     if(window.currentDay === 'wed') {
-        html += `<div class="input-group-compact" style="grid-column: span 2;"><div class="input-header"><span class="input-label-small">📦 드론 파츠 상자</span><span class="item-score-tag" id="pts-drone-box">0</span></div><button class="spd-btn-mini" style="width:100%; margin-top:5px;" onclick="openDroneModal()">${t.modal.btn_open}</button></div>`;
-    }
+     html += `
+        <div class="input-group-compact full-width-mobile">
+            <div class="input-header">
+                <span class="input-label-small">📦 ${t.modal.drone.split(' ')[0]}</span>
+                <span class="item-score-tag" id="pts-drone-box">0</span>
+         </div>
+         <button class="spd-btn-mini" style="width:100%;" onclick="openDroneModal()">${t.modal.btn_open}</button>
+     </div>`;
+}
+
+    // 목요일 영웅 조각 부분
     if(window.currentDay === 'thu') {
-        html += `<div class="input-group-compact" style="grid-column: span 2;"><div class="input-header"><span class="input-label-small">🧩 영웅 조각</span><span class="item-score-tag" id="pts-hero-shard">0</span></div><button class="spd-btn-mini" style="width:100%; margin-top:5px;" onclick="openHeroModal()">${t.modal.btn_open}</button></div>`;
-    }
+        html += `
+        <div class="input-group-compact full-width-mobile">
+            <div class="input-header">
+                <span class="input-label-small">🧩 ${t.modal.hero.split(' ')[0]}</span>
+              <span class="item-score-tag" id="pts-hero-shard">0</span>
+         </div>
+            <button class="spd-btn-mini" style="width:100%;" onclick="openHeroModal()">${t.modal.btn_open}</button>
+     </div>`;
+}
+
 
     (config[window.currentDay] || []).forEach(i => {
         const cid = `${window.currentDay}-${i.id}`;
