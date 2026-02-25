@@ -187,14 +187,46 @@ body { font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, sans-serif;
 .progress-text { position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; font-size: 0.75rem; font-weight: 800; color: white; text-shadow: 0 1px 3px rgba(0,0,0,0.3); }
 .remaining-text { font-size: 0.85rem; color: var(--text-muted); text-align: center; font-weight: 700; margin-top: 6px; }
 
-/* 미디어 쿼리 */
+/* =========================================
+   📱 반응형 미디어 쿼리 (모바일 맞춤 최적화)
+========================================= */
 @media (max-width: 600px) { 
+    /* 1. 게시판 레이아웃 */
     .masonry-grid { column-count: 1; }
+    
+    /* 2. 계산기 입력 폼 좁은 화면 최적화 */
     .input-grid { grid-template-columns: 1fr; gap: 12px; } 
     .full-mobile-item { grid-column: span 1 !important; }
     .day-btn { font-size: 0.8rem; padding: 12px 0; }
     .compact-input { padding: 12px; font-size: 1.05rem; }
+
+    /* 3. ✅ 상단 헤더 공간 압축 (세로 꺾임 방지) */
+    .header-bar { padding: 10px 12px; }
+    .logo { font-size: 0.95rem; } /* 로고 크기 살짝 축소 */
+    .header-actions { gap: 6px; flex-wrap: nowrap; } /* 요소 간격 줄이고 줄바꿈 금지 */
+    .icon-btn { font-size: 1.1rem; padding: 4px; }
+    .lang-selector span { font-size: 0.8rem; }
+    .live-counter { font-size: 0.7rem; padding: 4px 8px; white-space: nowrap; } /* 글자 안 깨지게 보호 */
+
+    /* 4. ✅ 모바일 모달 창 꽉 차게 (사진 크게 보기) */
+    .modal { padding: 10px; } /* 화면 밖 여백 최소화 */
+    .modal-card { 
+        width: 100%; 
+        padding: 20px 15px; /* 내부 여백을 30px -> 15px로 확 줄여서 사진 공간 확보 */
+        border-radius: 20px;
+    }
+    .close-x { top: 12px; right: 15px; font-size: 1.6rem; }
 }
+
+/* ✅ 피드 팝업창 이미지 비율 및 크기 강제 최적화 (기기 공통 적용) */
+#view-img {
+    width: 100% !important; /* 모달 가로폭에 100% 꽉 채우기 */
+    height: auto;
+    max-height: 60vh; /* 세로로 너무 긴 사진이 화면을 뚫고 나가는 것 방지 */
+    object-fit: contain; /* 사진 비율 찌그러짐 방지 */
+    background: rgba(0,0,0,0.03); /* 투명한 사진일 경우 배경 은은하게 */
+}
+
 @media (min-width: 1024px) {
     .container { max-width: 1100px; }
     .input-grid { grid-template-columns: repeat(3, 1fr); gap: 20px; }
