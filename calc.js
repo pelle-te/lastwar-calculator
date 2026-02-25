@@ -111,8 +111,11 @@ window.stepVal = function(id, delta) {
 let stepSpeed = 150;
 
 window.startStep = function(e, id, delta) {
-    // 꾹 누르기 시 발생하는 브라우저 기본 동작(복사, 돋보기 등) 완벽 차단!
-    if (e && e.preventDefault) e.preventDefault(); 
+    // 브라우저 기본 동작(복사, 돋보기, 이벤트 전파) 완벽 차단
+    if (e) {
+        if (e.cancelable) e.preventDefault();
+        if (e.stopPropagation) e.stopPropagation();
+    }
     
     stepVal(id, delta); 
     stepSpeed = 150;
@@ -135,10 +138,15 @@ window.addEventListener('mouseup', window.stopStep);
 window.addEventListener('touchend', window.stopStep);
 
 function createStepper(id, value) {
+    // 텍스트(+,-) 대신 SVG 아이콘을 사용하여 텍스트 선택 자체를 원천 차단
     return `<div class="stepper-container" style="-webkit-user-select: none; user-select: none; -webkit-touch-callout: none;">
-              <button class="stepper-btn" oncontextmenu="return false;" onmousedown="startStep(event, '${id}', -1)" ontouchstart="startStep(event, '${id}', -1)">-</button>
+              <button class="stepper-btn" style="-webkit-touch-callout: none;" oncontextmenu="return false;" onselectstart="return false;" onmousedown="startStep(event, '${id}', -1)" ontouchstart="startStep(event, '${id}', -1)">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" style="pointer-events: none;"><path d="M5 12h14"/></svg>
+              </button>
               <input type="number" id="${id}" class="compact-input" min="0" value="${value}" oninput="updateAll()">
-              <button class="stepper-btn" oncontextmenu="return false;" onmousedown="startStep(event, '${id}', 1)" ontouchstart="startStep(event, '${id}', 1)">+</button>
+              <button class="stepper-btn" style="-webkit-touch-callout: none;" oncontextmenu="return false;" onselectstart="return false;" onmousedown="startStep(event, '${id}', 1)" ontouchstart="startStep(event, '${id}', 1)">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" style="pointer-events: none;"><path d="M12 5v14M5 12h14"/></svg>
+              </button>
             </div>`;
 }
 
