@@ -132,9 +132,9 @@ window.addEventListener('touchend', window.stopStep);
 
 function createStepper(id, value) {
     return `<div class="stepper-container">
-              <button class="stepper-btn" onmousedown="startStep('${id}', -1)" ontouchstart="startStep('${id}', -1)">-</button>
+              <button class="stepper-btn" oncontextmenu="return false;" onmousedown="startStep('${id}', -1)" ontouchstart="startStep('${id}', -1)">-</button>
               <input type="number" id="${id}" class="compact-input" min="0" value="${value}" oninput="updateAll()">
-              <button class="stepper-btn" onmousedown="startStep('${id}', 1)" ontouchstart="startStep('${id}', 1)">+</button>
+              <button class="stepper-btn" oncontextmenu="return false;" onmousedown="startStep('${id}', 1)" ontouchstart="startStep('${id}', 1)">+</button>
             </div>`;
 }
 
