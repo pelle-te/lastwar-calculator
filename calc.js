@@ -110,7 +110,7 @@ window.setFixedValues = function() {
     }
 };
 
-// [보강] 초기화 버튼: 가속 상세 수량 데이터까지 삭제하도록 수정
+// [수정] 완전 초기화: 메인 데이터 + 드론/영웅 상세 데이터 모두 삭제
 window.resetDayData = function() {
     const msg = window.currentLang === 'ko' ? "데이터를 초기화하시겠습니까?" : "Reset data?";
     if(confirm(msg)) {
@@ -118,11 +118,19 @@ window.resetDayData = function() {
         const spdData = JSON.parse(localStorage.getItem('lastwar_spd_data') || '{}');
         const prefix = window.currentDay + '-';
         
-        // 일반 입력값 초기화
+        // 1. 일반 입력값 초기화
         Object.keys(data).forEach(key => { if(key.startsWith(prefix)) data[key] = key.includes('squads') ? "1" : "0"; });
         
-        // [추가] 해당 요일의 가속 상세 데이터도 삭제
+        // 2. 가속 상세 데이터 삭제
         Object.keys(spdData).forEach(key => { if(key.startsWith(prefix)) delete spdData[key]; });
+        
+        // 3. 드론 부품 및 영웅 조각 모달 내 입력값 수동 초기화
+        if(window.currentDay === 'wed') {
+            for(let i=1; i<=7; i++) { const el = document.getElementById('drone-b'+i); if(el) el.value = 0; }
+        }
+        if(window.currentDay === 'thu') {
+            ['hero-ur','hero-ssr','hero-sr'].forEach(id => { const el = document.getElementById(id); if (el) el.value = 0; });
+        }
         
         localStorage.setItem('lastwar_data', JSON.stringify(data));
         localStorage.setItem('lastwar_spd_data', JSON.stringify(spdData));
@@ -216,11 +224,23 @@ window.applySpd = function() {
     window.closeSpdModal();
 };
 
+// [수정] 점수 계산 로직: 각 항목별로 정확한 테크 보너스 적용
 window.updateAll = function() {
     const d = window.currentDay;
     const t = i18n[window.currentLang];
     let totalScore = 0;
-    let m = { rad: getM('t-radar'), spd: getM('t-expert'), rec: getM('t-expert'), con: getM('t-expert'), tec: getM('t-expert'), trn: getM('t-expert'), kil: getM('t-expert'), exp: getM('t-expert') };
+    
+    // 각 테크 항목의 레벨에 맞는 보너스 계산 (전문가 기본 5% + 항목별 5%)
+    let m = { 
+        rad: getM('t-radar'),    // 레이더 테크 적용
+        spd: getM('t-spd'),      // 가속 테크 적용
+        rec: getM('t-rec'),      // 모집 테크 적용
+        con: getM('t-con'),      // 건설 테크 적용
+        tec: getM('t-tec'),      // 테크 테크 적용
+        trn: getM('t-trn'),      // 훈련 테크 적용
+        kil: getM('t-kil'),      // 적처치 테크 적용
+        exp: getM('t-expert')    // 대결 전문가 기본 보너스
+    };
 
     function setPt(id, pt) {
         const el = document.getElementById('pts-' + id);
@@ -228,7 +248,8 @@ window.updateAll = function() {
         totalScore += pt;
     }
 
-    setPt('dia', val(d+'-dia') * 30);
+    setPt('dia', val(d+'-dia') * 30); // 다이아는 테크 보너스 제외
+
     if(d==='mon') {
         setPt('radar', val('mon-radar')*BASE.radar*m.rad.sub);
         setPt('stam', val('mon-stam')*150*m.exp.all);
@@ -240,35 +261,35 @@ window.updateAll = function() {
         setPt('truck', val('tue-truck')*BASE.truck*m.exp.all);
         setPt('sec', val('tue-sec')*BASE.secret*m.exp.all);
         setPt('surv', val('tue-surv')*BASE.surv*m.exp.all);
-        setPt('spd', val('tue-spd')*60*BASE.spd_min*m.exp.all);
-        setPt('pow', val('tue-pow')*1000*BASE.pow_pt*m.exp.all);
+        setPt('spd', val('tue-spd')*60*BASE.spd_min*m.spd.sub);
+        setPt('pow', val('tue-pow')*1000*BASE.pow_pt*m.con.sub);
     } else if(d==='wed') {
         setPt('radar', val('wed-radar')*BASE.radar*m.rad.sub);
-        setPt('spd', val('wed-spd')*60*BASE.spd_min*m.exp.all);
-        setPt('pow', val('wed-pow')*1000*BASE.pow_pt*m.exp.all);
+        setPt('spd', val('wed-spd')*60*BASE.spd_min*m.spd.sub);
+        setPt('pow', val('wed-pow')*1000*BASE.pow_pt*m.tec.sub);
         setPt('mdl', val('wed-mdl')*BASE.honor_medal*m.exp.all);
         let droneTotal = 0;
         for(let i=1; i<=7; i++) { droneTotal += val('drone-b'+i) * BASE.boxes[i]; }
         setPt('drone-box', droneTotal * m.exp.all);
     } else if(d==='thu') {
-        setPt('tkt', val('thu-tkt')*BASE.recruit*m.exp.all);
+        setPt('tkt', val('thu-tkt')*BASE.recruit*m.rec.sub);
         setPt('hero-shard', (val('hero-ur')*BASE.ur_shard + val('hero-ssr')*BASE.ssr_shard + val('hero-sr')*BASE.sr_shard) * m.exp.all);
         setPt('sk', val('thu-sk')*BASE.skill_medal*m.exp.all);
         setPt('exp', val('thu-exp')*1000000*BASE.exp_unit*m.exp.all);
     } else if(d==='fri') {
         setPt('radar', val('fri-radar')*BASE.radar*m.rad.sub);
-        setPt('spd-con', val('fri-spd-con')*60*BASE.spd_min*m.exp.all);
-        setPt('spd-tec', val('fri-spd-tec')*60*BASE.spd_min*m.exp.all);
-        setPt('spd-trn', val('fri-spd-trn')*60*BASE.spd_min*m.exp.all);
-        setPt('pow-con', val('fri-pow-con')*1000*BASE.pow_pt*m.exp.all);
-        setPt('pow-tec', val('fri-pow-tec')*1000*BASE.pow_pt*m.exp.all);
-        setPt('count', val('fri-count')*BASE.trp[val('fri-lvl')]*m.exp.all);
+        setPt('spd-con', val('fri-spd-con')*60*BASE.spd_min*m.spd.sub);
+        setPt('spd-tec', val('fri-spd-tec')*60*BASE.spd_min*m.spd.sub);
+        setPt('spd-trn', val('fri-spd-trn')*60*BASE.spd_min*m.spd.sub);
+        setPt('pow-con', val('fri-pow-con')*1000*BASE.pow_pt*m.con.sub);
+        setPt('pow-tec', val('fri-pow-tec')*1000*BASE.pow_pt*m.tec.sub);
+        setPt('count', val('fri-count')*BASE.trp[val('fri-lvl')]*m.trn.sub);
     } else if(d==='sat') {
         setPt('truck', val('sat-truck')*BASE.truck*m.exp.all);
         setPt('sec', val('sat-sec')*BASE.secret*m.exp.all);
-        setPt('spd-all', val('sat-spd-all')*60*BASE.spd_min*m.exp.all);
+        setPt('spd-all', val('sat-spd-all')*60*BASE.spd_min*m.spd.sub);
         let kScore = document.getElementById('sat-target')?.value === 'special' ? BASE.kil_spec[val('sat-elvl')] : BASE.kil_gen[val('sat-elvl')];
-        setPt('kill', val('sat-kill')*kScore*m.exp.all);
+        setPt('kill', val('sat-kill')*kScore*m.kil.sub);
         setPt('dth', val('sat-dth')*BASE.trp[val('sat-alvl')]*m.exp.all);
     }
 
