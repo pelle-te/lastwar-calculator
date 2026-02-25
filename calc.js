@@ -247,8 +247,35 @@ window.openQuickInputModal = function() {
     document.getElementById('quickInputModal').classList.add('active');
 };
 
-window.closeQuickInputModal = function() { document.getElementById('quickInputModal').classList.remove('active'); };
+// 📸 스크린샷 불러와서 모달 안에 띄워주기 (새로 추가됨)
+window.previewQuickScreenshot = function(event) {
+    const file = event.target.files[0];
+    if (file) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            const previewDiv = document.getElementById('quick-image-preview');
+            const imgTag = document.getElementById('quick-img-tag');
+            imgTag.src = e.target.result;
+            previewDiv.style.display = 'block'; // 숨겨놨던 이미지 영역 보여주기
+        }
+        reader.readAsDataURL(file);
+    }
+};
 
+// ❌ 창 닫을 때 불러왔던 사진도 초기화하도록 함수 수정 (기존 한 줄짜리 코드에서 변경됨)
+window.closeQuickInputModal = function() { 
+    document.getElementById('quickInputModal').classList.remove('active'); 
+    
+    // 다음 번에 열 때를 위해 이미지 초기화
+    const fileInput = document.getElementById('quick-screenshot');
+    if(fileInput) fileInput.value = "";
+    
+    const previewDiv = document.getElementById('quick-image-preview');
+    if(previewDiv) previewDiv.style.display = 'none';
+    
+    const imgTag = document.getElementById('quick-img-tag');
+    if(imgTag) imgTag.src = "";
+};
 window.applyQuickInput = function() {
     const inputs = document.querySelectorAll('.quick-input-field');
     const data = JSON.parse(localStorage.getItem('lastwar_data') || '{}');
