@@ -67,24 +67,23 @@
         <div id="techModal" class="modal"><div class="modal-card"><span class="close-x" onclick="closeTechModal()">&times;</span><h3 id="tech-modal-title" style="margin-top:0">연맹 테크 설정</h3><div class="tech-grid" id="tech-inputs"></div><button onclick="closeTechModal()" class="btn-primary" style="width:100%; margin-top:20px;">적용 완료</button></div></div>
         
         <div id="spdModal" class="modal">
-            <div class="modal-card">
+             <div class="modal-card">
                 <span class="close-x" onclick="closeSpdModal()">&times;</span>
-                <h3 id="spd-title" style="margin-top:0;">가속 계산기</h3>
+                 <h3 id="spd-title" style="margin-top:0; font-size:1.1rem;">가속 계산기</h3>
                 <div class="tech-grid">
-                    <div class="tech-item"><label>5분</label><input type="number" id="m5" class="compact-input" value="0" min="0" oninput="validatePos(this); calcSpdTotal()"></div>
-                    <div class="tech-item"><label>15분</label><input type="number" id="m15" class="compact-input" value="0" min="0" oninput="validatePos(this); calcSpdTotal()"></div>
-                    <div class="tech-item"><label>1시간</label><input type="number" id="h1" class="compact-input" value="0" min="0" oninput="validatePos(this); calcSpdTotal()"></div>
-                    <div class="tech-item"><label>3시간</label><input type="number" id="h3" class="compact-input" value="0" min="0" oninput="validatePos(this); calcSpdTotal()"></div>
-                    <div class="tech-item"><label>8시간</label><input type="number" id="h8" class="compact-input" value="0" min="0" oninput="validatePos(this); calcSpdTotal()"></div>
+                     <div class="tech-item"><label>5분</label><input type="number" id="m5" class="compact-input" value="0" min="0" oninput="window.calcSpdTotal()"></div>
+                     <div class="tech-item"><label>15분</label><input type="number" id="m15" class="compact-input" value="0" min="0" oninput="window.calcSpdTotal()"></div>
+                    <div class="tech-item"><label>1시간</label><input type="number" id="h1" class="compact-input" value="0" min="0" oninput="window.calcSpdTotal()"></div>
+                     <div class="tech-item"><label>3시간</label><input type="number" id="h3" class="compact-input" value="0" min="0" oninput="window.calcSpdTotal()"></div>
+                     <div class="tech-item"><label>8시간</label><input type="number" id="h8" class="compact-input" value="0" min="0" oninput="window.calcSpdTotal()"></div>
                 </div>
-                <div id="spd-result-text" style="margin: 15px 0; text-align: center; color: var(--primary); font-weight: 800;">총: 0일 0시 0분</div>
-                <div style="display:grid; grid-template-columns: 1fr 1.5fr; gap:10px">
-                    <button onclick="closeSpdModal()" class="btn-secondary">취소</button>
-                    <button onclick="applySpd()" class="btn-primary">적용</button>
-                </div>
-            </div>
+             <div id="spd-result-text" style="margin: 15px 0; text-align: center; color: var(--primary); font-weight: 800;">총: 0일 0시 0분</div>
+             <div style="display:grid; grid-template-columns: 1fr 1.5fr; gap:10px">
+                 <button onclick="closeSpdModal()" class="btn-secondary">취소</button>
+                 <button onclick="applySpd()" class="btn-primary">적용</button>
+              </div>
+         </div>
         </div>
-
         <div id="viewModal" class="modal">
             <div class="modal-card">
                 <span class="close-x" onclick="closeViewModal()">&times;</span>
