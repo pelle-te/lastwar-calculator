@@ -416,6 +416,38 @@ body {
     transition: 0.3s; 
 }
 
+/* 1. PC 및 큰 화면 (너비 1024px 이상) */
+@media (min-width: 1024px) {
+    .container {
+        max-width: 1200px; /* 화면 전체를 더 넓게 사용 */
+    }
+    .input-grid {
+        grid-template-columns: repeat(3, 1fr); /* 입력창을 3열로 배치하여 한눈에 보게 함 */
+        gap: 20px;
+    }
+    .target-selector {
+        grid-template-columns: repeat(3, 1fr);
+        max-width: 600px; /* 너무 퍼지지 않게 너비 제한 */
+        margin: 0 auto;
+    }
+    .modal-card {
+        max-width: 600px; /* 모달창 크기도 PC에 맞게 확장 */
+    }
+    .tech-grid {
+        grid-template-columns: repeat(3, 1fr); /* 테크 설정창도 3열로 확장 */
+    }
+}
+
+/* 2. 태블릿 화면 (너비 768px ~ 1023px) */
+@media (min-width: 768px) and (max-width: 1023px) {
+    .input-grid {
+        grid-template-columns: repeat(2, 1fr); /* 2열 배치 */
+    }
+    #posts-list, #suggestions-list {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
 /* style.css 미디어 쿼리 수정 */
 @media (max-width: 600px) { 
     #posts-list, #suggestions-list { grid-template-columns: 1fr; } 
