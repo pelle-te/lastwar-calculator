@@ -16,7 +16,8 @@ const i18n = {
         days: ["월", "화", "수", "목", "금", "토"],
         success: "🎉 목표 달성 완료!",
         labels: { m5: "5분", m15: "15분", h1: "1시간", h3: "3시간", h8: "8시간", ur: "UR 조각", ssr: "SSR 조각", sr: "SR 조각" },
-        inputs: { squads: "🚜 채집 부대 수", squads_unit: "부대", gather: "⏱️ 시간당 채집(h)", dia: "💎 다이아 구매", radar_task: "📡 레이더 임무", stam: "⚡ 체력 소모", exp: "⭐ 영웅 경험치(1M)", part: "⚙️ 드론 부품", data: "💾 드론 데이터(1k)", truck: "🚚 UR 화물차", sec: "🕵️ UR 은밀 임무", surv: "🎫 생존자 모집", build_spd: "⏱️ 건설 가속(h)", pow_con: "🏰 건물 전투력(1k)", tec_spd: "⏱️ 테크 가속(h)", pow_tec: "🔬 테크 전투력(1k)", medal: "🏅 명예 훈장 소모", tkt: "🎫 영웅 모집", sk: "🏅 스킬 훈장", trn_spd: "⏱️ 훈련 가속(h)", trn_cnt: "⚔️ 훈련 수", trn_lvl: "🎯 훈련 레벨", kill_spd: "⏱️ 모든 가속(h)", kill_target: "⚔️ 처치 대상", kill_lvl: "🎯 처치 레벨", kill_cnt: "🔥 처치 수", dth_lvl: "💀 전사 레벨", dth_cnt: "🩸 전사 수", target_spec: "특정 매칭 연맹", target_gen: "일반 적군" }
+        inputs: { squads: "🚜 채집 부대 수", squads_unit: "부대", gather: "⏱️ 시간당 채집(h)", dia: "💎 다이아 구매", radar_task: "📡 레이더 임무", stam: "⚡ 체력 소모", exp: "⭐ 영웅 경험치(1M)", part: "⚙️ 드론 부품", data: "💾 드론 데이터(1k)", truck: "🚚 UR 화물차", sec: "🕵️ UR 은밀 임무", surv: "🎫 생존자 모집", build_spd: "⏱️ 건설 가속(h)", pow_con: "🏰 건물 전투력(1k)", tec_spd: "⏱️ 테크 가속(h)", pow_tec: "🔬 테크 전투력(1k)", medal: "🏅 명예 훈장 소모", tkt: "🎫 영웅 모집", sk: "🏅 스킬 훈장", trn_spd: "⏱️ 훈련 가속(h)", trn_cnt: "⚔️ 훈련 수", trn_lvl: "🎯 훈련 레벨", kill_spd: "⏱️ 모든 가속(h)", kill_target: "⚔️ 처치 대상", kill_lvl: "🎯 처치 레벨", kill_cnt: "🔥 처치 수", dth_lvl: "💀 전사 레벨", dth_cnt: "🩸 전사 수", target_spec: "특정 매칭 연맹", target_gen: "일반 적군" },
+        rec: { success: "목표 달성! 자원을 아끼세요.", guide_title: "맞춤 가이드", only: "만", count: "개", custom_ratio: "나만의 맞춤 배분", target_goal: "목표" }
     },
     en: {
         nav: { calc: "📊 Calc", board: "📱 Feed", qna: "💬 Q&A" },
@@ -29,7 +30,8 @@ const i18n = {
         days: ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat"],
         success: "🎉 Goal Achieved!",
         labels: { m5: "5m", m15: "15m", h1: "1h", h3: "3h", h8: "8h", ur: "UR Shard", ssr: "SSR Shard", sr: "SR Shard" },
-        inputs: { squads: "🚜 Gather Squads", squads_unit: " Units", gather: "⏱️ Hourly(h)", dia: "💎 Buy Diamonds", radar_task: "📡 Radar Tasks", stam: "⚡ Stamina Used", exp: "⭐ Hero EXP (1M)", part: "⚙️ Drone Parts", data: "💾 Drone Data (1k)", truck: "🚚 UR Truck", sec: "🕵️ UR Secret Task", surv: "🎫 Survivor Recruit", build_spd: "⏱️ Build Spd-up(h)", pow_con: "🏰 Build Power(1k)", tec_spd: "⏱️ Tech Spd-up(h)", pow_tec: "🔬 Tech Power(1k)", medal: "🏅 Honor Medals", tkt: "🎫 Hero Recruit", sk: "🏅 Skill Medals", trn_spd: "⏱️ Train Spd-up(h)", trn_cnt: "⚔️ Units Trained", trn_lvl: "🎯 Train Level", kill_spd: "⏱️ Universal Spd-up(h)", kill_target: "⚔️ Target Type", kill_lvl: "🎯 Kill Level", kill_cnt: "🔥 Kill Count", dth_lvl: "💀 Death Level", dth_cnt: "🩸 Death Count", target_spec: "Match Enemy", target_gen: "General Enemy" }
+        inputs: { squads: "🚜 Gather Squads", squads_unit: " Units", gather: "⏱️ Hourly(h)", dia: "💎 Buy Diamonds", radar_task: "📡 Radar Tasks", stam: "⚡ Stamina Used", exp: "⭐ Hero EXP (1M)", part: "⚙️ Drone Parts", data: "💾 Drone Data (1k)", truck: "🚚 UR Truck", sec: "🕵️ UR Secret Task", surv: "🎫 Survivor Recruit", build_spd: "⏱️ Build Spd-up(h)", pow_con: "🏰 Build Power(1k)", tec_spd: "⏱️ Tech Spd-up(h)", pow_tec: "🔬 Tech Power(1k)", medal: "🏅 Honor Medals", tkt: "🎫 Hero Recruit", sk: "🏅 Skill Medals", trn_spd: "⏱️ Train Spd-up(h)", trn_cnt: "⚔️ Units Trained", trn_lvl: "🎯 Train Level", kill_spd: "⏱️ Universal Spd-up(h)", kill_target: "⚔️ Target Type", kill_lvl: "🎯 Kill Level", kill_cnt: "🔥 Kill Count", dth_lvl: "💀 Death Level", dth_cnt: "🩸 Death Count", target_spec: "Match Enemy", target_gen: "General Enemy" },
+        rec: { success: "Goal Achieved! Save your resources.", guide_title: "Custom Guide", only: " Only", count: "", custom_ratio: "Custom Ratio", target_goal: "Goal" }
     }
 };
 
@@ -42,7 +44,7 @@ const BASE = {
     kil_gen: [0, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]
 };
 
-// [추가] 앱 전체의 숫자 입력 필드에서 음수(-) 및 불필요한 기호를 원천 차단
+// 숫자 입력 필드에서 음수(-) 및 불필요한 기호 원천 차단
 document.addEventListener('keydown', function(e) {
     if (e.target && e.target.type === 'number') {
         if (e.key === '-' || e.key === 'e' || e.key === '+' || e.key === '.') {
@@ -204,14 +206,17 @@ window.applySpd = function() {
     window.closeSpdModal();
 };
 
-const RECOMMEND_MAP = {
-    mon: [{ label: '⚙️ 드론 부품', unit: (m) => BASE.drone_part * m.exp.all }, { label: '💾 드론 데이터(1k)', unit: (m) => 1000 * BASE.drone_data * m.exp.all }],
-    tue: [{ label: '⏱️ 건설 가속(h)', unit: (m) => 60 * BASE.spd_min * m.spd.sub }, { label: '🏰 건물 전투력(1k)', unit: (m) => 1000 * BASE.pow_pt * m.exp.all }],
-    wed: [{ label: '⏱️ 테크 가속(h)', unit: (m) => 60 * BASE.spd_min * m.spd.sub }, { label: '🔬 테크 전투력(1k)', unit: (m) => 1000 * BASE.pow_pt * m.exp.all }],
-    thu: [{ label: '🧩 UR 조각', unit: (m) => BASE.ur_shard * m.exp.all }, { label: '🏅 스킬 훈장', unit: (m) => BASE.skill_medal * m.exp.all }],
-    fri: [{ label: '⏱️ 훈련 가속(h)', unit: (m) => 60 * BASE.spd_min * m.spd.sub }, { label: '⚔️ 훈련 수', unit: (m) => BASE.trp[getVal('fri-lvl')||8] * m.exp.all }],
-    sat: [{ label: '⏱️ 모든 가속(h)', unit: (m) => 60 * BASE.spd_min * m.spd.sub }, { label: '🔥 적군 처치', unit: (m) => (getVal('sat-target') === 'general' ? BASE.kil_gen[getVal('sat-elvl')||8] : BASE.kil_spec[getVal('sat-elvl')||8]) * m.exp.all }]
-};
+// [수정] 맞춤가이드 라벨을 언어 설정에 맞게 동적으로 가져오기
+function getRecommendMap(t) {
+    return {
+        mon: [{ label: t.inputs.part, unit: (m) => BASE.drone_part * m.exp.all }, { label: t.inputs.data, unit: (m) => 1000 * BASE.drone_data * m.exp.all }],
+        tue: [{ label: t.inputs.build_spd, unit: (m) => 60 * BASE.spd_min * m.spd.sub }, { label: t.inputs.pow_con, unit: (m) => 1000 * BASE.pow_pt * m.exp.all }],
+        wed: [{ label: t.inputs.tec_spd, unit: (m) => 60 * BASE.spd_min * m.spd.sub }, { label: t.inputs.pow_tec, unit: (m) => 1000 * BASE.pow_pt * m.exp.all }],
+        thu: [{ label: "🧩 " + t.labels.ur, unit: (m) => BASE.ur_shard * m.exp.all }, { label: t.inputs.sk, unit: (m) => BASE.skill_medal * m.exp.all }],
+        fri: [{ label: t.inputs.trn_spd, unit: (m) => 60 * BASE.spd_min * m.spd.sub }, { label: t.inputs.trn_cnt, unit: (m) => BASE.trp[getVal('fri-lvl')||8] * m.exp.all }],
+        sat: [{ label: t.inputs.kill_spd, unit: (m) => 60 * BASE.spd_min * m.spd.sub }, { label: t.inputs.kill_cnt, unit: (m) => (getVal('sat-target') === 'general' ? BASE.kil_gen[getVal('sat-elvl')||8] : BASE.kil_spec[getVal('sat-elvl')||8]) * m.exp.all }]
+    };
+}
 
 function calculateDayScore(day) {
     let score = 0;
@@ -336,10 +341,11 @@ window.updateAll = function() {
 
     if(recBox) {
         if(rem <= 0) {
-            recBox.innerHTML = `<div class="recommend-card success" style="background:var(--fri); text-align:center; font-weight:800;">✅ ${dayName}요일 목표 달성! 자원을 아끼세요.</div>`;
+            // [수정] 성공 메시지 언어 연동
+            recBox.innerHTML = `<div class="recommend-card success" style="background:var(--fri); text-align:center; font-weight:800;">✅ [${dayName}] ${t.rec.success}</div>`;
         } else {
             const m_calc = { exp: getM('t-expert'), spd: getM('t-spd'), rad: getM('t-radar'), con: getM('t-con'), tec: getM('t-tec'), trn: getM('t-trn'), kil: getM('t-kil') };
-            const items = RECOMMEND_MAP[window.currentDay];
+            const items = getRecommendMap(t)[window.currentDay]; // 언어 연동된 항목들 불러오기
             
             if (items) {
                 const v1 = items[0].unit(m_calc);
@@ -349,23 +355,29 @@ window.updateAll = function() {
 
                 const existingSlider = document.getElementById('inner-ratio');
                 const renderedDay = recBox.getAttribute('data-rendered-day');
+                const renderedLang = recBox.getAttribute('data-rendered-lang'); // 현재 렌더링된 언어 추적
                 
-                if (existingSlider && renderedDay === window.currentDay) {
-                    document.getElementById('rec-val-1').innerText = Math.ceil(rem/v1).toLocaleString() + "개";
-                    document.getElementById('rec-val-2').innerText = Math.ceil(rem/v2).toLocaleString() + "개";
-                    document.getElementById('rec-ratio-title').innerText = `나만의 맞춤 배분 (${10-window.customRatio}:${window.customRatio})`;
+                // 목표 텍스트 언어 연동 (9상 -> 9 Boxes)
+                const targetText = window.targetScore === 7200000 ? (window.currentLang === 'ko' ? '9상' : '9 Boxes') : t.rec.target_goal;
+                
+                // 요일과 '언어'가 동일할 때만 숫자만 교체 (언어가 바뀌면 전체 덮어쓰기)
+                if (existingSlider && renderedDay === window.currentDay && renderedLang === window.currentLang) {
+                    document.getElementById('rec-val-1').innerText = Math.ceil(rem/v1).toLocaleString() + t.rec.count;
+                    document.getElementById('rec-val-2').innerText = Math.ceil(rem/v2).toLocaleString() + t.rec.count;
+                    document.getElementById('rec-ratio-title').innerText = `${t.rec.custom_ratio} (${10-window.customRatio}:${window.customRatio})`;
                     document.getElementById('rec-ratio-val').innerText = `${Math.ceil((rem * leftRatio)/v1).toLocaleString()} / ${Math.ceil((rem * rightRatio)/v2).toLocaleString()}`;
                 } else {
                     recBox.setAttribute('data-rendered-day', window.currentDay);
+                    recBox.setAttribute('data-rendered-lang', window.currentLang);
                     recBox.innerHTML = `
                         <div class="recommend-card">
-                            <span class="rec-title" style="font-weight:800; display:block; margin-bottom:10px;">💡 [${dayName}요일] ${window.targetScore === 7200000 ? '9상' : '목표'} 맞춤 가이드</span>
+                            <span class="rec-title" style="font-weight:800; display:block; margin-bottom:10px;">💡 [${dayName}] ${targetText} ${t.rec.guide_title}</span>
                             <div class="rec-grid">
-                                <div class="rec-item"><span>${items[0].label}만</span><br><b id="rec-val-1">${Math.ceil(rem/v1).toLocaleString()}개</b></div>
-                                <div class="rec-item"><span>${items[1].label}만</span><br><b id="rec-val-2">${Math.ceil(rem/v2).toLocaleString()}개</b></div>
+                                <div class="rec-item"><span>${items[0].label}${t.rec.only}</span><br><b id="rec-val-1">${Math.ceil(rem/v1).toLocaleString()}${t.rec.count}</b></div>
+                                <div class="rec-item"><span>${items[1].label}${t.rec.only}</span><br><b id="rec-val-2">${Math.ceil(rem/v2).toLocaleString()}${t.rec.count}</b></div>
                                 <div class="rec-item highlight ratio-integration">
                                     <div class="ratio-info" style="width:100%;">
-                                        <span id="rec-ratio-title">나만의 맞춤 배분 (${10-window.customRatio}:${window.customRatio})</span><br>
+                                        <span id="rec-ratio-title">${t.rec.custom_ratio} (${10-window.customRatio}:${window.customRatio})</span><br>
                                         <b id="rec-ratio-val" style="font-size:0.95rem;">${Math.ceil((rem * leftRatio)/v1).toLocaleString()} / ${Math.ceil((rem * rightRatio)/v2).toLocaleString()}</b>
                                     </div>
                                     <div class="ratio-control" style="width:100%; margin-top:8px;">
@@ -479,7 +491,6 @@ window.saveAllData = function() {
 };
 
 function initCalc() {
-    // 💡 테크 설정 강제 리셋 (기존에 10렙 넘게 저장된 것 초기화 방지)
     if (!localStorage.getItem('tech_init_v3')) {
         const data = JSON.parse(localStorage.getItem('lastwar_data') || '{}');
         data['t-expert'] = 20;
@@ -513,7 +524,6 @@ function initCalc() {
     };
     Object.keys(uiMap).forEach(id => { const el = document.getElementById(id); if(el) el.innerText = uiMap[id]; });
 
-    // 💡 [수정] 대결 전문가(max: 20), 나머지(max: 10) 설정
     const techGrid = document.getElementById('tech-inputs');
     if(techGrid) {
         const techs = [
@@ -531,7 +541,7 @@ function initCalc() {
         
         techGrid.innerHTML = techs.map(item => {
             let currentVal = savedData[item.id] !== undefined ? parseInt(savedData[item.id]) : item.def;
-            if(currentVal > item.max) currentVal = item.max; // 10렙 넘는 이전 값이 있으면 10으로 강제 보정
+            if(currentVal > item.max) currentVal = item.max; 
             
             return `<div class="tech-item"><label style="font-size:0.85rem; margin-bottom:5px; font-weight:700;">${item.l}</label><select id="${item.id}" class="compact-input" onchange="updateAll()">${Array.from({length:item.max + 1},(_,i)=>`<option value="${i}" ${i===currentVal?'selected':''}>Lv ${i}</option>`).join('')}</select></div>`;
         }).join('');
