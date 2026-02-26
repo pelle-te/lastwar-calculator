@@ -127,9 +127,15 @@ window.debouncedUpdateAll = typeof window.debounce === 'function' ? window.debou
 window.updateAll = window.debouncedUpdateAll; 
 
 window.stepVal = function(id, delta) { 
-    if(navigator.vibrate) navigator.vibrate(10); // 💡 조작 손맛 (햅틱)
+    if(navigator.vibrate) navigator.vibrate(10);
     const el = document.getElementById(id); 
-    if(el) { el.value = Math.max(0, (parseFloat(el.value) || 0) + delta); window.debouncedUpdateAll(); } 
+    if(el) { 
+        el.value = Math.max(0, (parseFloat(el.value) || 0) + delta); 
+        window.debouncedUpdateAll(); 
+        if(['m5','m15','h1','h3','h8'].includes(id) && window.calcSpdTotal) {
+            window.calcSpdTotal();
+        }
+    } 
 };
 window.quickStepVal = function(id, delta) {
     if(navigator.vibrate) navigator.vibrate(10);
@@ -491,16 +497,28 @@ window.initCalc = function() {
         
         window.renderDroneInputs(); window.updateAll();
 
-        let touchStartX = 0; let touchEndX = 0;
+        let touchStartX = 0; let touchStartY = 0;
         const calcPage = document.getElementById('page-vs');
         if(calcPage) {
-            calcPage.addEventListener('touchstart', e => { touchStartX = e.changedTouches[0].screenX; }, {passive: true});
+            calcPage.addEventListener('touchstart', e => { 
+                touchStartX = e.changedTouches[0].screenX; 
+                touchStartY = e.changedTouches[0].screenY; 
+            }, {passive: true});
             calcPage.addEventListener('touchend', e => {
-                touchEndX = e.changedTouches[0].screenX;
-                const days = ['mon','tue','wed','thu','fri','sat']; const threshold = 60; 
-                let idx = days.indexOf(window.currentDay);
-                if (touchEndX < touchStartX - threshold && idx < days.length - 1) { window.switchTab(days[idx + 1]); } 
-                else if (touchEndX > touchStartX + threshold && idx > 0) { window.switchTab(days[idx - 1]); } 
+                if (e.target.closest('input, button, .stepper-btn, .spd-btn-mini')) return; 
+
+                const touchEndX = e.changedTouches[0].screenX;
+                const touchEndY = e.changedTouches[0].screenY;
+                const days = ['mon','tue','wed','thu','fri','sat']; 
+                
+                const diffX = touchEndX - touchStartX;
+                const diffY = Math.abs(touchEndY - touchStartY);
+                
+                if (Math.abs(diffX) > 90 && diffY < 50) {
+                    let idx = days.indexOf(window.currentDay);
+                    if (diffX < 0 && idx < days.length - 1) { window.switchTab(days[idx + 1]); } 
+                    else if (diffX > 0 && idx > 0) { window.switchTab(days[idx - 1]); } 
+                }
             }, {passive: true});
         }
     } catch(e) { console.error("Init Error:", e); }
