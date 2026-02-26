@@ -148,16 +148,24 @@ body {
 .sheet-option.active { background: var(--primary-soft); color: var(--primary); }
 
 /* =========================================
-   6. UTILITIES & MEDIA QUERIES
+   6. UTILITIES & MEDIA QUERIES (모바일 최적화)
 ========================================= */
 .text-muted { color: var(--text-muted); }
 @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
 @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.1); } 100% { transform: scale(1); } }
 
 @media (max-width: 650px) {
-    .header-bar { padding: 12px 16px; }
-    .logo { font-size: 1.1rem; }
-    .header-actions { gap: 8px; flex-wrap: nowrap; } 
-    .modal-card { padding: 25px; border-radius: 24px; }
+    .header-bar { padding: 12px 15px; }
+    .logo { font-size: 1rem; }
+    .header-actions { gap: 6px; flex-wrap: nowrap; } 
+    
+    /* 💡 핵심: 모바일에서는 아이콘 옆의 텍스트를 숨겨서 공간 확보 */
+    .icon-text-btn .label { display: none; } 
+    .icon-text-btn { padding: 8px 10px; font-size: 1.1rem; }
+    
+    .live-counter span:not(.live-dot) { display: none; } /* 접속자 숫자 숨기고 초록불만 유지 */
+    .live-counter { padding: 6px 8px; }
+    
+    .modal-card { padding: 25px 20px; border-radius: 24px; }
     .nav-item { font-size: 0.95rem; padding: 10px 0; }
 }
