@@ -49,16 +49,24 @@ window.createCustomSelectBtn = function(id, min, max, prefix, suffix, currentVal
     return `<button id="${id}-btn" class="custom-select-btn" onclick="window.openCustomSelect('${id}', ${min}, ${max}, '${prefix}', '${suffix}')"><span>${prefix}${currentVal}${suffix}</span><svg viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg></button><input type="hidden" id="${id}" value="${currentVal}">`;
 };
 
+/* --- 안전한 모달 호출 함수 (Blurry 에러 완벽 차단) --- */
 window.openCustomSelect = function(id, min, max, prefix, suffix) {
-    if(navigator.vibrate) navigator.vibrate(15);
-    let optionsHtml = '';
-    let currentVal = parseInt(document.getElementById(id).value) || min;
-    for(let i=min; i<=max; i++) {
-        optionsHtml += `<div class="sheet-option ${i==currentVal?'active':''}" onclick="window.selectCustomValue('${id}', ${i}, '${prefix}', '${suffix}')">${prefix}${i}${suffix}</div>`;
+    try {
+        if(navigator.vibrate) navigator.vibrate(15);
+        let optionsHtml = '';
+        const el = document.getElementById(id); // 요소가 있는지 먼저 확인!
+        let currentVal = el ? (parseInt(el.value) || min) : min;
+        
+        for(let i=min; i<=max; i++) {
+            optionsHtml += `<div class="sheet-option ${i==currentVal?'active':''}" onclick="window.selectCustomValue('${id}', ${i}, '${prefix}', '${suffix}')">${prefix}${i}${suffix}</div>`;
+        }
+        document.getElementById('sheetTitle').innerText = window.currentLang === 'ko' ? "선택" : "Select";
+        document.getElementById('sheetOptions').innerHTML = optionsHtml;
+        document.getElementById('customSelectModal').classList.add('active');
+    } catch(e) {
+        console.error("Select Modal Error:", e);
+        document.getElementById('customSelectModal').classList.remove('active'); // 에러 시 블러 해제
     }
-    document.getElementById('sheetTitle').innerText = window.currentLang === 'ko' ? "선택" : "Select";
-    document.getElementById('sheetOptions').innerHTML = optionsHtml;
-    document.getElementById('customSelectModal').classList.add('active');
 };
 
 window.closeSelectModal = function() { document.getElementById('customSelectModal').classList.remove('active'); };
@@ -247,11 +255,32 @@ window.resetDayData = function() {
 /* --- Modals Open/Close --- */
 window.openTechModal = () => document.getElementById('techModal').classList.add('active');
 window.closeTechModal = () => { document.getElementById('techModal').classList.remove('active'); window.updateAll(); };
-window.openSpdModal = (cid, label) => { window.activeSpdId = `${window.currentDay}-${cid}`; const titleEl = document.getElementById('spd-title'); if(titleEl) titleEl.innerText = label; window.renderSpdStepper(); window.calcSpdTotal(); document.getElementById('spdModal')?.classList.add('active'); };
+window.openSpdModal = function(cid, label) { 
+    try {
+        window.activeSpdId = `${window.currentDay}-${cid}`; 
+        const titleEl = document.getElementById('spd-title'); 
+        if(titleEl) titleEl.innerText = label; 
+        
+        // 렌더링 및 계산이 성공했을 때만 모달 띄우기
+        if(window.renderSpdStepper) window.renderSpdStepper(); 
+        if(window.calcSpdTotal) window.calcSpdTotal(); 
+        
+        document.getElementById('spdModal')?.classList.add('active'); 
+    } catch (e) {
+        console.error("Spd Modal Error:", e);
+        document.getElementById('spdModal')?.classList.remove('active'); // 에러 시 블러 해제
+    }
+};
 window.closeSpdModal = () => document.getElementById('spdModal').classList.remove('active');
-window.openDroneModal = () => document.getElementById('droneModal').classList.add('active');
+window.openDroneModal = function() { 
+    try { document.getElementById('droneModal').classList.add('active'); } 
+    catch(e) { document.getElementById('droneModal')?.classList.remove('active'); }
+};
 window.closeDroneModal = () => document.getElementById('droneModal').classList.remove('active');
-window.openHeroModal = () => document.getElementById('heroModal').classList.add('active');
+window.openHeroModal = function() { 
+    try { document.getElementById('heroModal').classList.add('active'); } 
+    catch(e) { document.getElementById('heroModal')?.classList.remove('active'); }
+};
 window.closeHeroModal = () => document.getElementById('heroModal').classList.remove('active');
 window.showWeeklyReport = function() {
     const days = ['mon','tue','wed','thu','fri','sat']; const currentT = window.i18n[window.currentLang]; let html = `<div class="weekly-container">`; 
