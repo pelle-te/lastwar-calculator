@@ -29,27 +29,6 @@ window.setSkillTier = function(tier) {
     window.renderSkillRows();
 };
 
-window.changeHeroBg = function(event) {
-    const file = event.target.files[0];
-    if (file) {
-        const reader = new FileReader();
-        reader.onload = function(e) {
-            const img = new Image();
-            img.onload = function() {
-                const canvas = document.createElement('canvas'); let w = img.width, h = img.height; const maxSize = 800; 
-                if (w > h) { if (w > maxSize) { h *= maxSize / w; w = maxSize; } } else { if (h > maxSize) { w *= maxSize / h; h = maxSize; } }
-                canvas.width = w; canvas.height = h; canvas.getContext('2d').drawImage(img, 0, 0, w, h);
-                const compressedDataUrl = canvas.toDataURL('image/jpeg', 0.8);
-                document.getElementById('hero-bg-img').style.backgroundImage = `url('${compressedDataUrl}')`;
-                try { localStorage.setItem('lastwar_hero_bg', compressedDataUrl); } catch(err) { window.customAlert("이미지 용량이 너무 큽니다."); }
-            }; img.src = e.target.result;
-        }
-        reader.readAsDataURL(file);
-    }
-};
-
-window.resetHeroBg = function() { localStorage.removeItem('lastwar_hero_bg'); window.renderSkillRows(); };
-
 window.skillStepInterval = null;
 window.stepSkillVal = function(id, delta) {
     const el = document.getElementById(id);
@@ -72,16 +51,11 @@ window.stepSkillVal = function(id, delta) {
 
 window.startSkillStep = function(e, id, delta) {
     if (e) { if (e.cancelable) e.preventDefault(); if (e.stopPropagation) e.stopPropagation(); }
+    if (navigator.vibrate) navigator.vibrate(10); // 햅틱 피드백 추가
     window.stepSkillVal(id, delta);
     let speed = 150; let count = 0;
     if(window.skillStepInterval) clearTimeout(window.skillStepInterval);
-    const run = () => {
-        window.stepSkillVal(id, delta);
-        count++;
-        if(count > 5) speed = 50;
-        if(count > 15) speed = 15;
-        window.skillStepInterval = setTimeout(run, speed);
-    };
+    const run = () => { window.stepSkillVal(id, delta); count++; if(count > 5) speed = 50; if(count > 15) speed = 15; window.skillStepInterval = setTimeout(run, speed); };
     window.skillStepInterval = setTimeout(run, speed);
 };
 
@@ -95,22 +69,20 @@ if (!window.skillStepListenersAdded) {
     window.skillStepListenersAdded = true;
 }
 
+// 💡 스킬 레이아웃을 깔끔한 그리드 카드로 완전히 교체
 window.renderSkillRows = function() {
     const t = window.i18n[window.currentLang].skill;
     const container = document.getElementById('growth-skill');
     if(!container) return;
     const saved = JSON.parse(localStorage.getItem('lastwar_skill_data') || '{"s1":{"c":1,"t":10},"s2":{"c":1,"t":10},"s3":{"c":1,"t":10}}');
-    const savedBg = localStorage.getItem('lastwar_hero_bg'); 
-    let bgStyle = savedBg ? `background-image: url('${savedBg}');` : `background-image: url('./dva.jpg'); background-color: #1c1c1e;`;
 
     let html = `
-    <div style="display:flex; gap:10px; margin-bottom: 15px;">
-        <button class="target-btn ${window.currentSkillTier === 'UR' ? 'active' : ''}" style="flex:1; ${window.currentSkillTier === 'UR' ? 'background:var(--primary-soft); color:var(--primary);' : ''}" onclick="window.setSkillTier('UR')">${t.ur}</button>
-        <button class="target-btn ${window.currentSkillTier === 'SSR' ? 'active' : ''}" style="flex:1; ${window.currentSkillTier === 'SSR' ? 'background:var(--primary-soft); color:var(--primary);' : ''}" onclick="window.setSkillTier('SSR')">${t.ssr}</button>
+    <div style="display:flex; gap:10px; margin-bottom: 20px;">
+        <button class="target-btn ${window.currentSkillTier === 'UR' ? 'active' : ''}" style="flex:1; ${window.currentSkillTier === 'UR' ? 'background:var(--primary-soft); color:var(--primary); border-color:var(--primary);' : ''}" onclick="window.setSkillTier('UR')">${t.ur}</button>
+        <button class="target-btn ${window.currentSkillTier === 'SSR' ? 'active' : ''}" style="flex:1; ${window.currentSkillTier === 'SSR' ? 'background:var(--primary-soft); color:var(--primary); border-color:var(--primary);' : ''}" onclick="window.setSkillTier('SSR')">${t.ssr}</button>
     </div>
-    <div class="hero-immersive-layout">
-        <div id="hero-bg-img" class="hero-bg" style="${bgStyle}"></div>
-        <div class="skill-nodes-container">
+    
+    <div class="skill-grid">
     `;
     
     const posNames = [t.pos1, t.pos2, t.pos3, t.pos4];
@@ -120,7 +92,7 @@ window.renderSkillRows = function() {
             html += `
             <div class="skill-game-node">
                 <div class="node-header">${posNames[i-1]}</div>
-                <div style="flex: 1; display: flex; align-items: center; justify-content: center; color: #FFD60A; font-weight: 900; font-size: 1.5rem; text-shadow: 0 2px 5px rgba(0,0,0,0.8); letter-spacing: 2px;">MAX</div>
+                <div style="flex: 1; display: flex; align-items: center; justify-content: center; color: #FFD60A; font-weight: 900; font-size: 1.5rem; text-shadow: 0 2px 10px rgba(255, 214, 10, 0.3); letter-spacing: 2px;">MAX</div>
             </div>`;
         } else {
             let cur = saved[`s${i}`]?.c || 1; let tgt = saved[`s${i}`]?.t || 10;
@@ -151,14 +123,9 @@ window.renderSkillRows = function() {
         }
     }
     
-    html += `</div></div>
-    <div style="display: flex; justify-content: flex-end; gap: 8px; margin-top: 12px;">
-        <input type="file" id="hero-bg-upload" accept="image/*" style="display:none;" onchange="window.changeHeroBg(event)">
-        <label for="hero-bg-upload" class="btn-secondary" style="padding: 8px 16px; font-size: 0.85rem; border-radius: 10px; margin:0; cursor:pointer;">${t.bg_change}</label>
-        <button onclick="window.resetHeroBg()" class="btn-secondary" style="padding: 8px 16px; font-size: 0.85rem; border-radius: 10px; margin:0; color: var(--danger);">${t.bg_reset}</button>
-    </div>
-    <div class="summary-box" style="margin-top:15px; padding:15px;">
-        <div id="skill-total-text" style="text-align: center; color: #d97706; font-weight: 900; font-size: 1.2rem;">${t.total}: 0</div>
+    html += `</div>
+    <div class="summary-box">
+        <div id="skill-total-text" style="text-align: center; color: #FFD60A; font-weight: 900; font-size: 1.25rem;">${t.total}: 0</div>
     </div>`;
     
     container.innerHTML = html; window.calcSkillCost();
@@ -181,9 +148,10 @@ window.calcSkillCost = function() {
     }
     
     const totEl = document.getElementById('skill-total-text');
-    if(totEl) totEl.innerText = `${t.total}: ${formatK(grandTotal)}`;
+    if(totEl) totEl.innerText = `${t.total}: ${formatK(grandTotal)} 🏅`;
     localStorage.setItem('lastwar_skill_data', JSON.stringify(dataToSave));
 };
+
 
 
 // =====================================
