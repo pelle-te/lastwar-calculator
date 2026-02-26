@@ -416,19 +416,33 @@ window.updateRecommendBox = function(rem, t, day) {
         const dayName = t.days[['mon','tue','wed','thu','fri','sat'].indexOf(day)];
 
         if(recBox) {
-            if(rem <= 0) { recBox.innerHTML = `<div class="recommend-card" style="background:var(--success); border-radius:24px; text-align:center; font-weight:800; color:white; border:none; box-shadow:0 10px 30px rgba(52, 199, 89, 0.2);">✅ [${dayName}] ${t.rec.success}</div>`; }
+            if(rem <= 0) { 
+                recBox.innerHTML = `<div class="recommend-card" style="background:var(--success); border-radius:24px; text-align:center; font-weight:800; color:white; border:none; box-shadow:0 10px 30px rgba(52, 199, 89, 0.2);">✅ [${dayName}] ${t.rec.success}</div>`; 
+            }
             else {
                 const m_calc = { exp: getM('t-expert'), spd: getM('t-spd'), rad: getM('t-radar'), con: getM('t-con'), tec: getM('t-tec'), trn: getM('t-trn'), kil: getM('t-kil') };
                 const items = getRecommendMap(t)[day]; 
                 
+                // 💡 k 단위 변환 포맷터 추가
+                const formatRecVal = (v, label) => {
+                    if (label.includes('스킬 훈장') || label.includes('Skill Medal')) {
+                        return (v / 1000).toLocaleString('ko-KR', { maximumFractionDigits: 1 }) + 'k';
+                    }
+                    return v.toLocaleString();
+                };
+
+                let targetLabel = window.targetScore === 3600000 ? "8상" : (window.targetScore === 7200000 ? "9상" : "6상");
+                const targetText = window.currentLang === 'en' ? targetLabel.replace('상', ' Boxes') : targetLabel;
+
                 if (items && items.length === 2) {
                     const v1 = items[0].unit(m_calc); const v2 = items[1].unit(m_calc);
                     const leftRatio = (100 - window.customRatio) / 100; const rightRatio = window.customRatio / 100;
-                    const val1 = Math.ceil((rem * leftRatio)/v1).toLocaleString(); const val2 = Math.ceil((rem * rightRatio)/v2).toLocaleString();
+                    
+                    const val1 = formatRecVal(Math.ceil((rem * leftRatio)/v1), items[0].label);
+                    const val2 = formatRecVal(Math.ceil((rem * rightRatio)/v2), items[1].label);
+
                     const existingSlider = document.getElementById('inner-ratio');
                     const renderedDay = recBox.getAttribute('data-rendered-day'); const renderedLang = recBox.getAttribute('data-rendered-lang'); 
-                    let targetLabel = window.targetScore === 3600000 ? "8상" : (window.targetScore === 7200000 ? "9상" : "6상");
-                    const targetText = window.currentLang === 'en' ? targetLabel.replace('상', ' Boxes') : targetLabel;
 
                     if (existingSlider && renderedDay === day && renderedLang === window.currentLang) {
                         document.getElementById('rec-val-1').innerText = val1 + items[0].suffix; 
@@ -440,9 +454,7 @@ window.updateRecommendBox = function(rem, t, day) {
                 } 
                 else if (items && items.length === 1) {
                     const v1 = items[0].unit(m_calc);
-                    const val1 = Math.ceil(rem / v1).toLocaleString();
-                    let targetLabel = window.targetScore === 3600000 ? "8상" : (window.targetScore === 7200000 ? "9상" : "6상");
-                    const targetText = window.currentLang === 'en' ? targetLabel.replace('상', ' Boxes') : targetLabel;
+                    const val1 = formatRecVal(Math.ceil(rem / v1), items[0].label);
                     
                     const renderedDay = recBox.getAttribute('data-rendered-day'); 
                     const renderedLang = recBox.getAttribute('data-rendered-lang'); 
@@ -456,7 +468,8 @@ window.updateRecommendBox = function(rem, t, day) {
                         recBox.setAttribute('data-rendered-lang', window.currentLang);
                         recBox.setAttribute('data-rendered-label', currentLabel);
                         
-                        recBox.innerHTML = `<div class="recommend-card"><div class="rec-title">💡 [${dayName}] ${targetText} ${t.rec.guide_title}</div><div class="rec-desc">${t.rec.single_desc}</div><div class="rec-single-item"><span class="rec-slider-label">${currentLabel}</span><span class="rec-slider-val" id="rec-val-single">${val1}${items[0].suffix}</span></div></div>`;
+                        // 💡 단일 항목(토요일 등)이 박스로 분리되도록 HTML 구조 변경
+                        recBox.innerHTML = `<div class="recommend-card"><div class="rec-title">💡 [${dayName}] ${targetText} ${t.rec.guide_title}</div><div class="rec-desc">${t.rec.single_desc}</div><div class="rec-single-item"><div class="rec-slider-label">${currentLabel}</div><div class="rec-slider-val" id="rec-val-single">${val1}${items[0].suffix}</div></div></div>`;
                     }
                 }
             }
