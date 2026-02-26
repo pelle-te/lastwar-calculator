@@ -168,4 +168,11 @@ body {
     
     .modal-card { padding: 25px 20px; border-radius: 24px; }
     .nav-item { font-size: 0.95rem; padding: 10px 0; }
+    
+    /* 💡 해결포인트: 모바일 키보드 팝업 시 렌더링 렉을 유발하는 블러 효과 완전 제거 */
+    .modal { 
+        backdrop-filter: none !important; 
+        -webkit-backdrop-filter: none !important; 
+        background: rgba(0,0,0,0.7) !important; 
+    }
 }
