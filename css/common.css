@@ -1,7 +1,7 @@
 @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css');
 
 /* =========================================
-   1. ROOT VARIABLES & THEMES (프리미엄 컬러셋)
+   1. ROOT VARIABLES & THEMES (프리미엄 컬러 & 텍스처)
 ========================================= */
 :root {
     --primary: #007AFF; 
@@ -14,46 +14,68 @@
     --mon: #007AFF; --tue: #FF9500; --wed: #AF52DE;
     --thu: #FF3B30; --fri: #34C759; --sat: #FF2D55;
 
-    /* Light Theme */
-    --bg-main: #F4F5F8; 
-    --card-bg: #FFFFFF; 
+    /* Light Theme - 맑고 투명한 유리 질감 */
+    --bg-main: #F2F2F7; 
+    --card-bg: rgba(255, 255, 255, 0.85); 
     --card-bg-rgb: 255, 255, 255;
     --text-main: #1C1C1E;
     --text-muted: #8E8E93;
-    --input-bg: #F0F0F5;
+    --input-bg: rgba(229, 229, 234, 0.6);
     --border-light: rgba(0, 0, 0, 0.05);
-    --shadow-soft: 0 8px 30px rgba(0, 0, 0, 0.04);
+    --shadow-soft: 0 10px 40px rgba(0, 0, 0, 0.04);
+    --shadow-inner: inset 0 1px 1px rgba(255, 255, 255, 1);
     
-    --radius-card: 28px;
-    --radius-btn: 16px;
+    /* Apple Squircle 곡률 */
+    --radius-card: 32px;
+    --radius-btn: 20px;
+    
+    /* 물리 엔진 (Spring) */
+    --spring: cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
 
 .dark-theme {
-    /* Premium Dark Theme */
-    --bg-main: #0D0D12; 
-    --card-bg: #1C1C22; 
-    --card-bg-rgb: 28, 28, 34;
+    /* Premium Dark - 심도 깊은 #0A0A0C 그레이블랙 */
+    --bg-main: #0A0A0C; 
+    --card-bg: rgba(28, 28, 30, 0.75); 
+    --card-bg-rgb: 28, 28, 30;
     --text-main: #F5F5F7;
     --text-muted: #9898A0;
-    --input-bg: #2A2A32; 
-    --border-light: rgba(255, 255, 255, 0.05);
-    --shadow-soft: 0 8px 30px rgba(0, 0, 0, 0.3);
+    --input-bg: rgba(44, 44, 46, 0.6); 
+    --border-light: rgba(255, 255, 255, 0.08);
+    --shadow-soft: 0 10px 50px rgba(0, 0, 0, 0.5);
+    --shadow-inner: inset 0 1px 1px rgba(255, 255, 255, 0.08);
     --primary-soft: rgba(10, 132, 255, 0.15);
 }
 
 /* =========================================
-   2. RESET & GLOBAL
+   2. RESET & GLOBAL (Mesh Gradient & Tabular Nums)
 ========================================= */
 * { box-sizing: border-box; font-family: 'Pretendard', -apple-system, sans-serif; letter-spacing: -0.3px; }
+
 body { 
     margin: 0; 
-    background: var(--bg-main); 
+    background-color: var(--bg-main); 
+    /* 💡 Mesh Gradient: 은은하게 번지는 빛 효과 */
+    background-image: 
+        radial-gradient(circle at 15% 50%, rgba(0, 122, 255, 0.04), transparent 40%), 
+        radial-gradient(circle at 85% 30%, rgba(175, 82, 222, 0.04), transparent 40%);
+    background-attachment: fixed;
     color: var(--text-main); 
     font-size: 15px; 
     -webkit-tap-highlight-color: transparent; 
-    transition: background 0.4s ease, color 0.4s ease; 
-    /* 플로팅 하단바를 위해 여백 크게 확보 */
-    padding-bottom: calc(180px + env(safe-area-inset-bottom)); 
+    transition: background-color 0.5s ease, color 0.5s ease; 
+    padding-bottom: calc(200px + env(safe-area-inset-bottom)); 
+}
+.dark-theme body {
+    background-image: 
+        radial-gradient(circle at 15% 50%, rgba(10, 132, 255, 0.06), transparent 40%), 
+        radial-gradient(circle at 85% 30%, rgba(191, 90, 242, 0.06), transparent 40%);
+}
+
+/* 💡 Tabular Nums: 숫자가 변할 때 UI가 덜덜거리지 않게 고정폭 처리 */
+.info-val, .item-pts, .node-cost, .compact-input, .quick-input-val, .score-text {
+    font-variant-numeric: tabular-nums;
+    letter-spacing: -0.02em;
 }
 
 /* =========================================
@@ -62,93 +84,103 @@ body {
 .header-bar { 
     display: flex; justify-content: space-between; align-items: center; 
     padding: 16px 24px; 
-    background: rgba(var(--card-bg-rgb), 0.7); 
-    backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+    background: rgba(var(--card-bg-rgb), 0.65); 
+    backdrop-filter: blur(30px) saturate(180%); -webkit-backdrop-filter: blur(30px) saturate(180%);
     border-bottom: 1px solid var(--border-light);
     position: sticky; top: 0; z-index: 100; transition: 0.3s; 
 }
 .logo { font-weight: 900; font-size: 1.3rem; background: var(--primary-gradient); -webkit-background-clip: text; color: transparent; letter-spacing: -1px; }
 
 .header-actions { display: flex; align-items: center; gap: 12px; }
-.icon-text-btn { background: var(--input-bg); border: none; padding: 8px 12px; border-radius: 14px; font-weight: 700; color: var(--text-main); display: flex; align-items: center; gap: 6px; cursor: pointer; transition: 0.2s; font-size: 0.85rem; }
-.icon-text-btn:active { transform: scale(0.95); }
-.lang-selector { font-weight: 800; font-size: 0.85rem; color: var(--text-muted); display: flex; gap: 6px; cursor: pointer; padding: 0 10px; }
+.icon-text-btn { background: var(--input-bg); border: none; padding: 8px 14px; border-radius: 16px; font-weight: 800; color: var(--text-main); display: flex; align-items: center; gap: 6px; cursor: pointer; transition: transform 0.3s var(--spring), background 0.2s; font-size: 0.85rem; box-shadow: var(--shadow-inner); }
+.icon-text-btn:active { transform: scale(0.9); background: var(--border-light); }
+.lang-selector { font-weight: 900; font-size: 0.85rem; color: var(--text-muted); display: flex; gap: 6px; cursor: pointer; padding: 0 10px; }
 .lang-selector span.active { color: var(--primary); }
-.live-counter { font-size: 0.75rem; font-weight: 800; color: var(--text-muted); display: flex; align-items: center; gap: 6px; background: var(--input-bg); padding: 6px 10px; border-radius: 12px; }
-.live-dot { width: 6px; height: 6px; background: var(--success); border-radius: 50%; box-shadow: 0 0 5px var(--success); animation: blink 1.5s infinite; }
+.live-counter { font-size: 0.75rem; font-weight: 800; color: var(--text-muted); display: flex; align-items: center; gap: 6px; background: var(--input-bg); padding: 8px 12px; border-radius: 14px; box-shadow: var(--shadow-inner); }
+.live-dot { width: 6px; height: 6px; background: var(--success); border-radius: 50%; box-shadow: 0 0 8px var(--success); animation: blink 1.5s infinite; }
 
 .nav-bar { 
     display: flex; width: calc(100% - 40px); max-width: 600px; 
-    background: var(--card-bg); 
+    background: var(--card-bg); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
     margin: 20px auto 30px auto; 
     border-radius: 100px; 
-    padding: 6px;
-    box-shadow: var(--shadow-soft);
+    padding: 8px;
+    box-shadow: var(--shadow-soft), var(--shadow-inner);
     border: 1px solid var(--border-light);
 }
 .nav-item { 
-    flex: 1; text-align: center; padding: 12px 0; 
-    font-weight: 800; color: var(--text-muted); font-size: 1rem; 
-    cursor: pointer; transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1); 
+    flex: 1; text-align: center; padding: 14px 0; 
+    font-weight: 800; color: var(--text-muted); font-size: 1.05rem; 
+    cursor: pointer; transition: all 0.4s var(--spring); 
     border-radius: 100px;
 }
-.nav-item.active { background: var(--text-main); color: var(--bg-main); box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
-.dark-theme .nav-item.active { background: var(--primary); color: #fff; }
+.nav-item.active { background: var(--text-main); color: var(--bg-main); box-shadow: 0 8px 25px rgba(0,0,0,0.2); transform: translateY(-2px); }
+.dark-theme .nav-item.active { background: var(--primary); color: #fff; box-shadow: 0 8px 25px rgba(0,122,255,0.4); }
 
 /* =========================================
    4. CARDS & BUTTONS 
 ========================================= */
 .container { padding: 0 20px; max-width: 1200px; margin: 0 auto; width: 100%; transition: max-width 0.3s; }
-.page-content { display: none; animation: fadeIn 0.4s ease-out; }
+.page-content { display: none; animation: fadeIn 0.5s var(--spring); }
 .page-content.active { display: block; }
-@keyframes fadeIn { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(20px) scale(0.98); } to { opacity: 1; transform: translateY(0) scale(1); } }
 
-.card { background: var(--card-bg); border-radius: var(--radius-card); padding: 28px; margin-bottom: 24px; box-shadow: var(--shadow-soft); border: 1px solid var(--border-light); transition: transform 0.3s ease, box-shadow 0.3s ease; }
-.card:hover { transform: translateY(-2px); box-shadow: 0 12px 40px rgba(0,0,0,0.08); }
-.section-title { font-size: 1.05rem; font-weight: 900; color: var(--text-muted); margin-bottom: 15px; letter-spacing: 0.5px; }
+.card { background: var(--card-bg); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border-radius: var(--radius-card); padding: 32px; margin-bottom: 24px; box-shadow: var(--shadow-soft), var(--shadow-inner); border: 1px solid var(--border-light); transition: transform 0.4s var(--spring), box-shadow 0.4s ease; }
+.card:hover { transform: translateY(-4px) scale(1.01); box-shadow: 0 20px 50px rgba(0,0,0,0.08), var(--shadow-inner); }
+.dark-theme .card:hover { box-shadow: 0 20px 50px rgba(0,0,0,0.6), var(--shadow-inner); }
+.section-title { font-size: 1.15rem; font-weight: 900; color: var(--text-muted); margin-bottom: 15px; letter-spacing: 0.5px; }
 
 .btn-primary { 
-    background: var(--primary); color: white; border: none; padding: 18px; 
-    border-radius: var(--radius-btn); font-weight: 800; font-size: 1.1rem; 
-    cursor: pointer; transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); 
-    box-shadow: 0 8px 20px rgba(0, 122, 255, 0.3); 
+    background: var(--primary); color: white; border: none; padding: 20px; 
+    border-radius: var(--radius-btn); font-weight: 900; font-size: 1.15rem; 
+    cursor: pointer; transition: all 0.3s var(--spring); 
+    box-shadow: 0 10px 25px rgba(0, 122, 255, 0.35), inset 0 1px 1px rgba(255,255,255,0.3); 
 }
-.btn-primary:active { transform: scale(0.95); box-shadow: 0 4px 10px rgba(0, 122, 255, 0.2); }
-.btn-secondary { background: var(--input-bg); color: var(--text-main); border: none; padding: 18px; border-radius: var(--radius-btn); font-weight: 800; font-size: 1.1rem; cursor: pointer; transition: 0.2s; }
-.btn-secondary:active { transform: scale(0.95); background: rgba(118, 118, 128, 0.15); }
+.btn-primary:active { transform: scale(0.92); box-shadow: 0 4px 10px rgba(0, 122, 255, 0.2); }
+.btn-secondary { background: var(--input-bg); color: var(--text-main); border: none; padding: 20px; border-radius: var(--radius-btn); font-weight: 900; font-size: 1.15rem; cursor: pointer; transition: all 0.3s var(--spring); box-shadow: var(--shadow-inner); }
+.btn-secondary:active { transform: scale(0.92); background: var(--border-light); }
 
-.modern-input, .modern-textarea { width: 100%; background: var(--input-bg); border: 1.5px solid transparent; padding: 18px; border-radius: 16px; font-size: 1.05rem; color: var(--text-main); font-weight: 600; transition: all 0.3s ease; resize: none; outline: none; margin-bottom: 15px; box-sizing: border-box; }
-.modern-input:focus, .modern-textarea:focus { border-color: var(--primary); background: transparent; box-shadow: 0 0 0 4px var(--primary-soft); }
-.modern-file-input { width: 100%; padding: 15px; background: var(--input-bg); border-radius: 12px; font-size: 0.95rem; color: var(--text-muted); cursor: pointer; margin-bottom: 15px; }
+.modern-input, .modern-textarea { width: 100%; background: var(--input-bg); border: 2px solid transparent; padding: 20px; border-radius: 20px; font-size: 1.1rem; color: var(--text-main); font-weight: 700; transition: all 0.3s var(--spring); resize: none; outline: none; margin-bottom: 15px; box-sizing: border-box; box-shadow: inset 0 2px 5px rgba(0,0,0,0.02); }
+.dark-theme .modern-input, .dark-theme .modern-textarea { box-shadow: inset 0 2px 5px rgba(0,0,0,0.2); }
+.modern-input:focus, .modern-textarea:focus { border-color: var(--primary); background: transparent; box-shadow: 0 0 0 4px var(--primary-soft); transform: scale(1.02); }
+.modern-file-input { width: 100%; padding: 18px; background: var(--input-bg); border-radius: 16px; font-size: 1rem; color: var(--text-muted); cursor: pointer; margin-bottom: 15px; font-weight: 700; }
 
-.modern-select { background: var(--input-bg); border: 1px solid transparent; border-radius: 14px; padding: 10px 14px; font-size: 1rem; font-weight: 800; color: var(--text-main); outline: none; cursor: pointer; transition: 0.2s; width: 130px; text-align: center; }
+.modern-select { background: var(--input-bg); border: 2px solid transparent; border-radius: 16px; padding: 12px 16px; font-size: 1.05rem; font-weight: 900; color: var(--text-main); outline: none; cursor: pointer; transition: 0.3s var(--spring); width: 130px; text-align: center; box-shadow: var(--shadow-inner); }
 .modern-select.w-100 { width: 100%; }
-.modern-select:focus { border-color: var(--primary); background: transparent; }
+.modern-select:focus { border-color: var(--primary); background: transparent; transform: scale(1.05); }
 
 /* =========================================
    5. MODALS & BOTTOM SHEETS
 ========================================= */
-.modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.4); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); z-index: 2000; align-items: center; justify-content: center; }
-.modal.active { display: flex; animation: fadeModal 0.25s ease-out forwards; }
+.modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); z-index: 2000; align-items: center; justify-content: center; }
+.modal.active { display: flex; animation: fadeModal 0.3s ease-out forwards; }
 
-.modal-card { background: var(--card-bg); width: 92%; max-width: 600px; max-height: 85vh; display: flex; flex-direction: column; border-radius: 32px; padding: 36px; position: relative; box-shadow: 0 30px 60px rgba(0,0,0,0.2); transform: translateY(20px) scale(0.95); opacity: 0; animation: popModal 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards; border: 1px solid var(--border-light); }
-@keyframes popModal { to { transform: translateY(0) scale(1); opacity: 1; } }
+.modal-card { 
+    background: var(--card-bg); width: 92%; max-width: 600px; max-height: 85vh; 
+    display: flex; flex-direction: column; border-radius: 36px; padding: 40px; 
+    position: relative; box-shadow: 0 40px 80px rgba(0,0,0,0.3); border: 1px solid var(--border-light); 
+    animation: popModal 0.4s var(--spring) forwards; 
+}
+/* 💡 리사이즈 버그 완벽 차단: 애니메이션 상태와 무관하게 무조건 화면에 띄움 */
+.modal.active .modal-card { opacity: 1; transform: translateY(0) scale(1); }
+
+@keyframes popModal { 0% { transform: translateY(30px) scale(0.95); opacity: 0; } 100% { transform: translateY(0) scale(1); opacity: 1; } }
 @keyframes fadeModal { from { opacity: 0; } to { opacity: 1; } }
 
 .close-x { position: absolute; top: 25px; right: 30px; font-size: 2rem; cursor: pointer; color: var(--text-muted); transition: 0.2s; line-height: 1; padding: 5px; z-index: 10; font-weight: 300; }
 .close-x:hover { color: var(--danger); transform: scale(1.1); }
 
-/* Bottom Sheet */
+/* Bottom Sheet 공통 로직 */
 .bottom-sheet-modal { align-items: flex-end; }
-.bottom-sheet { background: var(--card-bg); width: 100%; border-radius: 32px 32px 0 0; padding: 25px; max-height: 50vh; display: flex; flex-direction: column; transform: translateY(100%); transition: 0.4s cubic-bezier(0.16, 1, 0.3, 1); border-top: 1px solid var(--border-light); }
+.bottom-sheet { background: var(--card-bg); width: 100%; border-radius: 40px 40px 0 0; padding: 30px; max-height: 60vh; display: flex; flex-direction: column; transform: translateY(100%); transition: 0.4s var(--spring); border-top: 1px solid var(--border-light); }
 .modal.active .bottom-sheet { transform: translateY(0); }
 .sheet-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; padding-bottom: 15px; border-bottom: 1px solid var(--border-light); }
 .sheet-options { overflow-y: auto; display: flex; flex-direction: column; gap: 10px; }
-.sheet-option { padding: 18px; text-align: center; border-radius: 16px; background: var(--input-bg); font-weight: 800; font-size: 1.1rem; cursor: pointer; transition: 0.2s; }
+.sheet-option { padding: 18px; text-align: center; border-radius: 20px; background: var(--input-bg); font-weight: 800; font-size: 1.15rem; cursor: pointer; transition: 0.2s; }
 .sheet-option.active { background: var(--primary-soft); color: var(--primary); }
 
 /* =========================================
-   6. UTILITIES & MEDIA QUERIES (모바일 최적화)
+   6. UTILITIES & MEDIA QUERIES (모바일 완벽 최적화)
 ========================================= */
 .text-muted { color: var(--text-muted); }
 @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
@@ -156,23 +188,35 @@ body {
 
 @media (max-width: 650px) {
     .header-bar { padding: 12px 15px; }
-    .logo { font-size: 1rem; }
+    .logo { font-size: 1.1rem; }
     .header-actions { gap: 6px; flex-wrap: nowrap; } 
-    
-    /* 💡 핵심: 모바일에서는 아이콘 옆의 텍스트를 숨겨서 공간 확보 */
     .icon-text-btn .label { display: none; } 
-    .icon-text-btn { padding: 8px 10px; font-size: 1.1rem; }
+    .icon-text-btn { padding: 10px 12px; font-size: 1.15rem; border-radius: 12px; }
+    .live-counter span:not(.live-dot) { display: none; }
+    .live-counter { padding: 8px 10px; border-radius: 12px; }
     
-    .live-counter span:not(.live-dot) { display: none; } /* 접속자 숫자 숨기고 초록불만 유지 */
-    .live-counter { padding: 6px 8px; }
+    .nav-bar { margin: 15px auto 20px auto; }
+    .nav-item { font-size: 0.95rem; padding: 12px 0; }
     
-    .modal-card { padding: 25px 20px; border-radius: 24px; }
-    .nav-item { font-size: 0.95rem; padding: 10px 0; }
-    
-    /* 💡 해결포인트: 모바일 키보드 팝업 시 렌더링 렉을 유발하는 블러 효과 완전 제거 */
-    .modal { 
-        backdrop-filter: none !important; 
-        -webkit-backdrop-filter: none !important; 
-        background: rgba(0,0,0,0.7) !important; 
+/* 💡 모바일 Bottom Sheet 설정 및 리사이즈 증발 방지 */
+    .modal { align-items: flex-end !important; padding: 0 !important; }
+    .modal-card { 
+        width: 100%; max-width: 100%; max-height: 90vh; 
+        border-radius: 36px 36px 0 0; padding: 35px 20px 40px; margin: 0; 
+        animation: slideUpModal 0.4s var(--spring) forwards !important; 
     }
+    /* 💡 모바일에서도 모달이 활성화되어 있으면 무조건 화면 하단에 고정 */
+    .modal.active .modal-card { opacity: 1 !important; transform: translateY(0) !important; }
+    
+    @keyframes slideUpModal { 0% { transform: translateY(100%); opacity: 1; } 100% { transform: translateY(0); opacity: 1; } }
+    
+    /* Bottom Sheet 손잡이 (Pill) */
+    .modal-card::before {
+        content: ''; position: absolute; top: 12px; left: 50%; transform: translateX(-50%);
+        width: 40px; height: 5px; background: var(--text-muted); border-radius: 10px; opacity: 0.3;
+    }
+    .close-x { top: 20px; right: 20px; font-size: 1.8rem; }
 }
+
+::-webkit-scrollbar { display: none; }
+* { -ms-overflow-style: none; scrollbar-width: none; }
