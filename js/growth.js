@@ -105,7 +105,7 @@ export function renderSkillRows() {
             </div>`;
         }
     }
-    html += `</div><div class="summary-box"><div id="skill-total-text" style="text-align: center; color: #FFD60A; font-weight: 900; font-size: 1.25rem;">${t.total}: 0</div></div>`;
+    html += `</div><div class="summary-box"><div id="skill-total-text" class="skill-total-display">${t.total}: <span class="highlight">0</span></div></div>`;
     container.innerHTML = html; 
     calcSkillCost();
 }
