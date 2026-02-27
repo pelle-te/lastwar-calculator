@@ -150,6 +150,60 @@ body {
 .modern-select:focus { border-color: var(--primary); background: transparent; transform: scale(1.05); }
 
 /* =========================================
+   4.5 GLOBAL MENU BUTTONS (연맹 테크 설정 등)
+========================================= */
+.global-menu-btn { 
+    background: var(--card-bg); /* 배경색을 카드 테마색으로 적용 */
+    border: 1px solid var(--border-light); 
+    padding: 18px 24px; 
+    border-radius: 20px; 
+    display: flex; 
+    align-items: center; 
+    gap: 15px; 
+    cursor: pointer; 
+    box-shadow: var(--shadow-soft), var(--shadow-inner); 
+    transition: all 0.3s var(--spring); 
+    width: 100%;
+    backdrop-filter: blur(10px); 
+    -webkit-backdrop-filter: blur(10px);
+    text-align: left;
+}
+
+.global-menu-btn .icon {
+    font-size: 1.5rem;
+}
+
+.global-menu-btn .text-group {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+}
+
+.global-menu-btn .title {
+    font-weight: 800;
+    font-size: 1rem;
+    color: var(--text-main); /* 💡 다크모드에서 흰색 계열로 밝게 보임 */
+}
+
+.global-menu-btn .desc {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--text-muted);
+}
+
+/* 마우스 올리거나 클릭했을 때 효과 */
+.global-menu-btn:hover {
+    transform: translateY(-2px);
+    border-color: var(--primary);
+    box-shadow: 0 10px 25px rgba(0, 122, 255, 0.15);
+}
+
+.global-menu-btn:active {
+    transform: scale(0.97);
+    background: var(--input-bg);
+}
+
+/* =========================================
    5. MODALS & BOTTOM SHEETS
 ========================================= */
 .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); z-index: 2000; align-items: center; justify-content: center; }
