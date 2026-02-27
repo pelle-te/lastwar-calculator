@@ -5,8 +5,15 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>라스트 워 VS 마스터</title>
     
-    <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-firestore-compat.js"></script>
+    <script type="importmap">
+      {
+        "imports": {
+          "firebase/app": "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js",
+          "firebase/firestore": "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js",
+          "firebase/auth": "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js"
+        }
+      }
+    </script>
     
     <link rel="stylesheet" href="css/common.css">
     <link rel="stylesheet" href="css/features.css">
@@ -15,27 +22,27 @@
     <div class="header-bar">
         <div class="logo">ALLIANCE MASTER</div>
         <div class="header-actions">
-            <button onclick="window.toggleDarkMode()" class="icon-text-btn">
-                <span class="icon">✨</span><span class="label">테마</span>
+            <button data-action="toggleDarkMode" class="icon-text-btn" aria-label="테마 변경">
+                <span class="icon" aria-hidden="true">✨</span><span class="label">테마</span>
             </button>
-            <div id="auto-save-status" class="icon-text-btn">
-                <span class="icon">☁️</span><span class="label">Sync</span>
+            <div id="auto-save-status" class="icon-text-btn" aria-label="동기화 상태">
+                <span class="icon" aria-hidden="true">☁️</span><span class="label">Sync</span>
             </div>
-            <button onclick="window.showWeeklyReport()" class="icon-text-btn">
-                <span class="icon">📊</span><span class="label">리포트</span>
+            <button data-action="showWeeklyReport" class="icon-text-btn" aria-label="리포트 보기">
+                <span class="icon" aria-hidden="true">📊</span><span class="label">리포트</span>
             </button>
             <div class="lang-selector">
-                <span id="lang-ko" class="active" onclick="window.changeLang('ko')">KO</span> | 
-                <span id="lang-en" onclick="window.changeLang('en')">EN</span>
+                <span id="lang-ko" class="active" data-action="changeLang" data-lang="ko">KO</span> | 
+                <span id="lang-en" data-action="changeLang" data-lang="en">EN</span>
             </div>
             <div class="live-counter"><div class="live-dot"></div><span id="user-count">연결 중...</span></div>
         </div>
     </div>
 
     <nav class="nav-bar">
-        <div id="nav-vs" class="nav-item active" onclick="window.showPage('vs')">📊 VS 대결</div>
-        <div id="nav-growth" class="nav-item" onclick="window.showPage('growth')">📈 성장 계산기</div>
-        <div id="nav-board" class="nav-item" onclick="window.showPage('board')">💡 정보 공유</div>
+        <div id="nav-vs" class="nav-item active" data-action="showPage" data-page="vs" data-i18n="nav.vs">📊 VS 대결</div>
+        <div id="nav-growth" class="nav-item" data-action="showPage" data-page="growth" data-i18n="nav.growth">📈 성장 계산기</div>
+        <div id="nav-board" class="nav-item" data-action="showPage" data-page="board" data-i18n="nav.board">💡 정보 공유</div>
     </nav>
 
     <div class="container">
@@ -45,14 +52,14 @@
             <div class="card status-card">
                 <div class="section-title">🎯 DAILY GOAL</div>
                 <div class="target-selector">
-                    <button class="target-btn" id="target-2300000" onclick="window.setTarget(2300000)">6상<br><span class="target-medal">🏅 400</span></button>
-                    <button class="target-btn" id="target-3600000" onclick="window.setTarget(3600000)">8상<br><span class="target-medal">🏅 800</span></button>
-                    <button class="target-btn active" id="target-7200000" onclick="window.setTarget(7200000)">9상<br><span class="target-medal">🏅 1,200</span></button>
+                    <button class="target-btn" id="target-2300000" data-action="setTarget" data-target="2300000">6상<br><span class="target-medal">🏅 400</span></button>
+                    <button class="target-btn" id="target-3600000" data-action="setTarget" data-target="3600000">8상<br><span class="target-medal">🏅 800</span></button>
+                    <button class="target-btn active" id="target-7200000" data-action="setTarget" data-target="7200000">9상<br><span class="target-medal">🏅 1,200</span></button>
                 </div>
             </div>
 
             <div class="global-menu-grid" style="grid-template-columns: 1fr;">
-                <button class="global-menu-btn" onclick="window.openTechModal()">
+                <button class="global-menu-btn" data-action="openTechModal">
                     <div class="icon">🔬</div>
                     <div class="text-group">
                         <span class="title" id="menu-tech-title">연맹 테크 설정</span>
@@ -67,9 +74,9 @@
 
         <div id="page-growth" class="page-content">
             <div class="growth-sub-tabs">
-                <button id="tab-skill" class="growth-tab-btn active" onclick="window.showGrowthTab('skill')">🏅 스킬 훈장</button>
-                <button id="tab-gear" class="growth-tab-btn" onclick="window.showGrowthTab('gear')">⚙️ 장비 강화</button>
-                <button id="tab-valor" class="growth-tab-btn" onclick="window.showGrowthTab('valor')">🔬 테크 연구</button>
+                <button id="tab-skill" class="growth-tab-btn active" data-action="showGrowthTab" data-tab="skill">🏅 스킬 훈장</button>
+                <button id="tab-gear" class="growth-tab-btn" data-action="showGrowthTab" data-tab="gear">⚙️ 장비 강화</button>
+                <button id="tab-valor" class="growth-tab-btn" data-action="showGrowthTab" data-tab="valor">🔬 테크 연구</button>
             </div>
             <div id="growth-skill" class="growth-section active"></div>
             <div id="growth-gear" class="growth-section"></div>
@@ -78,7 +85,7 @@
         
         <div id="page-board" class="page-content">
             <div class="page-header-actions">
-                <button onclick="window.openModal()" class="btn-primary">📝 글쓰기</button>
+                <button data-action="openWriteModal" class="btn-primary">📝 글쓰기</button>
             </div>
             <div id="posts-list" class="masonry-grid"></div>
         </div>
@@ -116,8 +123,8 @@
                 <h3 id="dialogTitle" style="margin-top:0; font-size:1.2rem; font-weight:800; margin-bottom: 15px;">알림</h3>
                 <p id="dialogMsg" style="color: var(--text-muted); font-size:0.95rem; margin-bottom: 25px; line-height:1.4; word-break: keep-all;"></p>
                 <div style="display: flex; gap: 10px;">
-                    <button id="dialogBtnCancel" class="btn-secondary" style="flex:1; display:none;">취소</button>
-                    <button id="dialogBtnConfirm" class="btn-primary" style="flex:1;">확인</button>
+                    <button id="dialogBtnCancel" data-action="closeModal" class="btn-secondary" style="flex:1; display:none;">취소</button>
+                    <button id="dialogBtnConfirm" data-action="closeModal" class="btn-primary" style="flex:1;">확인</button>
                 </div>
             </div>
         </div>
@@ -126,7 +133,7 @@
             <div class="bottom-sheet">
                 <div class="sheet-header">
                     <h3 id="sheetTitle" style="margin:0; font-size:1.1rem;">선택</h3>
-                    <span class="close-x" onclick="window.closeSelectModal()" style="position:static; padding:0;">&times;</span>
+                    <span class="close-x" data-action="closeModal" style="position:static; padding:0;">&times;</span>
                 </div>
                 <div id="sheetOptions" class="sheet-options"></div>
             </div>
@@ -134,24 +141,24 @@
 
         <div id="quickInputModal" class="modal">
             <div class="modal-card" style="max-width: 850px; padding: 25px;">
-                <span class="close-x" onclick="window.closeQuickInputModal()">&times;</span>
+                <span class="close-x" data-action="closeModal">&times;</span>
                 <h3 style="margin-top:0; margin-bottom: 10px; font-weight: 800; display:flex; align-items:center; gap:8px;"><span style="font-size:1.4rem;">⚡</span> <span id="quick-modal-title">쾌속 입력</span></h3>
                 <div style="margin-bottom: 15px;">
                     <label id="quick-bg-btn" for="quick-screenshot" class="btn-secondary" style="display: block; text-align: center; padding: 12px; cursor: pointer; border-radius: 12px; font-size: 0.9rem; border: 2px dashed rgba(0,0,0,0.2);">📷 인벤토리 스크린샷 불러오기</label>
-                    <input type="file" id="quick-screenshot" accept="image/*" style="display: none;" onchange="window.previewQuickScreenshot(event)">
+                    <input type="file" id="quick-screenshot" accept="image/*" style="display: none;" data-action="previewQuickScreenshot">
                     <div id="quick-image-preview" style="margin-top: 10px; height: 180px; overflow-y: auto; border-radius: 12px; display: none; border: 1px solid rgba(0,0,0,0.1); background: #000;"><img id="quick-img-tag" style="width: 100%; display: block;"></div>
                 </div>
                 <div id="quick-input-container" class="quick-input-grid"></div>
                 <div style="display:flex; gap:10px; margin-top:20px;">
-                    <button id="quick-cancel-btn" onclick="window.closeQuickInputModal()" class="btn-secondary" style="flex:1;">취소</button>
-                    <button id="quick-apply-btn" onclick="window.applyQuickInput()" class="btn-primary" style="flex:2;">일괄 적용</button>
+                    <button id="quick-cancel-btn" data-action="closeModal" class="btn-secondary" style="flex:1;">취소</button>
+                    <button id="quick-apply-btn" data-action="applyQuickInput" class="btn-primary" style="flex:2;">일괄 적용</button>
                 </div>
             </div>
         </div>
 
         <div id="writeModal" class="modal">
             <div class="modal-card">
-                <span class="close-x" onclick="window.closeModal()">&times;</span>
+                <span class="close-x" data-action="closeModal">&times;</span>
                 <h3 style="margin-top:0; margin-bottom: 20px; font-weight: 800;">게시물 작성</h3>
                 <input type="hidden" id="edit-doc-id">
                 <div class="modern-input-wrapper">
@@ -163,25 +170,25 @@
                 <div class="modern-file-wrapper">
                     <input type="file" id="post-file" accept="image/*" class="modern-file-input">
                 </div>
-                <button onclick="window.sendLivePost()" class="btn-primary" style="width:100%; margin-top: 10px;">등록하기</button>
+                <button data-action="sendLivePost" class="btn-primary" style="width:100%; margin-top: 10px;">등록하기</button>
             </div>
         </div>
 
         <div id="viewModal" class="modal">
             <div class="modal-card" style="max-height: 90vh; overflow-y: auto;">
-                <span class="close-x" onclick="window.closeViewModal()">&times;</span>
+                <span class="close-x" data-action="closeModal">&times;</span>
                 <div id="view-content" style="margin-bottom: 15px;"></div>
                 <img id="view-img" style="max-width: 100%; border-radius: 16px; display: none; margin-bottom: 15px;">
                 <div id="delete-area" style="text-align: right; margin-bottom: 15px; display: none;">
-                    <a href="#" id="edit-link" onclick="window.openModal(); window.closeViewModal();" style="color: var(--primary); font-size: 0.9rem; margin-right: 15px; font-weight:800;">수정</a>
-                    <a href="#" onclick="window.deletePostUI()" style="color: var(--danger); font-size: 0.9rem; font-weight:800;">삭제</a>
+                    <a href="#" id="edit-link" data-action="editPost" style="color: var(--primary); font-size: 0.9rem; margin-right: 15px; font-weight:800;">수정</a>
+                    <a href="#" data-action="deletePostUI" style="color: var(--danger); font-size: 0.9rem; font-weight:800;">삭제</a>
                 </div>
                 <div style="border-top: 1px solid rgba(0,0,0,0.05); padding-top: 15px;">
                     <h4 style="margin: 0 0 10px 0;">댓글</h4>
                     <div id="view-replies" style="max-height: 150px; overflow-y: auto; margin-bottom: 15px; font-size: 0.9rem;"></div>
                     <div style="display: flex; gap: 8px;">
                         <input type="text" id="view-reply-input" class="modern-input" style="margin: 0; padding: 12px; flex: 1;" placeholder="댓글을 남겨보세요...">
-                        <button onclick="window.submitReply()" class="btn-primary" style="padding: 12px 20px; white-space: nowrap;">등록</button>
+                        <button data-action="submitReply" class="btn-primary" style="padding: 12px 20px; white-space: nowrap;">등록</button>
                     </div>
                 </div>
             </div>
@@ -189,70 +196,60 @@
 
         <div id="weeklyModal" class="modal">
             <div class="modal-card">
-                <span class="close-x" onclick="window.closeWeeklyModal()">&times;</span>
+                <span class="close-x" data-action="closeModal">&times;</span>
                 <h3 id="weekly-modal-title" style="margin-top:0">이번 주 대결 리포트 📈</h3>
                 <div id="weekly-report-content"></div>
-                <button id="weekly-close-btn" onclick="window.closeWeeklyModal()" class="btn-primary" style="width:100%; margin-top:20px;">닫기</button>
+                <button id="weekly-close-btn" data-action="closeModal" class="btn-primary" style="width:100%; margin-top:20px;">닫기</button>
             </div>
         </div>
 
         <div id="techModal" class="modal">
             <div class="modal-card">
-                <span class="close-x" onclick="window.closeTechModal()">&times;</span>
+                <span class="close-x" data-action="closeModal">&times;</span>
                 <h3 id="tech-modal-title" style="margin-top:0">연맹 테크 설정</h3>
                 <div class="tech-grid" id="tech-inputs"></div>
-                <button id="tech-confirm-btn" onclick="window.closeTechModal()" class="btn-primary" style="width:100%; margin-top:20px;">적용 완료</button>
+                <button id="tech-confirm-btn" data-action="closeModal" class="btn-primary" style="width:100%; margin-top:20px;">적용 완료</button>
             </div>
         </div>
 
         <div id="spdModal" class="modal">
             <div class="modal-card">
-                <span class="close-x" onclick="window.closeSpdModal()">&times;</span>
+                <span class="close-x" data-action="closeModal">&times;</span>
                 <h3 id="spd-title" style="margin-top:0; font-size:1.1rem; margin-bottom:20px;">가속 계산기</h3>
                 <div class="tech-grid" id="spd-stepper-container"></div>
                 <div id="spd-result-text" style="margin: 20px 0; text-align: center; color: var(--primary); font-weight: 800; font-size: 1.15rem; background: var(--primary-soft); padding: 10px; border-radius: 12px;">총: 0일 0시 0분</div>
                 <div style="display:grid; grid-template-columns: 1fr 1fr; gap:12px">
-                    <button id="spd-cancel-btn" onclick="window.closeSpdModal()" class="btn-secondary">취소</button>
-                    <button id="spd-apply-btn" onclick="window.applySpd()" class="btn-primary">적용</button>
+                    <button id="spd-cancel-btn" data-action="closeModal" class="btn-secondary">취소</button>
+                    <button id="spd-apply-btn" data-action="applySpd" class="btn-primary">적용</button>
                 </div>
             </div>
         </div>
 
         <div id="droneModal" class="modal">
             <div class="modal-card">
-                <span class="close-x" onclick="window.closeDroneModal()">&times;</span>
+                <span class="close-x" data-action="closeModal">&times;</span>
                 <h3 id="drone-modal-title" style="margin-top:0">드론 파츠 상자</h3>
                 <div class="tech-grid" id="drone-inputs-container"></div>
-                <button id="drone-confirm-btn" onclick="window.closeDroneModal()" class="btn-primary" style="width:100%; margin-top:20px;">확인</button>
+                <button id="drone-confirm-btn" data-action="closeModal" class="btn-primary" style="width:100%; margin-top:20px;">확인</button>
             </div>
         </div>
-
         <div id="heroModal" class="modal">
             <div class="modal-card">
-                <span class="close-x" onclick="window.closeHeroModal()">&times;</span>
+                <span class="close-x" data-action="closeModal">&times;</span>
                 <h3 id="hero-modal-title" style="margin-top:0">영웅 조각 입력</h3>
                 <div class="tech-grid" id="hero-inputs-container"></div>
-                <button id="hero-confirm-btn" onclick="window.closeHeroModal()" class="btn-primary" style="width:100%; margin-top:20px;">확인</button>
+                <button id="hero-confirm-btn" data-action="closeModal" class="btn-primary" style="width:100%; margin-top:20px;">확인</button>
             </div>
         </div>
 
-        <div id="lightboxModal" class="modal" style="background: rgba(0,0,0,0.95); z-index: 5000;" onclick="window.closeLightbox(event)">
-            <span class="close-x" style="color: white; top: 20px; right: 20px; font-size: 2.5rem;">&times;</span>
+        <div id="lightboxModal" class="modal" style="background: rgba(0,0,0,0.95); z-index: 5000;" data-action="closeLightbox">
+            <span class="close-x" style="color: white; top: 20px; right: 20px; font-size: 2.5rem;" data-action="closeLightbox">&times;</span>
             <div style="width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; overflow: hidden;">
                 <img id="lightbox-img" style="max-width: 100%; max-height: 100%; object-fit: contain; transition: transform 0.1s ease-out;" />
             </div>
         </div>
     </div>
 
-    <script src="js/i18n.js"></script>    
-    <script src="js/common.js"></script>  
-    <script src="js/vs.js"></script>      
-    <script src="js/growth.js"></script>  
-    <script src="js/board.js"></script>   
-    <script>
-        window.onload = () => {
-            if(window.initCalc) window.initCalc();
-        };
-    </script>
+    <script type="module" src="js/main.js"></script>
 </body>
 </html>
