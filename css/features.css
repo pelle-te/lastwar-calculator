@@ -182,6 +182,29 @@ details.modern-accordion .accordion-content { margin-top: 15px; padding-top: 15p
 .weekly-total { background: var(--card-bg); border: 2px solid var(--primary); border-radius: 24px; padding: 20px; margin-top: 10px; box-shadow: 0 10px 30px rgba(0,122,255,0.15); }
 .weekly-total-row { display: flex; justify-content: space-between; align-items: center; font-weight: 900; font-size: 1.1rem; color: var(--text-main); }
 
+/* 💡 성장 계산기 총합 텍스트 가독성 개선 */
+.skill-total-display {
+    text-align: center;
+    font-weight: 800;
+    font-size: 1.3rem;
+    color: var(--text-main); /* 기본 글자색으로 변경하여 눈의 피로 감소 */
+    letter-spacing: -0.5px;
+}
+
+.skill-total-display .highlight {
+    color: var(--warning);
+    /* 💡 글자 테두리에 아주 미세한 그림자를 주어 밝은 배경에서도 글자가 묻히지 않게 함 */
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+    font-size: 1.5rem;
+    margin-left: 5px;
+}
+
+/* 다크모드에서는 조금 더 선명한 노란색으로 강조 */
+.dark-theme .skill-total-display .highlight {
+    color: #FFD60A;
+    text-shadow: 0 0 10px rgba(255, 214, 10, 0.2);
+}
+
 /* =========================================
    4. MEDIA QUERIES (모바일 완벽 최적화)
 ========================================= */
