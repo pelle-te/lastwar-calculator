@@ -1,6 +1,11 @@
-window.currentLang = 'ko';
+/* ==========================================
+   js/i18n.js - 다국어 처리 모듈
+========================================== */
+import { Store } from './store.js';
+import { renderInputs, renderTechInputs, renderHeroInputs, renderDroneInputs, debouncedUpdateAll } from './vs.js';
+import { renderSkillRows, renderGearUI, renderValorUI } from './growth.js';
 
-window.i18n = {
+export const i18n = {
     ko: {
         nav: { vs: "📊 VS 대결", growth: "📈 성장 계산기", board: "💡 정보 공유" },
         targets: { t6: "6상", t8: "8상", t9: "9상" },
@@ -57,13 +62,18 @@ window.i18n = {
     }
 };
 
-window.updateUITexts = function() {
-    const t = window.i18n[window.currentLang];
+export function updateUITexts() {
+    const lang = Store.getState('lang');
+    const t = i18n[lang];
     
-    const elVs = document.getElementById('nav-vs'); if(elVs) elVs.innerText = t.nav.vs;
-    const elGrowth = document.getElementById('nav-growth'); if(elGrowth) elGrowth.innerText = t.nav.growth;
-    const elBoard = document.getElementById('nav-board'); if(elBoard) elBoard.innerText = t.nav.board;
-    
+    // data-i18n 속성 자동 매핑
+    document.querySelectorAll('[data-i18n]').forEach(el => {
+        const keys = el.getAttribute('data-i18n').split('.');
+        let text = t;
+        keys.forEach(k => { text = text ? text[k] : null; });
+        if (text) el.innerText = text;
+    });
+
     const elTabSkill = document.getElementById('tab-skill'); if(elTabSkill) elTabSkill.innerText = t.growth.tab_skill;
     const elTabGear = document.getElementById('tab-gear'); if(elTabGear) elTabGear.innerText = t.growth.tab_gear;
     const elTabValor = document.getElementById('tab-valor'); if(elTabValor) elTabValor.innerText = t.growth.tab_valor;
@@ -86,26 +96,30 @@ window.updateUITexts = function() {
     const t9El = document.getElementById('target-7200000'); if (t9El) t9El.innerHTML = `${t.targets.t9}<br><span class="target-medal">🏅 1,200</span>`;
 
     const dayTabs = document.getElementById('day-tabs-container');
-    if(dayTabs) { dayTabs.innerHTML = ['mon','tue','wed','thu','fri','sat'].map((d, i) => `<button id="btn-${d}" class="day-btn ${d===window.currentDay?'active':''}" style="background:var(--${d})" onclick="window.switchTab('${d}')">${t.days[i]}</button>`).join(''); }
+    if(dayTabs) { 
+        const currentDay = Store.getState('currentDay');
+        dayTabs.innerHTML = ['mon','tue','wed','thu','fri','sat'].map((d, i) => `<button id="btn-${d}" class="day-btn ${d===currentDay?'active':''}" data-action="switchTab" data-day="${d}">${t.days[i]}</button>`).join(''); 
+    }
 
-    if(window.renderTechInputs) window.renderTechInputs(); 
-    if(window.renderHeroInputs) window.renderHeroInputs(); 
-    if(window.renderInputs) window.renderInputs(); 
+    renderTechInputs(); 
+    renderHeroInputs(); 
+    renderDroneInputs();
+    renderInputs(); 
     
     const growthSkill = document.getElementById('growth-skill');
-    if(growthSkill && growthSkill.classList.contains('active') && window.renderSkillRows) window.renderSkillRows();
+    if(growthSkill && growthSkill.classList.contains('active')) renderSkillRows();
     const growthGear = document.getElementById('growth-gear');
-    if(growthGear && growthGear.classList.contains('active') && window.renderGearUI) window.renderGearUI();
+    if(growthGear && growthGear.classList.contains('active')) renderGearUI();
     const growthValor = document.getElementById('growth-valor');
-    if(growthValor && growthValor.classList.contains('active') && window.renderValorUI) window.renderValorUI();
+    if(growthValor && growthValor.classList.contains('active')) renderValorUI();
 }
 
-window.changeLang = function(lang) { 
-    window.currentLang = lang; 
+export function changeLang(lang) { 
+    Store.setState('lang', lang);
     document.getElementById('lang-ko').classList.toggle('active', lang === 'ko'); 
     document.getElementById('lang-en').classList.toggle('active', lang === 'en'); 
     const recBox = document.getElementById('recommend-box'); 
     if(recBox) { recBox.removeAttribute('data-rendered-day'); recBox.removeAttribute('data-rendered-lang'); } 
-    window.updateUITexts(); 
-    if(window.updateAll) window.updateAll();
-};
+    updateUITexts(); 
+    debouncedUpdateAll();
+}
